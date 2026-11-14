@@ -1,6 +1,9 @@
 # 誰が作業しているか（各自のローカル。Claude が参照する）
 .me
 
+# 作業用の置き場（コミットしない）
+tmp/
+
 # Unity（プロジェクトは unity/ に置く）
 unity/[Ll]ibrary/
 unity/[Tt]emp/
