@@ -13,11 +13,11 @@
 - 13:40 #25 3D モデルの作者を midori と記録（README・メンバー表）
 - 13:47 #29 Unity MCP（CoplayDev/unity-mcp v10.3.0）を追加。.mcp.json でチーム共有
 - 13:51 #31 手描きスケッチ4枚（ゲームの流れ7場面）を docs/design/storyboard.md に画像付きでまとめた（文書化：sonnet）
-- 14:10 #35 #9 の決定に合わせて planning-meeting.md を SPEC.md と揃えた（設計・スコア・イベント・難易度・人数・移動・3Dモデル）
 - 15:00 #34 必ず必要な 3D モデル33個を作成（精度エージェントチーム：計画 Fable、制作 Fable 2・Opus 4、まとめ Opus）。共通の土台 modeling/core/、Unity に FBX、CREDITS.md
 - 15:14 #38 Unity でパレットの色が付かない件を、取り込み時に共通マテリアル M_Core_Palette.mat へ自動で差し替えて解決（31個 OK、エラー0）。確認用シーン ModelCheck.unity
 - 15:15 #41 docs/design を最新だけにし、議事録・調査・計画・参考画像を docs/reference へ。art-direction.md を今の決定で書き直し。CLAUDE.md に「docs と食い違いはすぐ言う」
 - 15:16 #39 クルーを iizuka のスケッチに合わせて可愛く作り直した（約2頭身、横長バイザー、ひとかたまりの体、NASA の文字なし。Opus）
 - 15:36 #40 宇宙船の内部（船室 Ship_Interior）を作った。ドールハウス型で俯瞰・断面の両方に対応、4席・タンク・窓の配置と Slot（Fable 5.2 high）
+- 16:15 #66 サーバーを Python（reference_sim を使う WebSocket サーバー、Cloudflare Tunnel で公開）に決定。docs/design/architecture.md、SPEC.md・CLAUDE.md を更新
 - 16:29 #55 Unity の光・空・煙・ランプ・画面の発光・クルーの浮遊、船室を置いた LookDev シーン、Fable のレビュー（55%）の指摘を直した
 - 16:29 #64 無重力：浮いて漂う小物4種（ペン・手順書・宇宙食・ダクトテープ）、ガスは四方に広がる。ヘルメットの輪はやめた

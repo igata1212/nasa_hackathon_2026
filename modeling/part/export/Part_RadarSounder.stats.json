@@ -1,0 +1,61 @@
+{
+ "name": "Part_RadarSounder",
+ "tris": 1150,
+ "min": [
+  -0.8907,
+  -0.179,
+  0.0
+ ],
+ "max": [
+  0.8907,
+  0.16,
+  0.53383
+ ],
+ "size": [
+  1.78141,
+  0.339,
+  0.53383
+ ],
+ "objects": {
+  "Part_RadarSounder": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_RadarSounder.Antenna": {
+   "origin": [
+    -0.52,
+    0.0,
+    0.156
+   ],
+   "tris": 392
+  },
+  "Part_RadarSounder.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.13
+   ],
+   "tris": 108
+  },
+  "Part_RadarSounder.Dish": {
+   "origin": [
+    0.0,
+    0.0,
+    0.295
+   ],
+   "tris": 542
+  },
+  "Part_RadarSounder.Stripe": {
+   "origin": [
+    0.0,
+    -0.164,
+    0.13
+   ],
+   "tris": 108
+  }
+ }
+}

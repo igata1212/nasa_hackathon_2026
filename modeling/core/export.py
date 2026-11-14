@@ -1,6 +1,7 @@
 """ルートを原点に置いて FBX（Unity 用）と glb（予備）を書き出す。書き出した時点の数値も <名前>.stats.json に残す。
 
 書いた人：iizuka（作成：Fable 5.2、FBX の画像パスをファイル名だけに：Opus-5、Unity の差し替えの注記：Opus 5.5）／ 最終更新：2026-11-14
+更新：Taiga（2026-11-14、Fable 5.2）#48 KINDS に part（設計画面の部品）を足した
 
 ふつうは build_*.py から `ck.export_all(root, "fx")` で呼ぶ（corekit がここを使う）。
 FBX の設定は FBX_SETTINGS の1か所だけ。Unity 6000.6.9f1 に見本（Fx_Alarm）を入れて確かめた値（README「Unity での向き」）。
@@ -16,7 +17,8 @@ REPO = os.path.dirname(MODELING)
 UNITY_MODELS = os.path.join(REPO, "unity", "Assets", "Models")
 KINDS = {"controls": "Controls", "console": "Console", "crew": "Crew", "tank": "Tank",
          "ship": "Ship", "bodies": "Bodies", "fx": "Fx", "props": "Props",
-         "interior": "Ship"}      # 船室（Ship_Interior）。FBX は外観と同じ Ship/ に、元データは modeling/interior/ に置く（#40）
+         "interior": "Ship",
+         "part": "Part"}      # 船室（Ship_Interior）。FBX は外観と同じ Ship/ に、元データは modeling/interior/ に置く（#40）。part は設計画面の部品（#48）。props は浮く小物（#64）
 
 # Unity で確かめた設定。変えるときは build_axis_check.py のモデルを入れ直して ModelImportReport の出力を見ること。
 # bake_space_transform は使わない：Blender 5.1.2 の FBX 書き出しは、これを True にすると「孫」（子の子）の位置と
