@@ -7,7 +7,7 @@
 //   1) 音声ファイルを Assets/Resources/Voice/Houston/<id>.wav（.ogg・.mp3 も可）に置く。id は M05・H07・B01 など。これだけで鳴る
 //   2) 別の置き場所から引くなら HoustonClipVoice.Lookup = id => ... を差し替える（AudioClip を返す。無ければ null）
 //   3) 鳴らし方ごと替えるなら IHoustonVoice を実装して HoustonBox.Voice に入れる（音声合成をその場で呼ぶなど）
-// 音量は HoustonClipVoice.Gain（既定 1）。#141 の SoundPrefs ができたら Gain = () => SoundPrefs.Gain(SoundBus.Voice) をつなぐ。
+// 音量は HoustonClipVoice.Gain（SoundPrefs の VOICE。#150 でつないだ）。声のファイルは Resources/Voice/Houston/<id>.mp3（#150、Achird、52本）。
 // 口の動き：鳴っている間は管制室の小窓（HoustonWindow）の口を動かす（HoustonBox が Talk を呼ぶ）。
 using System;
 using UnityEngine;
@@ -33,7 +33,7 @@ public class HoustonClipVoice : IHoustonVoice
 {
     public const string ResourceFolder = "Voice/Houston/";
     public static Func<string, AudioClip> Lookup = id => string.IsNullOrEmpty(id) ? null : Resources.Load<AudioClip>(ResourceFolder + id);
-    public static Func<float> Gain = () => 1f;
+    public static Func<float> Gain = () => SoundPrefs.Gain(SoundBus.Voice);   // DEV の VOICE ミュートが効く（#141・#150）
 
     readonly AudioSource src;
 
