@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-14 ／ 更新：iizuka（作成：Claude Opus 5.5、#71 HUD の部品の寸法を足した。2026-11-14）
 // UI のデザイントークン（docs/design/ui-guidelines.md の 2章）。色コードと px はここにだけ書く。
 // px は Canvas の基準 1600×900（GameFlow の CanvasScaler）での値。部品は UiKit.cs、書体とスプライトは UiTheme（Resources/UiTheme.asset）
 using TMPro;
@@ -68,6 +68,41 @@ public static class UiTokens
     public const float BadgeShapeScale = 0.5f;   // 席バッジの円に対する形（▲●■◆）の大きさ
     public const float TagH = 44;               // 名前タグ（YOU など）
     public const float ChipH = 96;              // 合言葉のチップ
+
+    // ------------------------------------------------------------------ HUD の部品（#71。UiKitHud.cs。ガイドライン 3章）
+    public const float CanvasRefW = 1600, CanvasRefH = 900, CanvasMatch = 0.5f;   // CanvasScaler（GameFlow と同じ。見本の画面で使う）
+    // ゲージ
+    public const float GaugeH = 28;             // 溝と中身（ピル）
+    public const float GaugeW = 480;            // 1行の幅（アイコン・数字の箱・状態のアイコンを含む）。親が広げてよい
+    public const float GaugeMinTrackW = 120;    // 溝の最小の幅
+    public const float GaugeNumberW = 128;      // 数字の箱（右寄せ。桁ぶれを防ぐ）
+    public const float LifelineW = 4, LifelineOver = 6;   // 生還ラインの縦線（幅・上下のはみ出し）
+    // トグル（ON/OFF を色・つまみの位置・文字で）
+    public const float ToggleW = 128, ToggleH = 64, ToggleKnob = 48;
+    public const float ToggleSlideSec = 0.12f;  // つまみが動く時間
+    // 長押しボタン・同時押しの合図の輪
+    public const float HoldD = 96;              // 長押しボタンの円（アイコンボタンと同じ）
+    public const float RingW = 8;               // 進み具合の輪の幅
+    public const float HoldBaseSec = 0.5f;      // 長押しの基本の時間（SPEC 6章「基本0.5秒 ×（1 + slow/100）」。parameters.json に無いのでここに置く）
+    public const float HoldDrainSec = 0.15f;    // 途中で離したとき、輪が空に戻るまで
+    public const float DoneFlashSec = 0.6f;     // できたとき ✓ を出しておく時間
+    public const float MarkD = 40;              // 右上の小さな印（足りない条件・切断など。中のアイコンは IconS）
+    // カウントダウンのチップ
+    public const float CountdownH = 64, CountdownIcon = 32, CountdownNumberW = 112;
+    public const float CountdownWarnSec = 10;   // 残りこれ以下で danger にして、1秒ごとに弾む
+    public const float BounceScale = 1.08f, BounceSec = 0.25f;   // 弾む（大きさ・時間）
+    // 警告の帯（画面上の中央。同時に1本）
+    public const float BannerH = 72, BannerPadX = 40;
+    // 吹き出し
+    public const float BubbleW = 880;           // 幅（1600 の 55%。844×390 では約 50%）
+    public const float BubbleMinH = 150, BubbleMaxH = 200;
+    public const float BubblePadX = 40, BubblePadY = 28;
+    public const float BubbleTagTilt = 4;       // 名前タグの傾き（度、反時計回り。ガイドラインの「−4°」は CSS の向き）
+    public const int BubbleMaxLines = 3;
+    public const float CaretW = 24, CaretH = 14, CaretY = 8, CaretBob = 6, CaretPeriod = 0.6f;   // ▼（大きさ・下からの位置・上下の幅・周期）
+    public static readonly Color BubbleEm = Go; // 台詞の固有名詞と数字の色。accent は 32px 以上の太字だけなので、本文 28 では go にする
+    // 席タブ（1人で複数の席を持つとき）
+    public const float TabH = 72;               // 面の高さ（押せる範囲は Hit）
 
     // ------------------------------------------------------------------ 画面ごとの寸法（#72）
     public const float TitleFormW = 880;   // タイトルの入力パネルの幅
