@@ -16,7 +16,7 @@
 | 名前 | GitHub | 担当 |
 |---|---|---|
 | iizuka | `tada246` | Unity・サーバー（Python）・通信・GMAT 連携・GitHub 運用 |
-| Taiga | `igata1212` | 物語・台詞・パラメータ・UI・3D アセットなど上の層 |
+| Taiga | `igata1212` | 物語・台詞・パラメータ・UI（絵とレイアウトまで。Unity への組み込みは iizuka）・3D アセットなど上の層 |
 | midori | `midori11111111` | 3D モデル（`modeling/PhysDraft-SpaceCrew3D`）、物語の英語レビューなど。海外在住・英語。この人向けの Issue は英語で書く |
 
 Issue の担当を付けるときは GitHub の名前を使う：`gh issue edit N --add-assignee igata1212`

@@ -21,7 +21,7 @@ flowchart LR
 - 公開は自宅サーバー＋Cloudflare Tunnel（ポート開放なし。https・wss が付く。WebGL は wss が必須）
 - 予備は同じプログラムをクラウド（Fly.io・Render など。料金は未確認）に置く
 - Unity の WebSocket は、WebGL と iOS の両方で動くライブラリ（NativeWebSocket など。ライセンスは入れる前に確認）。WebGL は C# 標準の WebSocket が使えないため
-- 担当：iizuka がサーバーと Unity、Taiga が物語・台詞・パラメータ・UI など上の層
+- 担当：iizuka がサーバーと Unity、Taiga が物語・台詞・パラメータ・UI など上の層。UI は、Taiga が絵とレイアウト（何をどこにどう見せるか）まで、Unity への組み込みは iizuka（#110 の決定。更新：Taiga 2026-11-14）
 
 ## メッセージの形（案）
 

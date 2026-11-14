@@ -26,6 +26,7 @@
 | パレット | 16色。船内 `cream` #F2E3C6／`orange` #F28C28／`teal` #2A9D8F／`navy` #1D2D50、無彩色 4色、`visor` #0E1630。色名と色コードは `modeling/core/palette.json` が正 |
 | 席の色とアイコン | Pilot 赤 `#E4572E` ▲／Life Support 緑 `#6BBF59` ●／Comms & Power 黄 `#FFC857` ■／Mission Planner 青 `#3A86FF` ◆（色だけに頼らずアイコンも付ける） |
 | ランプの色 | `lamp_green`・`lamp_yellow`・`lamp_red` は `Lamp_` の部品だけ。モデルの塗りには使わない。発光は Unity で付ける（`LampGlow` が `.Lamp_` の部品を発光マテリアルに差し替えて点滅させる。#55） |
+| 2D の画面（UI） | あつ森の**方向性だけ**（クリームの紙に濃紺の文字、丸い形、吹き出し）。アイコンは Ionicons（filled、MIT）、見出し Baloo 2 ExtraBold・本文 Nunito（OFL）。詳しくは `ui-guidelines.md`（#72） |
 | 塗り | トゥーン・アウトラインなし。輪郭線は「今押せる部品」のハイライトだけ |
 | 形 | 全部の角にベベル（2〜4cm、2段）。細い部品は作らない。スイッチ類は実物の約3倍に誇張する |
 | スケール | 1 unit = 1m。クルー 1.2m、コンソール天板 0.8m |

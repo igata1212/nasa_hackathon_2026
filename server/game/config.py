@@ -10,7 +10,7 @@ LEAKING_TANK = 2           # SPEC 6章：漏れているのは Tank 2 固定
 TANKS = (1, 2)
 H09_AFTER_S = 30           # H09：事故から30秒たっても何も切っていない
 WARN_BEFORE_BURN_S = 30    # H24・H25：噴射窓まで30秒
-ENDING_HOLD_S = 8          # Ending の画面を出してから Report に進むまで（"next" でも進む）
+ENDING_HOLD_S = 16         # Ending の画面を出してから Report に進むまで（"next" でも進む）。帰還の演出 6.7 秒のあとに結果を読めるよう 16（#130）
 
 # 状況に反応する台詞の閾値（houston_lines.json の when の文に書いてある数値）
 H_POWER_HALF = 0.50        # H10：容量の50%
