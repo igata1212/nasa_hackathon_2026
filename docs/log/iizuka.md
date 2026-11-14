@@ -12,3 +12,4 @@
 - 13:35 #23 柔らかいモデルの傾向（Overcooked・Fall Guys・Among Us）を docs/design/art-research.md にまとめ、参考画像15枚を追加（調査：haiku 3体、まとめ：sonnet）
 - 13:40 #25 3D モデルの作者を midori と記録（README・メンバー表）
 - 13:47 #29 Unity MCP（CoplayDev/unity-mcp v10.3.0）を追加。.mcp.json でチーム共有
+- 13:51 #31 手描きスケッチ4枚（ゲームの流れ7場面）を docs/design/storyboard.md に画像付きでまとめた（文書化：sonnet）
