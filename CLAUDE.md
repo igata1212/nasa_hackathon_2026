@@ -21,7 +21,7 @@
 4. **終わる**：本人に「終わりでいい？」と確認してから
    - `docs/log/<名前>.md` に1行追記する（下のログの書式）
    - `git fetch origin && git merge origin/main` → `git push -u origin HEAD`
-   - `gh pr create --fill --body "Closes #N"` → `gh pr merge --squash --delete-branch`
+   - `gh pr create --fill --body "Closes #N"` → `gh pr merge --squash`（ブランチは消さない）
    - `git switch main && git pull`
 
 守ること：
