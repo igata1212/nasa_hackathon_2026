@@ -1,0 +1,77 @@
+{
+ "name": "Crew_Controller_B",
+ "tris": 1780,
+ "min": [
+  -0.38984,
+  -0.27555,
+  0.0
+ ],
+ "max": [
+  0.38984,
+  0.295,
+  1.185
+ ],
+ "size": [
+  0.77968,
+  0.57055,
+  1.185
+ ],
+ "objects": {
+  "Crew_Controller_B": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Crew_Controller_B.Arm_L": {
+   "origin": [
+    0.2,
+    0.0,
+    0.53
+   ],
+   "tris": 168
+  },
+  "Crew_Controller_B.Arm_R": {
+   "origin": [
+    -0.2,
+    0.0,
+    0.53
+   ],
+   "tris": 168
+  },
+  "Crew_Controller_B.Head": {
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "tris": 604
+  },
+  "Crew_Controller_B.Face": {
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "tris": 240
+  },
+  "Crew_Controller_B.Legs": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 240
+  },
+  "Crew_Controller_B.Torso": {
+   "origin": [
+    0.0,
+    0.0,
+    0.2
+   ],
+   "tris": 360
+  }
+ }
+}

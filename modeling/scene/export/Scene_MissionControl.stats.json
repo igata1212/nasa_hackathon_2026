@@ -1,0 +1,293 @@
+{
+ "name": "Scene_MissionControl",
+ "tris": 4432,
+ "min": [
+  -4.8,
+  -2.3,
+  0.0
+ ],
+ "max": [
+  4.8,
+  6.6,
+  4.6
+ ],
+ "size": [
+  9.6,
+  8.9,
+  4.6
+ ],
+ "objects": {
+  "Scene_MissionControl": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Desks_1": {
+   "origin": [
+    -2.7,
+    1.5,
+    0.5
+   ],
+   "tris": 720
+  },
+  "Scene_MissionControl.Desks_2": {
+   "origin": [
+    -2.7,
+    3.1,
+    0.85
+   ],
+   "tris": 720
+  },
+  "Scene_MissionControl.Desks_3": {
+   "origin": [
+    -2.7,
+    4.7,
+    1.2
+   ],
+   "tris": 720
+  },
+  "Scene_MissionControl.Floor": {
+   "origin": [
+    0.0,
+    2.1,
+    0.05
+   ],
+   "tris": 108
+  },
+  "Scene_MissionControl.Lamp_Green": {
+   "origin": [
+    -2.95,
+    1.14,
+    0.72
+   ],
+   "tris": 288
+  },
+  "Scene_MissionControl.Lamp_Red": {
+   "origin": [
+    -3.45,
+    1.14,
+    0.72
+   ],
+   "tris": 72
+  },
+  "Scene_MissionControl.Lamp_Yellow": {
+   "origin": [
+    -2.45,
+    1.14,
+    0.72
+   ],
+   "tris": 72
+  },
+  "Scene_MissionControl.Risers": {
+   "origin": [
+    0.0,
+    2.22,
+    0.16
+   ],
+   "tris": 324
+  },
+  "Scene_MissionControl.Screen_Center": {
+   "origin": [
+    0.0,
+    6.35,
+    3.15
+   ],
+   "tris": 424
+  },
+  "Scene_MissionControl.Screen_Left": {
+   "origin": [
+    -3.1,
+    6.35,
+    3.05
+   ],
+   "tris": 180
+  },
+  "Scene_MissionControl.Screen_Right": {
+   "origin": [
+    3.1,
+    6.35,
+    3.05
+   ],
+   "tris": 264
+  },
+  "Scene_MissionControl.Slot_Houston": {
+   "origin": [
+    0.0,
+    0.0,
+    0.1
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_PopupCamera": {
+   "origin": [
+    0.0,
+    -2.3,
+    0.98
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_11": {
+   "origin": [
+    -3.3,
+    2.22,
+    0.22
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_12": {
+   "origin": [
+    -2.1,
+    2.22,
+    0.22
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_13": {
+   "origin": [
+    -0.6,
+    2.22,
+    0.22
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_14": {
+   "origin": [
+    0.6,
+    2.22,
+    0.22
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_15": {
+   "origin": [
+    2.1,
+    2.22,
+    0.22
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_16": {
+   "origin": [
+    3.3,
+    2.22,
+    0.22
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_21": {
+   "origin": [
+    -3.3,
+    3.82,
+    0.57
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_22": {
+   "origin": [
+    -2.1,
+    3.82,
+    0.57
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_23": {
+   "origin": [
+    -0.6,
+    3.82,
+    0.57
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_24": {
+   "origin": [
+    0.6,
+    3.82,
+    0.57
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_25": {
+   "origin": [
+    2.1,
+    3.82,
+    0.57
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_26": {
+   "origin": [
+    3.3,
+    3.82,
+    0.57
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_31": {
+   "origin": [
+    -3.3,
+    5.42,
+    0.92
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_32": {
+   "origin": [
+    -2.1,
+    5.42,
+    0.92
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_33": {
+   "origin": [
+    -0.6,
+    5.42,
+    0.92
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_34": {
+   "origin": [
+    0.6,
+    5.42,
+    0.92
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_35": {
+   "origin": [
+    2.1,
+    5.42,
+    0.92
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Slot_Seat_36": {
+   "origin": [
+    3.3,
+    5.42,
+    0.92
+   ],
+   "tris": 0
+  },
+  "Scene_MissionControl.Tiers": {
+   "origin": [
+    0.0,
+    4.5,
+    0.275
+   ],
+   "tris": 216
+  },
+  "Scene_MissionControl.Walls": {
+   "origin": [
+    0.0,
+    6.5,
+    2.35
+   ],
+   "tris": 324
+  }
+ }
+}

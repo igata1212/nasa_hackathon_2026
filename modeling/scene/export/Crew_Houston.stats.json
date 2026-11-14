@@ -1,0 +1,77 @@
+{
+ "name": "Crew_Houston",
+ "tris": 2768,
+ "min": [
+  -0.38984,
+  -0.287,
+  0.0
+ ],
+ "max": [
+  0.38984,
+  0.3,
+  1.21386
+ ],
+ "size": [
+  0.77968,
+  0.587,
+  1.21386
+ ],
+ "objects": {
+  "Crew_Houston": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Crew_Houston.Arm_L": {
+   "origin": [
+    0.2,
+    0.0,
+    0.53
+   ],
+   "tris": 240
+  },
+  "Crew_Houston.Arm_R": {
+   "origin": [
+    -0.2,
+    0.0,
+    0.53
+   ],
+   "tris": 240
+  },
+  "Crew_Houston.Head": {
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "tris": 960
+  },
+  "Crew_Houston.Face": {
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "tris": 456
+  },
+  "Crew_Houston.Legs": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 240
+  },
+  "Crew_Houston.Torso": {
+   "origin": [
+    0.0,
+    0.0,
+    0.2
+   ],
+   "tris": 632
+  }
+ }
+}

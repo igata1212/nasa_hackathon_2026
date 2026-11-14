@@ -1,4 +1,216 @@
 {
+ "Crew_Controller_A": [
+  {
+   "name": "Crew_Controller_A.Head",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "note": "左右を見る。うなずきは X まわりに ±12° まで（顔 Face は Head の子で一緒に動く）",
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Controller_A.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Controller_A.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    -0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Crew_Controller_B": [
+  {
+   "name": "Crew_Controller_B.Head",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "note": "左右を見る。うなずきは X まわりに ±12° まで（顔 Face は Head の子で一緒に動く）",
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Controller_B.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Controller_B.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    -0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Crew_Controller_C": [
+  {
+   "name": "Crew_Controller_C.Head",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "note": "左右を見る。うなずきは X まわりに ±12° まで（顔 Face は Head の子で一緒に動く）",
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Controller_C.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Controller_C.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    -0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Crew_Houston": [
+  {
+   "name": "Crew_Houston.Head",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "note": "左右を見る。うなずきは X まわりに ±12° まで（顔 Face は Head の子で一緒に動く）",
+   "origin": [
+    0.0,
+    0.0,
+    0.66
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Houston.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Houston.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -150,
+   "max": 40,
+   "default": 0,
+   "note": "−で前・上へ",
+   "origin": [
+    -0.2,
+    0.0,
+    0.53
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
  "Scene_LaunchPad": [
   {
    "name": "Scene_LaunchPad.Move_Arm_1",

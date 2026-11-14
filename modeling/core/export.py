@@ -2,6 +2,7 @@
 
 書いた人：iizuka（作成：Fable 5.2、FBX の画像パスをファイル名だけに：Opus-5、Unity の差し替えの注記：Opus 5.5）／ 最終更新：2026-11-14
 更新：Taiga（2026-11-14、Fable 5.2）#48 KINDS に part（設計画面の部品）を足した
+更新：Taiga（2026-11-14、Fable 5.2）#53 シェイプキー（口・目の動き）も一緒に Y-up に直すようにした（shape_keys=True）
 
 ふつうは build_*.py から `ck.export_all(root, "fx")` で呼ぶ（corekit がここを使う）。
 FBX の設定は FBX_SETTINGS の1か所だけ。Unity 6000.6.9f1 に見本（Fx_Alarm）を入れて確かめた値（README「Unity での向き」）。
@@ -116,7 +117,7 @@ def _to_fbx_space(root, G):
     for o in tree(root)[1:]:
         o.matrix_basis = G @ o.matrix_basis @ Gi
         if o.type == "MESH" and o.data.name not in done:
-            o.data.transform(G); o.data.update(); done.add(o.data.name)
+            o.data.transform(G, shape_keys=True); o.data.update(); done.add(o.data.name)
     root.matrix_basis = root.matrix_basis @ Gi
     bpy.context.view_layer.update()
 
@@ -169,7 +170,7 @@ def export_fbx(root, path):
         for o, m in keep:
             o.matrix_basis = m
             if o is not root and o.type == "MESH" and o.data.name not in done:
-                o.data.transform(Gi); o.data.update(); done.add(o.data.name)
+                o.data.transform(Gi, shape_keys=True); o.data.update(); done.add(o.data.name)
         bpy.context.view_layer.update()
     return path
 
