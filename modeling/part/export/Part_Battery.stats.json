@@ -1,0 +1,61 @@
+{
+ "name": "Part_Battery",
+ "tris": 880,
+ "min": [
+  -0.28,
+  -0.18,
+  0.0
+ ],
+ "max": [
+  0.28,
+  0.18,
+  0.685
+ ],
+ "size": [
+  0.56,
+  0.36,
+  0.685
+ ],
+ "objects": {
+  "Part_Battery": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_Battery.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.335
+   ],
+   "tris": 108
+  },
+  "Part_Battery.Bolt": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 384
+  },
+  "Part_Battery.Plinth": {
+   "origin": [
+    0.0,
+    0.0,
+    0.03
+   ],
+   "tris": 108
+  },
+  "Part_Battery.Terminals": {
+   "origin": [
+    -0.13,
+    0.0,
+    0.645
+   ],
+   "tris": 280
+  }
+ }
+}
