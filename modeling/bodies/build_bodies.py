@@ -11,7 +11,7 @@
 向き：北極が +Z（Unity の +Y）。経度 0° が正面 −Y（Unity の +Z）、東経 90° が +X（Unity の −X）。
       画像の継ぎ目（経度 180°）は背中側 +Y（Unity の −Z）。月は経度 0° が地球に向く面（表側）なので、正面に表側が来る。
 大きさ：半径 1m。Unity 側で拡大する（実際の比は 月／地球 ＝ 0.273）。
-マテリアル：例外の M_Body_Earth・M_Body_Moon（各1枚の画像）。M_Core_Palette は使わない。月に顔は付けない（#9 で未決定）。
+マテリアル：例外の M_Body_Earth・M_Body_Moon（各1枚の画像）。M_Core_Palette は使わない。月に顔は付けない（#54 の決定。月の表面の地形は modeling/scene/build_moon_surface.py）。
 """
 import sys, os
 sys.dont_write_bytecode = True

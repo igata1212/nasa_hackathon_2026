@@ -1,0 +1,37 @@
+{
+ "name": "Scene_MoonSurface",
+ "tris": 5200,
+ "min": [
+  -10.00109,
+  -10.00414,
+  0.0
+ ],
+ "max": [
+  10.00064,
+  10.00051,
+  2.06738
+ ],
+ "size": [
+  20.00173,
+  20.00465,
+  2.06738
+ ],
+ "objects": {
+  "Scene_MoonSurface": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Scene_MoonSurface.Ground": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 5200
+  }
+ }
+}
