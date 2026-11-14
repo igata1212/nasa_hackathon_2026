@@ -21,3 +21,8 @@
 - 16:15 #66 サーバーを Python（reference_sim を使う WebSocket サーバー、Cloudflare Tunnel で公開）に決定。docs/design/architecture.md、SPEC.md・CLAUDE.md を更新
 - 16:29 #55 Unity の光・空・煙・ランプ・画面の発光・クルーの浮遊、船室を置いた LookDev シーン、Fable のレビュー（55%）の指摘を直した
 - 16:29 #64 無重力：浮いて漂う小物4種（ペン・手順書・宇宙食・ダクトテープ）、ガスは四方に広がる。ヘルメットの輪はやめた
+- 16:39 #65 GMAT の帰還ルート A/B（Taiga 計算）を確認し、ゲーム時間との対応表（time_map.json）と Unity の軌道の地図（OrbitMap シーン、TrajectoryView）を作った
+- 16:47 #69 Python の WebSocket ゲームサーバー（reference_sim をそのまま使う、47 テスト合格）、xlsx からパラメータ JSON（T1〜T5 完全一致）、Unity のオフライン再生用の記録
+- 16:49 #96 Unity のゲームの流れの骨組み（Title → Lobby → Design → Cabin → Ending → Report、1シーンで画面切替）。IGameClient、OfflineClient（記録の再生）、WsClient（ClientWebSocket）
+- 16:49 #113 物語の台本の下書き story/script.md（材料を並べただけ。Taiga が仕上げる）
+- 16:54 #68 アポロ13号の本物の数値を NASA の資料から集めて docs/reference/apollo13-data.md にまとめた（haiku 7体、出典付き、ゲームの数値との対応）
