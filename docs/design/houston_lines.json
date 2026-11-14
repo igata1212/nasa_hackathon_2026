@@ -253,8 +253,8 @@
       "id": "H08",
       "situation": "Flight",
       "when": "A healthy tank's valve is closed",
-      "line": "That's the wrong tank. Open it again and check the pressure gauges.",
-      "line_ja": "そのタンクじゃない。開け直して、圧力計を確かめて。",
+      "line": "That's the wrong tank. Check the pressure gauges.",
+      "line_ja": "そのタンクじゃない。圧力計を確かめて。",
       "priority": "critical",
       "notes": "",
       "row": 11

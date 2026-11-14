@@ -1,6 +1,6 @@
 # ミッション・リターン 実装仕様 v0.1
 
-最終更新：2026-11-14　／　読む人：iizuka（Unity実装）　／　書いた人：Taiga　／　更新：iizuka（2026-11-14、通信の決定）
+最終更新：2026-11-14　／　読む人：iizuka（Unity実装）　／　書いた人：Taiga　／　更新：iizuka（2026-11-14、通信の決定）　／　更新：Taiga（2026-11-14、食い違い #97〜#109 の決定）
 
 ## 0. この文書の読み方
 
@@ -15,14 +15,14 @@
 | `SPEC.md` | この文書 | — |
 | `parameters.json` | 数値パラメータ 77個（`key` / `value` / `unit` / シートの行番号） | シート「Parameters」 |
 | `parts.json` | 部品カタログ、予算と質量の上限 | シート「Parts」 |
-| `houston_lines.json` | マイルストーンの台詞 17本、状況に反応する台詞 28本 | シート「Milestones」「Houston lines」 |
+| `houston_lines.json` | マイルストーンの台詞 16本（M01〜M12、ED-A・ED-B・ED-C、R01）、状況に反応する台詞 28本 | シート「Milestones」「Houston lines」 |
 | `reference_sim.py` | 1秒刻みの参照実装とテストシナリオ | — |
 
 スプレッドシート：https://claude.ai/artifact/KC1NkXEhPLpqKMN8kNpFt9 （共有設定は Taiga 側で行います）
 
 ## 1. 何を作るか
 
-アポロ13号型の緊急帰還ゲームです。1〜4人で遊び、1プレイは約10分です。
+アポロ13号型の緊急帰還ゲームです。1〜4人で遊び、1プレイは約10〜12分です（ルート A で約10分、ルート B で約11.5分）。
 
 | 固定されているもの | プレイヤーが自由に決めるもの |
 |---|---|
@@ -153,14 +153,15 @@ tick():
 
 ## 6. 操作（コマンド）
 
-クライアントはコマンドを送るだけで、判定はサーバーが行います。
+クライアントはコマンドを送るだけで、判定はサーバーが行います。ここに書くのはゲームのルールです。メッセージの形（JSON のキー、部屋・席取り・設計の ±・`launch`・`again`、サーバーが配る状態の中身）は `server/README.md` を正とします。
 
 | コマンド | 席 | 使える条件 | 効果 |
 |---|---|---|---|
+| `stir()` | Life Support | M04 の間だけ | 押しボタンを1回押す。M05（事故）に進む |
 | `set_attitude(mode)` | Pilot | いつでも | 向きが変わるたびに `fuel -= fuel_attitude_change` |
-| `correction_burn()` | Pilot | 観測向き軌道で未実施、`sw[nav]` が ON | `fuel -= fuel_correction_burn`。`t >= T_LOS` なら `fuel_burn_retry` も引く |
+| `correction_burn()` | Pilot | 観測向き軌道で未実施、`sw[nav]` が ON | 1回押せば成立（長押しでのゲージ合わせはしない）。`fuel -= fuel_correction_burn`。`t >= T_LOS` なら `fuel_burn_retry` も引く |
 | `ignite()` | Pilot と Comms & Power の同時押し | 噴射窓の中、`sw[nav]` ON、`attitude == burn`、`correction_done`、燃料が足りる | 成功：`fuel -= fuel_burn_a または b`。同時押し失敗：`fuel -= fuel_burn_retry`、やり直し |
-| `close_valve(tank)` | Life Support | いつでも | 漏れているタンク（Tank 2 固定）なら `leak_open = false` |
+| `close_valve(tank)` | Life Support | いつでも | `tank` は 1 か 2 をプレイヤーが選ぶ。漏れているタンク（Tank 2 固定）なら `leak_open = false`。違うタンクなら何も起きない（H08 が流れる）。開け直す操作はない |
 | `swap_filter()` | Life Support と誰か1人の同時押し | `filters > 0` | `co2 = co2_start`、`filters -= 1`、`swaps += 1` |
 | `switch(name, on)` | Comms & Power（heater / lights / nav / comms） | いつでも | `nav` を OFF から ON にすると `power -= power_nav_restart` |
 | `switch(機器, on)` | Mission Planner | 設計で積んだ機器だけ | 5章の 6) を参照 |
@@ -171,7 +172,13 @@ tick():
 
 **操作が遅くなる**（提案）：`slow = max(寒さによる遅延, CO2による遅延)` とし、ボタンの長押し時間を「基本0.5秒 ×（1 + slow/100）」にします。寒さは `temp < temp_slow` で `slow_cold_pct`、`temp < temp_slower` で `slow_colder_pct`。CO2は `co2 >= co2_slow` で `slow_co2_pct`。
 
-**照明 OFF** は画面を暗くするだけです。**通信 OFF** はヒューストンの声とデータ送信が止まります。
+**どのタンクが漏れているか**は、タンクごとの圧力計で見分けます。状態にタンク別の圧力は足しません。漏れは Tank 2 固定なので、クライアントが `leak_open` と `leaked` から Tank 2 の針だけを下げて見せます。
+
+**照明 OFF** は画面を暗くし、船室の天井灯（`Lamp_Cabin`）も消します。ゲームの計算には影響しません。**通信 OFF** はヒューストンの声とデータ送信が止まります。
+
+**ヒューストンの「声」** は字幕（吹き出し）だけです。音声は付けません。
+
+**本物との違い**：ゲームでは正しいバルブを閉じれば漏れが止まります。アポロ13号では弁を閉じても止まりませんでした。ゲームはこのままにし、事後レポートで本物との違いを見せます。
 
 **人数と席**：4人なら1人1席。3人なら Comms & Power が Mission Planner を兼ねます。2人なら「Pilot + Mission Planner」と「Life Support + Comms & Power」（提案）。1人なら全席を切り替えます。
 
@@ -274,6 +281,7 @@ T1 は要件4つすべて合格、T2 は Req 2（科学）が不合格です。T
 - [ ] ソーラーパネルと太陽向き、追加の燃料タンク、レーダー
 - [ ] 軌道修正の噴射（M07）。省く場合は観測向き軌道も外す
 - [ ] 事後レポートのリソース推移グラフ
+- [ ] 要件トラッカー（Req 1〜4 のいまの状況）。xlsx にある「残り何分」の計器は作りません
 - [ ] 難易度レベル2・3
 
 ## 12. 未決事項・確認したいこと
