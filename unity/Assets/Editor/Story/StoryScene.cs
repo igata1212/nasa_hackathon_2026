@@ -4,7 +4,7 @@
 //   GameFlowScene.BuildScene（Tools/GameFlow/シーンを作り直す）からは BuildInto(flow) を呼ぶ
 // 舞台はどれも船内から遠く（y = -10000）に置き、ふだんは隠しておく。カメラは StoryDirector の1台（演出の間だけ）と、管制室の小窓の1台。
 //   LaunchStage   (0, -10000, 0)     地面・発射台・ロケット（0.05 倍）とクルー4人。宇宙の舞台は +3000（Z）先
-//   ReturnStage   (0, -10000, 6000)  海（y＝原点）と司令船・パラシュート・雲（#130：熱の2層・流れる筋・しぶきの柱・紙吹雪）
+//   ReturnStage   (0, -10000, 6000)  海（y＝原点）と司令船・パラシュート・雲（#130：光る熱シールド・流れる筋・しぶきの柱・紙吹雪）
 //   LostStage     (0, -10000, 9000)  漂う船と地球
 //   MissionControl(0, -10000, -3000) 管制室・先生・管制官
 // 向き：地上と管制室は 180° 回して、カメラが −Z 側から +Z を見るようにした（主光源 KeyEuler(55,-15) が前から当たる）。
@@ -25,7 +25,6 @@ public static class StoryScene
     const string SmokeMat = "Assets/Art/VFX/M_Smoke_Gas.mat";
     // #130 帰還の演出
     const string HeatCoreMat = ArtFolder + "/M_Story_HeatCore.mat";   // 熱の芯（不透明・HDR のオレンジ。M_Story_Fire は打ち上げの炎と共用なので別にした）
-    const string HeatMat = ArtFolder + "/M_Story_Heat.mat";           // 芯を包む光（加算・透ける）
     const string FireAddMat = ArtFolder + "/M_Story_FireAdd.mat";     // 炎の尾（煙のアトラスを加算で）
     const string LineMat = ArtFolder + "/M_Story_Line.mat";           // 流れる筋（加算・模様なし）
     const string ConfettiMat = ArtFolder + "/M_Story_Confetti.mat";   // 紙吹雪（四角・半透明）
@@ -184,11 +183,10 @@ public static class StoryScene
         st.chute.localPosition = new Vector3(0f, 3.4f, 0f);       // DockRing の上
         st.chute.gameObject.SetActive(false);
 
-        // 熱：不透明の芯（底に貼りつく板）と、それを包む透ける光（お椀）
+        // 熱：不透明の芯（底に貼りつく板）。横から撮るので光る縁に見える
+        //（包む光の層 HeatShell は、Unity で見ると縁の硬い板に見えたので作らない。#130）
         st.glow = Blob("HeatGlow", st.cm, new Vector3(0f, -0.15f, 0f), new Vector3(4.2f, 0.9f, 4.2f));
         st.glow.GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(HeatCoreMat);
-        st.glowShell = Blob("HeatShell", st.cm, new Vector3(0f, -0.6f, 0f), new Vector3(6.0f, 3.2f, 6.0f));
-        st.glowShell.GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(HeatMat);
         st.heatLight = PointLight(st.cm, "HeatLight", new Vector3(0f, -1.5f, 0f), Orange, 0f, 12f);
 
         // 炎の尾：速く短く、黄 → 赤で消える（灰色の煙にしない）。加算
@@ -204,23 +202,24 @@ public static class StoryScene
             var main = ps.main;
             main.loop = true; main.duration = 2f;
             main.startLifetime = 0.9f; main.startSpeed = 30f;
-            main.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.2f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.1f);   // 細く長く（Unity で見て 0.12〜0.2 は板に見えた）
             main.startColor = Color.white;
             main.simulationSpace = ParticleSystemSimulationSpace.Local;
             var em = ps.emission; em.rateOverTime = 50f;
             var sh = ps.shape; sh.enabled = true; sh.shapeType = ParticleSystemShapeType.Box; sh.scale = new Vector3(24f, 14f, 2f);
             var col = ps.colorOverLifetime; col.enabled = true; col.color = FadeInOut(Ui.Cream, 0.5f);
             var pr = ps.GetComponent<ParticleSystemRenderer>();
-            pr.renderMode = ParticleSystemRenderMode.Stretch; pr.velocityScale = 0.12f; pr.lengthScale = 1f;
+            pr.renderMode = ParticleSystemRenderMode.Stretch; pr.velocityScale = 0.2f; pr.lengthScale = 1f;   // 長さ 約 6m
         }
 
         // 着水：しぶきの冠と柱、白い輪、船のまわりに残る泡
+        // 粒は小さめ（Unity で見て、0.8〜1.8・growth 1.8 だと白い煙の塊になり船が隠れた）
         st.splash = Smoke(go.transform, "Splash", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 0f, life: new Vector2(0.9f, 1.5f),
-            speed: new Vector2(9f, 16f), size: new Vector2(0.8f, 1.8f), angle: 55f, radius: 2.2f,
-            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.5f, growth: 1.8f, burst: 120, gravity: 2.2f);
+            speed: new Vector2(9f, 16f), size: new Vector2(0.5f, 1.1f), angle: 55f, radius: 2.2f,
+            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.5f, growth: 0.7f, burst: 100, gravity: 2.2f);
         st.splashColumn = Smoke(go.transform, "SplashColumn", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 0f, life: new Vector2(1.0f, 1.4f),
-            speed: new Vector2(16f, 22f), size: new Vector2(0.7f, 1.5f), angle: 8f, radius: 0.6f,
-            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.4f, growth: 1.6f, burst: 40, gravity: 2.5f);
+            speed: new Vector2(16f, 22f), size: new Vector2(0.45f, 0.9f), angle: 8f, radius: 0.6f,
+            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.4f, growth: 0.6f, burst: 40, gravity: 2.5f);
         st.foam = Smoke(go.transform, "Foam", Vector3.zero, new Vector3(90f, 0f, 0f), rate: 0f, life: new Vector2(1.6f, 2.4f),
             speed: new Vector2(6f, 9f), size: new Vector2(1.5f, 2.6f), angle: 0f, radius: 2.0f,
             c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.5f), drag: 0.8f, growth: 1.6f, burst: 60, circle: true);
@@ -554,9 +553,6 @@ public static class StoryScene
         var core = Mat(HeatCoreMat, "Universal Render Pipeline/Unlit");
         core.SetColor("_BaseColor", new Color(3.0f, 1.1f, 0.25f, 1f));   // orange 寄りの HDR（Bloom で光る）
         EditorUtility.SetDirty(core);
-        var heat = Mat(HeatMat, "Universal Render Pipeline/Unlit");
-        heat.SetColor("_BaseColor", new Color(Ui.Yellow.r * 1.5f, Ui.Yellow.g * 1.5f, Ui.Yellow.b * 1.5f, 0.35f));
-        Blend(heat, 2f);
         var smoke = AssetDatabase.LoadAssetAtPath<Material>(SmokeMat);
         var fireAdd = Mat(FireAddMat, "Universal Render Pipeline/Particles/Unlit");
         if (smoke != null) fireAdd.SetTexture("_BaseMap", smoke.GetTexture("_BaseMap"));

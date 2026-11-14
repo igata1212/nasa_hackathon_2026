@@ -12,8 +12,11 @@ public class LostStage : StoryStage
 
     public const float TEnd = 4.4f, TTitle = 1.0f, TLine = 1.6f;
     [Tooltip("船の高さ（原点からの m）。上の黒帯で切れないように")] public float shipY = 1.0f;
+    [Tooltip("船の横の位置（原点からの m）。「Mission lost」の左に置く（Unity で見て直した：-2.4 だと字に重なった。右へ流れるので、終わりでも重ならない所から）")] public float shipX = -4.6f;
 
     public override float Length => TEnd;
+    /// <summary>ヒューストンの帯は Pose が決める（Run が拾った台詞を最初のフレームに一瞬出さないように）</summary>
+    public override bool AllowHouston(float t) => false;
 
     public override void Begin(StoryDirector d)
     {
@@ -27,7 +30,7 @@ public class LostStage : StoryStage
         Vector3 Q = transform.position;
         d.UseSkybox();
         d.SetFade(Mathf.Max(Mathf.Max(1f - Win(t, 0f, 0.6f), 0.4f * Win(t, 0.8f, 2.6f)), Win(t, TEnd - 0.5f, TEnd)));
-        ship.position = Q + new Vector3(-2.4f + t * 0.2f, shipY + t * 0.04f, 2f);
+        ship.position = Q + new Vector3(shipX + t * 0.2f, shipY + t * 0.04f, 2f);
         ship.rotation = Quaternion.Euler(25f + t * 6f, 30f + t * 10f, 15f + t * 4f);
         if (earth != null) earth.rotation = Quaternion.Euler(0f, 160f + t * 4f, 0f);
         d.Cam.transform.position = Q + new Vector3(0f, 0.6f, -10f - t * 0.4f);

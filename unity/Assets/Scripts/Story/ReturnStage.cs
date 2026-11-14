@@ -1,6 +1,7 @@
 // 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）
 // 演出3：帰還（#124。storyboard.md の場面6〜7。ED-A・ED-B のとき）。約 6.7 秒。#130 で Fable の採点をもとに作り直した。
-//   0.0〜2.0  再突入（RE-ENTRY）：熱シールドを前に、燃えながら斜めに落ちる。熱の塊2層・炎の尾・流れる筋・カメラの遅れと揺れ。海は隠す
+//   0.0〜2.0  再突入（RE-ENTRY）：熱シールドを前に、燃えながら斜めに落ちる。光る熱シールド・炎の尾・流れる筋・カメラの遅れと揺れ。海は隠す
+//            カメラは真横から（Unity で見て直した：正面寄りだと熱シールドが「黄色い円盤」に見える。包む光の層も板に見えたので作らない）
 //   2.1       パラシュート3つ（Fx_Parachute）が開く「ガクン」（船が少し持ち上がり、画角が開く）→ 振り子に揺れながら雲の前を降りる
 //   4.3       海に約 8 m/s で着水：沈んで浮き上がる、しぶきの冠と柱、白い輪、カメラの揺れ
 //   4.5       「SPLASHDOWN!」（ED-A だけ席の4色の紙吹雪）→ 余韻 → 6.3〜6.7 黒 → エンディングの画面
@@ -14,7 +15,7 @@ public class ReturnStage : StoryStage
     public Transform cm;                 // 司令船（ルートの原点＝熱シールドの底）
     public Transform chute;              // パラシュート（cm の子。DockRing の上）
     public Transform glow;               // 熱シールドの下の光る芯（cm の子）
-    public Transform glowShell;          // 芯を包む、透ける光（cm の子。加算）
+    public Transform glowShell;          // 芯を包む、透ける光（cm の子。加算）。今は作らない（板に見えた）。null でよい
     public Renderer ocean;               // 再突入の間は隠す（高さ 85m で下に海が見えると大きさが分からなくなる）
     public Light heatLight;
     public ParticleSystem heatTrail, speedLines, splash, splashColumn, foam, foamStay, confetti;
@@ -31,12 +32,16 @@ public class ReturnStage : StoryStage
     public float joltUp = 1.5f, swingDeg = 7f, swingX = 0.8f, swingRate = 4.2f;
 
     [Header("カメラ")]
-    public Vector3 entryCam = new Vector3(7f, -5f, -15f);      // 船からの位置（0.15 秒遅れて追う）
+    public Vector3 entryCam = new Vector3(1f, -1f, -18f);      // 船からの位置（0.15 秒遅れて追う）。ほぼ真横＝熱シールドが縁から見え、尾と筋が斜めに流れる
     public float camLag = 0.15f, entryShake = 0.35f, splashShake = 0.5f;
     public Vector3 descentCam = new Vector3(6f, 3f, -30f);     // 原点からの位置
     public float descentLookUp = 8.5f;                         // 船の上この高さを見る（傘まで1枚に収める）
     public Vector3 splashLook = new Vector3(-5f, 6f, 10f);     // 着水の前後に見る所（船が画面の下 1/3 に来る）
     public float fov = 40f, joltFov = 4f, splashFov = 3f;
+
+    [Header("着水のあとの傘")]
+    [Tooltip("倒れる角度（度）。カメラの奥（+Z）へ倒す。90 を越えると傘が水面に寝る")] public float chuteTipDeg = 100f;
+    [Tooltip("しぼんだときの縦の倍率")] public float chuteSag = 0.7f;
 
     static readonly Color High = Ui.Hex("2B2550"), Sky = Ui.Hex("8FC1E3");
 
@@ -44,6 +49,8 @@ public class ReturnStage : StoryStage
     bool splashed, partied;
 
     public override float Length => TEnd;
+    /// <summary>ヒューストンの帯は Pose が決める（Run が拾った台詞を最初のフレームに一瞬出さないように）</summary>
+    public override bool AllowHouston(float t) => false;
 
     public override void Begin(StoryDirector d)
     {
@@ -105,21 +112,23 @@ public class ReturnStage : StoryStage
         heatLight.intensity = 7f * heat * (1f + 0.15f * Mathf.Sin(t * 23f));
         PlayOnce(heatTrail, heat > 0.3f);
         PlayOnce(speedLines, heat > 0.3f);
+        if (t >= TChute && speedLines != null && speedLines.particleCount > 0) speedLines.Clear(true);   // 傘の「ガクン」で流れる筋が止まる
         if (ocean != null) ocean.enabled = t >= T1 - 0.3f;
 
-        // パラシュート：先に細長く伸びてから、ぼんと広がる。着水したら先にしぼみ、それから横に倒れる
+        // パラシュート：先に細長く伸びてから、ぼんと広がる。着水したら奥へ倒れて水面に寝ながら、少ししぼむ
+        //（Unity で見て直した：先に縦を 0.25 倍にしぼませると船の真上に平たい板が浮き、横（Z 軸）に倒すと傘が手前に来て船を隠した）
         bool open = t >= TChute;
         chute.gameObject.SetActive(open);
         if (open)
         {
             float wide = Mathf.LerpUnclamped(0.2f, 1f, EaseOutBack(Win(t, TChute + 0.1f, TChute + 0.6f)));
             float tall = Mathf.Lerp(0.6f, 1f, EaseOut(Win(t, TChute, TChute + 0.3f)));
-            float sag = Ease(Win(t, TSplash + 0.05f, TSplash + 0.55f));
-            float tip = Ease(Win(t, TSplash + 0.5f, TSplash + 1.4f));
-            wide *= Mathf.Lerp(1f, 1.15f, sag);
-            tall *= Mathf.Lerp(1f, 0.25f, sag);
+            float sag = Ease(Win(t, TSplash + 0.05f, TSplash + 0.6f));
+            float tip = Ease(Win(t, TSplash + 0.1f, TSplash + 0.9f));
+            wide *= Mathf.Lerp(1f, 1.1f, sag);
+            tall *= Mathf.Lerp(1f, chuteSag, sag);
             chute.localScale = new Vector3(chuteScale.x * wide, chuteScale.y * tall, chuteScale.z * wide);
-            chute.localRotation = Quaternion.Euler(0f, 0f, -80f * tip);
+            chute.localRotation = Quaternion.Euler(chuteTipDeg * tip, 0f, 0f);
         }
 
         // 着水：しぶきの冠と柱・白い輪（1回だけ）と、船のまわりに残る泡（2 秒）
