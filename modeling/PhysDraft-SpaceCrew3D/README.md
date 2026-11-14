@@ -13,8 +13,22 @@
 | 事件 | `export/incidents/Incident_*.glb` | BrokenPipe / HullBreach / Alarm / Debris / Fire |
 | 船の部屋 | `export/room/*.glb` | Room_Shell（床・壁・窓・宇宙）＋ Station_Pilot / Nav / Engine / Comms / Charger / Airlock |
 | 船外 | `export/exterior/*.glb` | Ship_Lander / Moon_Terrain / Moon_Base / Moon_LandingPad / Asteroid_Large / Asteroid_Small |
+| **NASA宇宙船** | `export/nasa/*.glb` ／ FBXは `unity/Assets/Models/NASA/` | Apollo13_Stack（司令船＋機械船＋月着陸船の合体、全長約18m・単位m・長軸X）／ Apollo_CSM ／ Apollo_LM。NASA公式モデルを加工（下の出典） |
 
 単位はメートル相当（クルーの身長1.5）。Blenderの +Y が three.js の -Z。
+
+## NASA宇宙船の出典
+
+追加：midori（2026-11-14）
+
+- 元データ：[nasa/NASA-3D-Resources](https://github.com/nasa/NASA-3D-Resources)（[NASA 3D Resources](https://science.nasa.gov/3d-resources/)）。元ファイルは `nasa_source/`
+  - `3D Models/Apollo Soyuz/Apollo Soyuz.glb` → アポロ司令船・機械船だけ切り出し（ドッキングモジュールとソユーズを削除）
+  - `3D Models/Apollo Lunar Module/Apollo Lunar Module.glb` → 1.4倍（実機の高さ約7m）にして司令船の先端にドッキング。アポロ13号で救命ボートになった配置
+- 利用条件：[NASA Images and Media Usage Guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/)。NASAが推奨・承認しているような見せ方はしない
+- クレジット例：「Spacecraft 3D models: NASA 3D Resources」
+- 月着陸船の脚は開いた状態（アポロ13号の飛行中は畳まれていた）
+- 作り直し：`python3 scripts/bl.py scripts/nasa_apollo.py`（GLB/FBXを `export/nasa/` に出す。FBXは `unity/Assets/Models/NASA/` にコピーする）
+- Unityの `.meta` は手で最小限（GUIDのみ）を作成。Unityで開くと設定が自動で補われるので、その差分もコミットしてよい
 
 ## 確認
 
