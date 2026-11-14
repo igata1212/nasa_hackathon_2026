@@ -21,7 +21,7 @@ flowchart LR
 - 公開は自宅サーバー＋Cloudflare Tunnel（ポート開放なし。https・wss が付く。WebGL は wss が必須）
 - 予備は同じプログラムをクラウド（Fly.io・Render など。料金は未確認）に置く
 - Unity の WebSocket は、WebGL と iOS の両方で動くライブラリ（NativeWebSocket など。ライセンスは入れる前に確認）。WebGL は C# 標準の WebSocket が使えないため
-- 担当：iizuka がサーバーと Unity、Taiga が物語・台詞・パラメータ・UI など上の層
+- 担当：iizuka がサーバーと Unity、Taiga が物語・台詞・パラメータ・UI など上の層。UI は、Taiga が絵とレイアウト（何をどこにどう見せるか）まで、Unity への組み込みは iizuka（#110 の決定。更新：Taiga 2026-11-14）
 
 ## メッセージの形（案）
 
@@ -45,7 +45,7 @@ flowchart LR
 ## 未決定
 
 - 部屋の作り方（合言葉で入る形にするか）
-- 再接続（切れた席に戻す方法）
+- 再接続：**決定（#94）**。切れた人は自動で同じ部屋・同じ席に戻る（サーバーは `player_id` で戻せる。`server/README.md`）。ほかの人が席を引き継ぐ仕組みは作らない。画面の表示は #94
 - 遅延の実測と `press_window_s`（0.5秒で足りるか）
 
 ## 軌道の表示（Issue #65）

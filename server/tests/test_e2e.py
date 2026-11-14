@@ -16,7 +16,7 @@ import websockets
 from tools.bot_client import Bot, case, run_bots
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SPEED = 40   # 着水まで 480 秒 → 約12秒
+SPEED = 40   # 着水まで 360 秒 → 約9秒
 
 
 def free_port():

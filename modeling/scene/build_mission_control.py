@@ -203,6 +203,62 @@ def add_face_keys(face):
 
 KEYS = ["MouthOpen", "MouthO", "MouthWide", "Smile", "Blink", "BrowsUp", "BrowsWorried"]
 
+# ---- 話すアニメーション（#120）。FBX にクリップ「Talk」として入る。12fps・36コマ（3秒）でくり返せる ----
+TALK_FPS, TALK_N = 12, 36
+TALK_MOUTH = [("MouthOpen", 0), ("MouthOpen", .6), ("MouthOpen", 1), ("MouthO", .8), ("MouthOpen", .3), ("MouthWide", .9),
+              ("MouthOpen", .9), ("MouthOpen", .2), ("MouthO", 1), ("MouthOpen", .7), ("MouthWide", .6), ("MouthOpen", .1)]
+
+
+def talk_pose(i, phase=0):
+    """コマ i（0〜TALK_N−1）の姿。返り値は (シェイプキーの値, 頭のうなずき・左右の角度（度）, 左腕の角度（度）)。"""
+    j = (i + phase) % TALK_N
+    keys = {k: 0.0 for k in KEYS}
+    if i > 0:                                        # コマ 0 は口を閉じた基本の姿（check.py が読み直して寸法を比べる）
+        name, v = TALK_MOUTH[j % len(TALK_MOUTH)]
+        keys[name] = v
+        keys["Blink"] = 1.0 if j in (9, 10) else 0.0
+        keys["BrowsUp"] = 0.6 * math.sin(math.pi * (j - 12) / 8) if 12 <= j <= 20 else 0.0
+    t = 2 * math.pi * i / TALK_N
+    nod, turn = 4 * math.sin(2 * t), 8 * math.sin(t)
+    a = i / TALK_N                                   # 腕：1回上げて下ろす（最初と最後は下ろした姿）
+    arm = -110 * math.sin(math.pi * min(1.0, max(0.0, (a - 0.3) / 0.4))) ** 2
+    return keys, (nod, turn), arm
+
+
+def talk_anim(root, phase=0):
+    """ck.export_all(root, KIND, anim=…) に渡す関数を作る。Y-up に組み替えた後で呼ばれるので、
+    頭の左右（Blender の Z まわり）は Y まわり、うなずきと腕（X まわり）は X のまま打つ。"""
+    name = root.name
+    head, arm, face = (bpy.data.objects[f"{name}.{p}"] for p in ("Head", "Arm_L", "Face"))
+
+    def anim():
+        scn = bpy.context.scene
+        keep = (scn.name, scn.render.fps, scn.frame_start, scn.frame_end, scn.frame_current)
+        scn.name = "Talk"; scn.render.fps = TALK_FPS; scn.frame_start = 1; scn.frame_end = TALK_N + 1
+        kb = face.data.shape_keys.key_blocks
+        for f in range(TALK_N + 1):                  # 最後のコマ＝最初のコマ（くり返せる）
+            keys, (nod, turn), arm_deg = talk_pose(f % TALK_N, phase)
+            for k, v in keys.items():
+                kb[k].value = v
+                kb[k].keyframe_insert("value", frame=f + 1)
+            head.rotation_euler = (math.radians(nod), math.radians(turn), 0)
+            head.keyframe_insert("rotation_euler", frame=f + 1)
+            arm.rotation_euler = (math.radians(arm_deg), 0, 0)
+            arm.keyframe_insert("rotation_euler", frame=f + 1)
+        scn.frame_set(1)
+
+        def undo():
+            for o in (head, arm):
+                o.animation_data_clear()
+                o.rotation_euler = (0, 0, 0)
+            face.data.shape_keys.animation_data_clear()
+            for k in KEYS:
+                kb[k].value = 0
+            scn.name, scn.render.fps, scn.frame_start, scn.frame_end = keep[:4]
+            scn.frame_set(keep[4])
+        return undo
+    return anim
+
 
 def build_person(name):
     cfg = PEOPLE[name]
@@ -276,7 +332,7 @@ def build_person(name):
         {"name": "Arm_R", "type": "rotate", "axis": "X", "min": -150, "max": 40, "default": 0, "note": "−で前・上へ"},
     ]
     ck.write_parts(KIND, root, parts)
-    ck.export_all(root, KIND)
+    ck.export_all(root, KIND, anim=talk_anim(root, phase=list(PEOPLE).index(name) * 7))
     pose = [dict(q) for q in parts]
     pose[1]["max"] = pose[1]["min"] = -70
     pose[2]["max"] = 20

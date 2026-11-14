@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129）
 // 演出1本ぶんの舞台（#124）。船内から遠く離れた所に組んだ物を、StoryDirector のカメラで撮る。
 // 動きは「始まってからの秒 t」だけで決める（Pose(t)）。同じ t なら同じ絵になるので、止めてスクリーンショットも撮れる。
 using UnityEngine;
@@ -13,6 +13,9 @@ public abstract class StoryStage : MonoBehaviour
 
     /// <summary>t 秒の姿にする（カメラ・物・字幕・フェード）</summary>
     public abstract void Pose(StoryDirector d, float t);
+
+    /// <summary>ヒューストンの台詞を t 秒に出してよいか（#129。打ち上げは宇宙のカットまで待たせる）</summary>
+    public virtual bool AllowHouston(float t) => true;
 
     /// <summary>終わり（飛ばしたときも呼ぶ）。隠して粒を消す</summary>
     public virtual void End(StoryDirector d)

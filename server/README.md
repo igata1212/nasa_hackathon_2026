@@ -59,7 +59,7 @@ cloudflared tunnel --url http://localhost:8765
 
 ## 流れ
 
-`lobby` →（`start`）→ `design`（M01。部品の ±、`launch` で M02 の判定。だめなら design のまま）→ `practice`（M03。各席が1回操作 or 90秒。リソースは減らない）→ `stir`（M04。Life Support が `stir`。20秒ごとに M04 を繰り返す）→ `flight`（M05〜。ゲーム内1秒ごとに tick）→ `ending`（ED-A/B/C。8秒か `next`）→ `report`（R01）→（`again`）→ `design`
+`lobby` →（`start`）→ `design`（M01。部品の ±、`launch` で M02 の判定。だめなら design のまま）→ `practice`（M03。各席が1回操作 or 90秒。リソースは減らない）→ `stir`（M04。Life Support が `stir`。20秒ごとに M04 を繰り返す）→ `flight`（M05〜。ゲーム内1秒ごとに tick）→ `ending`（ED-A/B/C。16秒か `next`）→ `report`（R01）→（`again`）→ `design`
 
 flight の1 tick：①幅を過ぎた同時押しを不成立にする → ②届いた順にコマンドを `Sim` のメソッドに渡す → ③`sim.step()` → ④マイルストーンの台詞 → ⑤ヒューストン → ⑥記録して `state` を全員に送る。
 tick k−1 と tick k の間に届いたコマンドは、`reference_sim.run()` で「時刻 k のイベント」と同じ扱いになる。
