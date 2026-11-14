@@ -16,7 +16,7 @@ from .houston import Houston, line_event as reactive_event
 from .report import score_breakdown
 from .seats import DUAL, SEATS, assign, seats_for
 from .sim_bridge import (ATTITUDES, DESIGN_PARTS, LIMITS, MILESTONE_LINES, P, PART,
-                         ROCKETS, SWITCHES, TRAJECTORIES, Sim, launch_check)
+                         ROCKETS, SWITCHES, TRAJECTORIES, Sim, launch_check, rs)
 
 MAX_PLAYERS = 4
 FLIGHT_CMDS = ("set_attitude", "correction_burn", "ignite", "close_valve", "swap_filter",
@@ -47,9 +47,14 @@ def default_design():
 def design_totals(design):
     mass, cost, status = launch_check(design)
     n = design["parts"].get
+    mass_limit, budget = LIMITS["rocket_%s_mass" % design["rocket"]], LIMITS["budget"]
     return {
         "mass": mass, "cost": cost, "status": status,
-        "mass_limit": LIMITS["rocket_%s_mass" % design["rocket"]], "budget": LIMITS["budget"],
+        "mass_limit": mass_limit, "budget": budget,
+        # 残り（UI は引き算しない）。負なら超過
+        "mass_left": mass_limit - mass, "budget_left": budget - cost,
+        "over_mass": mass > mass_limit, "over_budget": cost > budget,
+        "science_possible": any(n(pid, 0) > 0 for pid in rs.INSTRUMENTS),
         "capacity": P["power_per_battery"] * n("battery", 0),
         "oxygen": P["oxygen_start"] + P["oxygen_per_spare_tank"] * n("spare_o2_tank", 0),
         "fuel": P["fuel_start"] + P["fuel_per_extra_tank"] * n("extra_fuel_tank", 0),
