@@ -1,6 +1,6 @@
 """品質チェック（modeling-plan.md の E 章を機械で判定）。FBX を読み直して調べ、合否の表を出す。
 
-書いた人：iizuka（作成：Fable 5.2、parts_*.json・試し書きの順番・容量の数え方：Opus-5）／ 最終更新：2026-11-14
+書いた人：iizuka（作成：Fable 5.2、parts_*.json・試し書きの順番・容量の数え方：Opus-5、船室の上限と Ship/ の同居：Fable 5.2）／ 最終更新：2026-11-14
 
 使い方：
   modeling/core/run.sh modeling/core/check.py modeling/fx                              フォルダ（その種類の FBX 全部）
@@ -26,6 +26,7 @@ ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx)_[A-Z][A-Za-z0-9_]*
 PART_RE = re.compile(r"^[A-Z][A-Za-z0-9_]*$")
 TRI_LIMIT = {"Ctrl": 1500, "Console": 3000, "Crew": 3000, "Tank": 1500, "Ship": 6000, "Body": 2500, "Fx": 1500}
 TRI_LIMIT_TANK_BROKEN = 2000       # 破れたタンク（名前に Broken を含む）
+TRI_LIMIT_INTERIOR = 10000         # 船室（Ship_ で名前に Interior を含む）。art-direction.md の「船室 10,000 以下」（#40）
 FBX_MAX = 500 * 1024
 TOTAL_MAX = 20 * 1024 * 1024
 MIN_THICK = 0.02
@@ -36,6 +37,8 @@ def tri_limit(name):
     pre = name.split("_")[0]
     if pre == "Tank" and "Broken" in name:
         return TRI_LIMIT_TANK_BROKEN
+    if pre == "Ship" and "Interior" in name:
+        return TRI_LIMIT_INTERIOR
     return TRI_LIMIT.get(pre, 1500)
 
 
@@ -52,11 +55,15 @@ def _side_dirs(fbx):
     試し書き（<試し書き>/unity/<種類>/）の FBX なら <試し書き>/<種類>/ を先に見る（本番の表と混ざらないように）。"""
     fbx_dir = os.path.dirname(os.path.abspath(fbx))
     kind_dir = os.path.basename(fbx_dir)
-    kind = next((k for k, v in KINDS.items() if v == kind_dir), kind_dir.lower())
-    real = os.path.join(MODELING, kind)
-    if os.path.dirname(fbx_dir) == os.path.abspath(UNITY_MODELS):
-        return [real]
-    return [os.path.join(os.path.dirname(os.path.dirname(fbx_dir)), kind), real]
+    name = os.path.splitext(os.path.basename(fbx))[0]
+    # 1つの Unity のフォルダを2つの種類が使うことがある（Ship/ ← modeling/ship と modeling/interior）。
+    # その FBX を書き出した種類（export/<名前>.stats.json がある方）を先にする
+    kinds = [k for k, v in KINDS.items() if v == kind_dir] or [kind_dir.lower()]
+    trial = None if os.path.dirname(fbx_dir) == os.path.abspath(UNITY_MODELS) else os.path.dirname(os.path.dirname(fbx_dir))
+    bases = ([trial] if trial else []) + [MODELING]
+    dirs = [os.path.join(b, k) for b in bases for k in kinds]
+    own = [d for d in dirs if os.path.exists(os.path.join(d, "export", name + ".stats.json"))]
+    return own or dirs
 
 
 def _load_json(fbx, rel):
@@ -285,8 +292,11 @@ def targets(argv):
         # FBX のフォルダそのもの、最後に本番（modeling/<種類> → unity/Assets/Models/<種類>）
         cands = [os.path.join(os.path.dirname(p), "unity", KINDS.get(kind, kind)), p,
                  os.path.join(UNITY_MODELS, KINDS.get(kind, kind))]
+        shared = sum(1 for v in KINDS.values() if v == KINDS.get(kind)) > 1
         for d in cands:
             fs = sorted(f for f in (os.listdir(d) if os.path.isdir(d) else []) if f.lower().endswith(".fbx"))
+            if shared and d != p:          # Ship/ は外観（modeling/ship）と船室（modeling/interior）が同居。渡されたフォルダが書き出した物だけ見る
+                fs = [f for f in fs if os.path.exists(os.path.join(p, "export", f[:-4] + ".stats.json"))]
             if fs:
                 out += [os.path.join(d, f) for f in fs]; break
     return out

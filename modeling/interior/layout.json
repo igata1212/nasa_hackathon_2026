@@ -1,0 +1,405 @@
+{
+ "asset": "Ship_Interior",
+ "note": "build_interior.py が書く。pos・rot_z は Blender（m、度、Z まわり）。unity_pos・unity_euler は Unity（ルートが原点・回転0 のとき）",
+ "floor_z": 0.3,
+ "floor_radius": 3.0,
+ "wall_top_z": 2.45,
+ "top_z": 4.37,
+ "slots": {
+  "Slot_Console_Pilot": {
+   "pos": [
+    -2.1874,
+    0.7107,
+    0.3
+   ],
+   "rot_z": 72.0,
+   "note": "Console_Pilot の原点（底面の中心）。操作する側が部屋の中心を向く",
+   "unity_pos": [
+    2.1874,
+    0.3,
+    -0.7107
+   ],
+   "unity_euler": [
+    0,
+    -72.0,
+    0
+   ]
+  },
+  "Slot_Crew_Pilot": {
+   "pos": [
+    -1.6643,
+    0.5408,
+    0.42
+   ],
+   "rot_z": -108.0,
+   "note": "Crew_Pilot の原点（足の底の中心）。床から 0.12m 浮いてコンソールを向く。Unity でここを中心に上下に揺らす",
+   "unity_pos": [
+    1.6643,
+    0.42,
+    -0.5408
+   ],
+   "unity_euler": [
+    0,
+    108.0,
+    0
+   ]
+  },
+  "Slot_Console_LifeSupport": {
+   "pos": [
+    -1.2188,
+    1.9505,
+    0.3
+   ],
+   "rot_z": 32.0,
+   "note": "Console_LifeSupport の原点（底面の中心）。操作する側が部屋の中心を向く",
+   "unity_pos": [
+    1.2188,
+    0.3,
+    -1.9505
+   ],
+   "unity_euler": [
+    0,
+    -32.0,
+    0
+   ]
+  },
+  "Slot_Crew_LifeSupport": {
+   "pos": [
+    -0.9274,
+    1.4841,
+    0.42
+   ],
+   "rot_z": -148.0,
+   "note": "Crew_LifeSupport の原点（足の底の中心）。床から 0.12m 浮いてコンソールを向く。Unity でここを中心に上下に揺らす",
+   "unity_pos": [
+    0.9274,
+    0.42,
+    -1.4841
+   ],
+   "unity_euler": [
+    0,
+    148.0,
+    0
+   ]
+  },
+  "Slot_Console_CommsPower": {
+   "pos": [
+    1.2188,
+    1.9505,
+    0.3
+   ],
+   "rot_z": -32.0,
+   "note": "Console_CommsPower の原点（底面の中心）。操作する側が部屋の中心を向く",
+   "unity_pos": [
+    -1.2188,
+    0.3,
+    -1.9505
+   ],
+   "unity_euler": [
+    0,
+    32.0,
+    0
+   ]
+  },
+  "Slot_Crew_CommsPower": {
+   "pos": [
+    0.9274,
+    1.4841,
+    0.42
+   ],
+   "rot_z": 148.0,
+   "note": "Crew_CommsPower の原点（足の底の中心）。床から 0.12m 浮いてコンソールを向く。Unity でここを中心に上下に揺らす",
+   "unity_pos": [
+    -0.9274,
+    0.42,
+    -1.4841
+   ],
+   "unity_euler": [
+    0,
+    -148.0,
+    0
+   ]
+  },
+  "Slot_Console_MissionPlanner": {
+   "pos": [
+    2.1874,
+    0.7107,
+    0.3
+   ],
+   "rot_z": -72.0,
+   "note": "Console_MissionPlanner の原点（底面の中心）。操作する側が部屋の中心を向く",
+   "unity_pos": [
+    -2.1874,
+    0.3,
+    -0.7107
+   ],
+   "unity_euler": [
+    0,
+    72.0,
+    0
+   ]
+  },
+  "Slot_Crew_MissionPlanner": {
+   "pos": [
+    1.6643,
+    0.5408,
+    0.42
+   ],
+   "rot_z": 108.0,
+   "note": "Crew_MissionPlanner の原点（足の底の中心）。床から 0.12m 浮いてコンソールを向く。Unity でここを中心に上下に揺らす",
+   "unity_pos": [
+    -1.6643,
+    0.42,
+    -0.5408
+   ],
+   "unity_euler": [
+    0,
+    -108.0,
+    0
+   ]
+  },
+  "Slot_Crew_Dual_CommsPlanner": {
+   "pos": [
+    1.2608,
+    0.9851,
+    0.42
+   ],
+   "rot_z": 128.0,
+   "note": "3人のとき：Comms & Power のクルーが Mission Planner と2台を兼ねる位置（2台の間。任意）",
+   "unity_pos": [
+    -1.2608,
+    0.42,
+    -0.9851
+   ],
+   "unity_euler": [
+    0,
+    -128.0,
+    0
+   ]
+  },
+  "Slot_Tank_1": {
+   "pos": [
+    0.37,
+    2.38,
+    0.37
+   ],
+   "rot_z": 0.0,
+   "note": "Tank_Oxygen1 の原点（右）。上の .Slot_Valve に Ctrl_Valve",
+   "unity_pos": [
+    -0.37,
+    0.37,
+    -2.38
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  },
+  "Slot_Tank_2": {
+   "pos": [
+    -0.37,
+    2.38,
+    0.37
+   ],
+   "rot_z": 0.0,
+   "note": "Tank_Oxygen2 の原点（左。漏れるタンク。Life Support の隣）。事故のとき Tank_Oxygen2_Broken に差し替える。上の .Slot_Valve に Ctrl_Valve",
+   "unity_pos": [
+    0.37,
+    0.37,
+    -2.38
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  },
+  "Slot_Pipe": {
+   "pos": [
+    0.0,
+    2.585,
+    1.445
+   ],
+   "rot_z": 0.0,
+   "note": "Fx_BrokenPipe の原点。事故のとき .Pipe_Intact を消してここに出す（ガスは Fx_BrokenPipe.Slot_Leak から）",
+   "unity_pos": [
+    0.0,
+    1.445,
+    -2.585
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  },
+  "Slot_Alarm_1": {
+   "pos": [
+    -1.0179,
+    2.4575,
+    1.78
+   ],
+   "rot_z": 0.0,
+   "note": "Fx_Alarm の原点（窓の左右の箱の上）。1 が左、2 が右。片方だけでもよい",
+   "unity_pos": [
+    1.0179,
+    1.78,
+    -2.4575
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  },
+  "Slot_Alarm_2": {
+   "pos": [
+    1.0179,
+    2.4575,
+    1.78
+   ],
+   "rot_z": 0.0,
+   "note": "Fx_Alarm の原点（窓の左右の箱の上）。1 が左、2 が右。片方だけでもよい",
+   "unity_pos": [
+    -1.0179,
+    1.78,
+    -2.4575
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  },
+  "Slot_Center": {
+   "pos": [
+    0.0,
+    0.0,
+    0.3
+   ],
+   "rot_z": 0.0,
+   "note": "床のまん中（青緑の輪の中心）。空き。浮いている小物や演出用",
+   "unity_pos": [
+    0.0,
+    0.3,
+    0.0
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  },
+  "Slot_Window": {
+   "pos": [
+    0.0,
+    3.0,
+    2.03
+   ],
+   "rot_z": 0.0,
+   "note": "窓のまん中（壁の外側の面）。ローカル +Y（Unity では −Z）が外。地球・月はこの先に置く",
+   "unity_pos": [
+    0.0,
+    2.03,
+    -3.0
+   ],
+   "unity_euler": [
+    0,
+    0.0,
+    0
+   ]
+  }
+ },
+ "cameras": {
+  "Slot_Cam_Topdown": {
+   "pos": [
+    0.0,
+    -8.1823,
+    10.5942
+   ],
+   "elev": 50.0,
+   "fov": 30.0,
+   "note": "見下ろし 50°、床の全体（屋根なし）",
+   "unity_pos": [
+    0.0,
+    10.5942,
+    8.1823
+   ],
+   "unity_euler": [
+    50.0,
+    180,
+    0
+   ],
+   "aspect": "16:10 で合わせた"
+  },
+  "Slot_Cam_Topdown_Close": {
+   "pos": [
+    0.0,
+    -5.3912,
+    8.5614
+   ],
+   "elev": 50.0,
+   "fov": 30.0,
+   "note": "見下ろし 50°、席に寄せる（屋根なし）。床の手前は画面の下に切れる（そこに UI を置ける）",
+   "unity_pos": [
+    0.0,
+    8.5614,
+    5.3912
+   ],
+   "unity_euler": [
+    50.0,
+    180,
+    0
+   ],
+   "aspect": "16:10 で合わせた"
+  },
+  "Slot_Cam_Cutaway": {
+   "pos": [
+    0.0,
+    -11.2773,
+    4.5757
+   ],
+   "elev": 15.0,
+   "fov": 30.0,
+   "note": "横からの断面 15°（奥の屋根あり）",
+   "unity_pos": [
+    0.0,
+    4.5757,
+    11.2773
+   ],
+   "unity_euler": [
+    15.0,
+    180,
+    0
+   ],
+   "aspect": "16:10 で合わせた"
+  }
+ },
+ "show": {
+  "topdown": {
+   "hide": [
+    "Ship_Interior.Wall_Front",
+    "Ship_Interior.Roof_Front",
+    "Ship_Interior.Roof_Back"
+   ],
+   "camera": "Slot_Cam_Topdown",
+   "camera_close": "Slot_Cam_Topdown_Close"
+  },
+  "cutaway": {
+   "hide": [
+    "Ship_Interior.Wall_Front",
+    "Ship_Interior.Roof_Front"
+   ],
+   "camera": "Slot_Cam_Cutaway"
+  },
+  "closed": {
+   "hide": [],
+   "camera": null
+  }
+ },
+ "swap_on_accident": {
+  "Ship_Interior.Pipe_Intact": "消して Slot_Pipe に Fx_BrokenPipe",
+  "Tank_Oxygen2": "Slot_Tank_2 で Tank_Oxygen2_Broken に差し替え"
+ }
+}
