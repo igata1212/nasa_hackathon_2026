@@ -1,0 +1,61 @@
+{
+ "name": "Fx_Co2Filter_New",
+ "tris": 384,
+ "min": [
+  -0.1,
+  -0.123,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.177
+ ],
+ "size": [
+  0.2,
+  0.223,
+  0.177
+ ],
+ "objects": {
+  "Fx_Co2Filter_New": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Fx_Co2Filter_New.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.075
+   ],
+   "tris": 108
+  },
+  "Fx_Co2Filter_New.Grille": {
+   "origin": [
+    0.0,
+    -0.105,
+    0.075
+   ],
+   "tris": 108
+  },
+  "Fx_Co2Filter_New.Handle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.162
+   ],
+   "tris": 108
+  },
+  "Fx_Co2Filter_New.Port": {
+   "origin": [
+    0.0,
+    -0.112,
+    0.075
+   ],
+   "tris": 60
+  }
+ }
+}

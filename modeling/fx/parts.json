@@ -36,5 +36,23 @@
    "unity_sign": 1,
    "unit": "deg"
   }
+ ],
+ "Fx_Co2FilterHolder": [
+  {
+   "name": "Fx_Co2FilterHolder.Move_Canister",
+   "type": "translate",
+   "axis": "Y",
+   "min": -0.2,
+   "max": 0,
+   "default": 0,
+   "origin": [
+    -0.27,
+    0.0,
+    0.04
+   ],
+   "unity_axis": "Z",
+   "unity_sign": -1,
+   "unit": "m"
+  }
  ]
 }
