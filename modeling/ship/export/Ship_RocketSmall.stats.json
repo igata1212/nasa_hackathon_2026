@@ -1,0 +1,141 @@
+{
+ "name": "Ship_RocketSmall",
+ "tris": 4036,
+ "min": [
+  -4.29678,
+  -4.29678,
+  0.0
+ ],
+ "max": [
+  4.29678,
+  4.29678,
+  70.0
+ ],
+ "size": [
+  8.59357,
+  8.59357,
+  70.0
+ ],
+ "objects": {
+  "Ship_RocketSmall": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_RocketSmall.Adapter": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Band1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Band2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Engines": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 624
+  },
+  "Ship_RocketSmall.Fins": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 368
+  },
+  "Ship_RocketSmall.Payload_CM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 332
+  },
+  "Ship_RocketSmall.Payload_SM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Payload_Tower": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 156
+  },
+  "Ship_RocketSmall.Ring1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Ring2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Skirt": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Slot_Ship": {
+   "origin": [
+    0.0,
+    0.0,
+    56.6
+   ],
+   "tris": 0
+  },
+  "Ship_RocketSmall.Stage1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketSmall.Stage2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  }
+ }
+}
