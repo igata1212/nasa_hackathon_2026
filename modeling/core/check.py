@@ -23,14 +23,15 @@ import palette as _palette        # noqa: E402
 REPO, MODELING, UNITY_MODELS, KINDS = _export.REPO, _export.MODELING, _export.UNITY_MODELS, _export.KINDS
 MAT_NAME = "M_Core_Palette"
 EXTRA_MATS = ("M_Body_Earth", "M_Body_Moon")
-ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part)_[A-Z][A-Za-z0-9_]*$")
+ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part|Prop)_[A-Z][A-Za-z0-9_]*$")
 PART_RE = re.compile(r"^[A-Z][A-Za-z0-9_]*$")
 TRI_LIMIT = {"Ctrl": 1500, "Console": 3000, "Crew": 3000, "Tank": 1500, "Ship": 6000, "Body": 2500, "Fx": 1500,
-             "Part": 1500}                  # 設計画面の部品（#48）
+             "Part": 1500,                 # 設計画面の部品（#48）
+             "Prop": 800}                  # 浮く小物（#64）
 TRI_LIMIT_TANK_BROKEN = 2000       # 破れたタンク（名前に Broken を含む）
 TRI_LIMIT_INTERIOR = 10000         # 船室（Ship_ で名前に Interior を含む）。art-direction.md の「船室 10,000 以下」（#40）
 FBX_MAX = 500 * 1024
-TOTAL_MAX = 20 * 1024 * 1024
+TOTAL_MAX = 30 * 1024 * 1024      # #34 では 20MB。船室・小物・設計の部品が増えたので 30MB に（#55）
 MIN_THICK = 0.02
 EPS = 1e-4
 
@@ -184,14 +185,14 @@ def check_fbx(fbx):
     rp = root.matrix_world.translation
     if rp.length > 0.001:
         errs.append(f"ルートが原点にない {_fmt(rp)}")
-    if pre != "Body":                       # 地球・月は中心が原点
+    if pre not in ("Body", "Prop"):         # 地球・月・小物（Prop_。浮かせて回すので床置きの底面 z=0 は見ない）は中心が原点
         if abs(lo.z) > 0.001:
             errs.append(f"底面 z={lo.z:.4f}（0±0.001）")
         msg.append(f"底面 z={lo.z:.4f}")
     else:
         c = (lo + hi) / 2
         if c.length > 0.001:
-            errs.append(f"球の中心が原点にない {_fmt(c)}")
+            errs.append(f"中心が原点にない {_fmt(c)}")
         msg.append("中心が原点")
     table, src, clash = _load_parts(fbx)
     parts = table.get(name)
@@ -320,7 +321,7 @@ def main(argv):
     tot = total_size()
     ok = tot <= TOTAL_MAX
     fails += 0 if ok else 1
-    lines.append(f"\n合計容量：{'合格' if ok else '不合格'}（{tot / 1024 / 1024:.2f}MB / 20MB。modeling/ と unity/Assets/Models/ の #34 追加分。modeling/source/ は数えない）")
+    lines.append(f"\n合計容量：{'合格' if ok else '不合格'}（{tot / 1024 / 1024:.2f}MB / {TOTAL_MAX / 1024 / 1024:.0f}MB。modeling/ と unity/Assets/Models/ の追加分。modeling/source/ は数えない）")
     lines.append(f"判定：{len(fbxs)} 個を調べて " + ("全部合格" if not fails else f"不合格 {fails} 件"))
     print("\n".join(lines))
     sys.exit(1 if fails else 0)

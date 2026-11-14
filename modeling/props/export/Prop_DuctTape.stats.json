@@ -1,0 +1,37 @@
+{
+ "name": "Prop_DuctTape",
+ "tris": 576,
+ "min": [
+  -0.08,
+  -0.08,
+  -0.025
+ ],
+ "max": [
+  0.08,
+  0.08,
+  0.025
+ ],
+ "size": [
+  0.16,
+  0.16,
+  0.05
+ ],
+ "objects": {
+  "Prop_DuctTape": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Prop_DuctTape.Roll": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 576
+  }
+ }
+}

@@ -19,7 +19,8 @@
 
 部品（どれもルートの子。Move_Hatch と Lamp_Cabin だけ Roof_Back の子）：
   Floor        船底＋床板＋中央の輪＋席の印（席の色の円とアイコン）＋タンクの台
-  Wall_Back    奥半分の壁（窓の穴つき）＋すその帯＋オレンジの帯＋窓枠＋配管の箱2つ＋壁の画面4つ   いつも出す
+  Wall_Back    奥半分の壁（窓の穴つき）＋すその帯＋オレンジの帯＋窓枠＋配管の箱2つ＋画面の枠4つ   いつも出す
+  MonScreen0〜3 壁の画面（青緑の板）。Wall_Back とは別の部品（Unity で発光に差し替える）
   Wall_Front   手前半分の壁                                     カメラが中を見るときは消す
   Roof_Back    奥半分の屋根（円錐＋筒）＋骨4本                  断面のカメラでは出す。見下ろしでは消す（屋根なし）
   Roof_Front   手前半分の屋根                                   カメラが中を見るときは消す
@@ -292,10 +293,15 @@ def build_floor():
                        "gray_light", bevel=0.03))
     # 床板：壁の内側より 1cm 大きくして、壁の下にもぐらせる（すき間が見えない）
     parts.append(lathe("FloorPlate", [(0, BASE_H - 0.01), (R_IN + 0.01, BASE_H - 0.01), (R_IN + 0.01, FLOOR_Z),
-                                      (0, FLOOR_Z)], "gray_dark", bevel=0))
+                                      (0, FLOOR_Z)], "cream", bevel=0))
     # 中央の輪（部屋の中心の目印）
     parts.append(lathe("FloorRing", [(0.98, FLOOR_Z - 0.015), (1.07, FLOOR_Z - 0.015), (1.07, FLOOR_Z + 0.012),
                                      (0.98, FLOOR_Z + 0.012)], "teal", seg=32, bevel=0))
+    # 床の目地：灰色の細い同心円（幅 2.5cm、高さ 5mm。床の上に載せる）
+    for k, r in enumerate((1.45, 2.05, 2.55)):
+        parts.append(lathe(f"FloorJoint{k + 1}", [(r, FLOOR_Z - 0.002), (r + 0.025, FLOOR_Z - 0.002),
+                                              (r + 0.025, FLOOR_Z + 0.005), (r, FLOOR_Z + 0.005)],
+                           "gray_light", seg=32, bevel=0))
     # 席の印：クルーが浮く位置の真下に、席の色の円とアイコン。席が空いていても「ここが誰の席か」が分かる
     for seat, th, color, icon in SEATS:
         c = polar(R_CREW, th)
@@ -338,13 +344,14 @@ def build_wall_back():
         parts.append(box_m(f"JBox{side}", JBOX_SIZE, m, "gray_light", bevel=0.03))
         parts.append(box_m(f"JBoxCap{side}", (JBOX_SIZE[0] - 0.08, JBOX_SIZE[1] - 0.10, 0.03),
                            m @ Matrix.Translation((0, -0.02, JBOX_SIZE[2] / 2 + 0.005)), "gray_dark", bevel=0))
-    # 壁の画面（枠＋青緑の画面。文字は入れない。Unity で絵を貼れる）
+    # 壁の画面（枠＋青緑の画面。文字は入れない。Unity で絵を貼れる）。画面は join しない：
+    # 独立した部品 Ship_Interior.MonScreen{k} のまま（ルートの子）。Unity の ScreenGlow が名前で探して発光させる
     for k, (th, w) in enumerate(MONITORS):
         zc = (MON_Z0 + MON_Z1) / 2
         m = Matrix.Translation(polar(R_IN - 0.03, th, zc)) @ rot_th(th)
         parts.append(box_m(f"Mon{k}", (w, 0.10, MON_Z1 - MON_Z0), m, "gray_light", bevel=0.02))
-        parts.append(box_m(f"MonScreen{k}", (w - 0.16, 0.04, MON_Z1 - MON_Z0 - 0.14),
-                           m @ Matrix.Translation((0, -0.045, 0)), "teal", bevel=0))
+        box_m(f"MonScreen{k}", (w - 0.16, 0.04, MON_Z1 - MON_Z0 - 0.14),
+              m @ Matrix.Translation((0, -0.045, 0)), "teal", bevel=0)
     wall = ck.join(parts, "Wall_Back")
     ck.set_origin(wall, (0, 0, 0))
     return wall
