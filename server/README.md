@@ -120,7 +120,8 @@ practice の間は同じメッセージが「練習」として数えられる�
 {"type":"room","room":"1234","phase":"design","players":[{"id":"9f3a01bc","name":"aki","seats":["pilot"],"connected":true,"bot":false}]}
 // phase: lobby / design / practice / stir / flight / ending / report。段階が変わるたび・人の出入りのたびに全員へ
 {"type":"design","design":{"parts":{"battery":3,"camera":1},"trajectory":"science","rocket":"large"},
- "totals":{"mass":96,"cost":90,"status":"ok","mass_limit":140,"budget":110,"capacity":150,"oxygen":100,"fuel":100}}
+ "totals":{"mass":96,"cost":90,"status":"ok","mass_limit":140,"budget":110,"mass_left":44,"budget_left":20,"over_mass":false,"over_budget":false,"science_possible":true,"capacity":150,"oxygen":100,"fuel":100}}
+// totals：mass_left / budget_left は上限との差（超過なら負。UI は引き算しない）。over_mass / over_budget は真偽（status は over_mass が優先）。science_possible は観測機器（camera・spectrometer・radar）が1つ以上あるか（0 なら Req 2 は届かない）
 {"type":"state","t":120,"state":{ ... 下の表 ... }}                                          // flight の間、毎秒
 {"type":"result","result":{ ... reference_sim の result() と同じ ... },"strict":false,"strict_reason":null}
 // strict_reason：null / "missed_burn"（噴射窓を逃した）/ "reentry_not_ready"（再突入の準備不足）。report にも同じ2つが付く

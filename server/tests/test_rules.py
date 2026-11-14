@@ -293,3 +293,20 @@ def test_strict_reason_in_state_result_report(events, reason):
     assert rep["strict_reason"] == reason
     st = g.sim
     assert st.strict is (reason is not None)
+
+
+def test_design_totals_left_and_flags():
+    from game.room import design_totals
+    ok = design_totals(rs.DESIGN_SCIENCE)
+    assert ok["mass_left"] == ok["mass_limit"] - ok["mass"]
+    assert ok["budget_left"] == ok["budget"] - ok["cost"]
+    assert not ok["over_mass"] and not ok["over_budget"] and ok["science_possible"]
+    # 小型ロケットに詰め込むと重さ超過（残りは負）
+    heavy = {"parts": dict(rs.DESIGN_SCIENCE["parts"]), "trajectory": "science", "rocket": "small"}
+    heavy["parts"]["battery"] = rs.PART["battery"]["max"]
+    heavy["parts"]["extra_fuel_tank"] = rs.PART["extra_fuel_tank"]["max"]
+    t = design_totals(heavy)
+    assert t["over_mass"] == (t["mass_left"] < 0) and t["over_budget"] == (t["budget_left"] < 0)
+    # 観測機器が無ければ science_possible は false
+    none = {"parts": {"battery": 1}, "trajectory": "free_return", "rocket": "small"}
+    assert design_totals(none)["science_possible"] is False
