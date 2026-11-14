@@ -205,7 +205,7 @@ public class LifeSupportPanel : SeatPanel
     /// <summary>#84：練習の間「まだ試していない操作」を光らせる（close_valve → タンク、swap_filter → フィルター、stir → かき混ぜ）</summary>
     public override void Highlight(string cmd, bool on)
     {
-        if (on) lit.Add(cmd); else lit.Remove(cmd);
+        if (on ? !lit.Add(cmd) : !lit.Remove(cmd)) return;   // #84 は毎フレーム呼ぶので、変わったときだけ描き直す
         if (stirCard != null && cmd == "stir") stirCard.Set(on || stirBtn.Root.gameObject.activeSelf, false);
         Refresh(Ctx.State);
     }

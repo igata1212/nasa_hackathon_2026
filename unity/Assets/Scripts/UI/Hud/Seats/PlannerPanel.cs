@@ -185,7 +185,7 @@ public class PlannerPanel : SeatPanel
     /// <summary>#84：練習の間「まだ試していない操作」を光らせる（switch → 観測、set_route → 帰り道）</summary>
     public override void Highlight(string cmd, bool on)
     {
-        if (on) lit.Add(cmd); else lit.Remove(cmd);
+        if (on ? !lit.Add(cmd) : !lit.Remove(cmd)) return;   // #84 は毎フレーム呼ぶので、変わったときだけ描き直す
         Refresh(Ctx.State);
     }
 
