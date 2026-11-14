@@ -209,3 +209,15 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 | `export.py` | `KINDS` に `"part": "Part"` を足した |
 
 設計画面用のアイコン（PNG）は、大きさと背景が未決定。決まるまでは `renders/` の画像（`_2_front.png`）を使う。
+
+## 11. 場面の背景 `Scene_`（#52・#53、追記：Taiga・Fable 5.2、2026-11-14）
+
+場面の背景（発射台・地面・管制室の部屋）の名前の頭を `Scene_` にした。元データは `modeling/scene/`、FBX は `unity/Assets/Models/Scene/`。その場面にだけ出る人（管制室の先生など）も同じフォルダに置く。core を次のように直した。
+
+| ファイル | 直したこと |
+|---|---|
+| `corekit.py`・`check.py` | ルートの名前に `Scene_` を足した |
+| `check.py` | 三角数の上限：`Scene_` は 6,000 |
+| `export.py` | `KINDS` に `"scene": "Scene"` を足した |
+
+各場面の部品と置き方は `modeling/scene/README.md`。
