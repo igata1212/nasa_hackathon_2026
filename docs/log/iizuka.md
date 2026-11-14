@@ -23,3 +23,4 @@
 - 16:29 #64 無重力：浮いて漂う小物4種（ペン・手順書・宇宙食・ダクトテープ）、ガスは四方に広がる。ヘルメットの輪はやめた
 - 16:39 #65 GMAT の帰還ルート A/B（Taiga 計算）を確認し、ゲーム時間との対応表（time_map.json）と Unity の軌道の地図（OrbitMap シーン、TrajectoryView）を作った
 - 16:47 #69 Python の WebSocket ゲームサーバー（reference_sim をそのまま使う、47 テスト合格）、xlsx からパラメータ JSON（T1〜T5 完全一致）、Unity のオフライン再生用の記録
+- 16:49 #96 Unity のゲームの流れの骨組み（Title → Lobby → Design → Cabin → Ending → Report、1シーンで画面切替）。IGameClient、OfflineClient（記録の再生）、WsClient（ClientWebSocket）
