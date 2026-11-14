@@ -1,0 +1,53 @@
+{
+ "name": "Ctrl_Valve",
+ "tris": 1380,
+ "min": [
+  -0.15,
+  -0.15,
+  0.0
+ ],
+ "max": [
+  0.15,
+  0.15,
+  0.24
+ ],
+ "size": [
+  0.3,
+  0.3,
+  0.24
+ ],
+ "objects": {
+  "Ctrl_Valve": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Valve.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Valve.Bonnet": {
+   "origin": [
+    0.0,
+    0.0,
+    0.095
+   ],
+   "tris": 188
+  },
+  "Ctrl_Valve.Move_Wheel": {
+   "origin": [
+    0.0,
+    0.0,
+    0.17
+   ],
+   "tris": 1084
+  }
+ }
+}

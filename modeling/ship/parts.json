@@ -1,0 +1,40 @@
+{
+ "Ship_SM": [
+  {
+   "name": "Ship_SM.Move_Panel4",
+   "type": "rotate",
+   "axis": "X",
+   "min": 0,
+   "max": 120.0,
+   "default": 0,
+   "note": "事故で吹き飛ぶ外板（機械船の第4区画、−Y 側の 60°）。原点は下の辺の外側で、+ で外（−Y）へ開く。吹き飛ばすときは Unity で子から外して −Y 向きに飛ばす",
+   "origin": [
+    0.0,
+    -1.95,
+    2.98
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Ship_Stack": [
+  {
+   "name": "Ship_SM.Move_Panel4",
+   "type": "rotate",
+   "axis": "X",
+   "min": 0,
+   "max": 120.0,
+   "default": 0,
+   "note": "事故で吹き飛ぶ外板（機械船の第4区画、−Y 側の 60°）。原点は下の辺の外側で、+ で外（−Y）へ開く。吹き飛ばすときは Unity で子から外して −Y 向きに飛ばす",
+   "origin": [
+    0.0,
+    -1.95,
+    2.98
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ]
+}

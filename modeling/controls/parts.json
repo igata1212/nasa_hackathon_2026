@@ -1,0 +1,168 @@
+{
+ "Ctrl_Instr_Camera": [
+  {
+   "name": "Ctrl_Instr_Camera.Move_Knob",
+   "type": "rotate",
+   "axis": "Z",
+   "min": 0,
+   "max": 90,
+   "default": 0,
+   "on": 90,
+   "off": 0,
+   "note": "2位置。0＝OFF（左前の小さい灰の角を指す）、90＝ON（右前のクリームの三角を指す）。初期は OFF（SPEC 3章）",
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Instr_Radar": [
+  {
+   "name": "Ctrl_Instr_Radar.Move_Knob",
+   "type": "rotate",
+   "axis": "Z",
+   "min": 0,
+   "max": 90,
+   "default": 0,
+   "on": 90,
+   "off": 0,
+   "note": "2位置。0＝OFF（左前の小さい灰の角を指す）、90＝ON（右前のクリームの三角を指す）。初期は OFF（SPEC 3章）",
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Instr_Spectrometer": [
+  {
+   "name": "Ctrl_Instr_Spectrometer.Move_Knob",
+   "type": "rotate",
+   "axis": "Z",
+   "min": 0,
+   "max": 90,
+   "default": 0,
+   "on": 90,
+   "off": 0,
+   "note": "2位置。0＝OFF（左前の小さい灰の角を指す）、90＝ON（右前のクリームの三角を指す）。初期は OFF（SPEC 3章）",
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Stir": [
+  {
+   "name": "Ctrl_Stir.Move_Knob",
+   "type": "rotate",
+   "axis": "Z",
+   "min": 0,
+   "max": 50,
+   "default": 0,
+   "note": "ひねると右前のクリームの三角まで 50° 回る。手を離すと 0 に戻る（モーメンタリ）。M04 で Life Support が操作",
+   "origin": [
+    0.0,
+    0.025,
+    0.06
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Toggle_Comms": [
+  {
+   "name": "Ctrl_Toggle_Comms.Move_Lever",
+   "type": "rotate",
+   "axis": "X",
+   "min": -25,
+   "max": 25,
+   "default": -25,
+   "on": -25,
+   "off": 25,
+   "note": "2位置。ON＝奥（−Y の反対）へ倒す −25°、OFF＝手前へ +25°。初期は ON（SPEC 3章 sw[...] = true）",
+   "origin": [
+    0.0,
+    0.035,
+    0.09
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Toggle_Heater": [
+  {
+   "name": "Ctrl_Toggle_Heater.Move_Lever",
+   "type": "rotate",
+   "axis": "X",
+   "min": -25,
+   "max": 25,
+   "default": -25,
+   "on": -25,
+   "off": 25,
+   "note": "2位置。ON＝奥（−Y の反対）へ倒す −25°、OFF＝手前へ +25°。初期は ON（SPEC 3章 sw[...] = true）",
+   "origin": [
+    0.0,
+    0.035,
+    0.09
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Toggle_Lights": [
+  {
+   "name": "Ctrl_Toggle_Lights.Move_Lever",
+   "type": "rotate",
+   "axis": "X",
+   "min": -25,
+   "max": 25,
+   "default": -25,
+   "on": -25,
+   "off": 25,
+   "note": "2位置。ON＝奥（−Y の反対）へ倒す −25°、OFF＝手前へ +25°。初期は ON（SPEC 3章 sw[...] = true）",
+   "origin": [
+    0.0,
+    0.035,
+    0.09
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Toggle_Nav": [
+  {
+   "name": "Ctrl_Toggle_Nav.Move_Lever",
+   "type": "rotate",
+   "axis": "X",
+   "min": -25,
+   "max": 25,
+   "default": -25,
+   "on": -25,
+   "off": 25,
+   "note": "2位置。ON＝奥（−Y の反対）へ倒す −25°、OFF＝手前へ +25°。初期は ON（SPEC 3章 sw[...] = true）",
+   "origin": [
+    0.0,
+    0.035,
+    0.09
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ]
+}

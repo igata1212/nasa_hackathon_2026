@@ -1,0 +1,53 @@
+{
+ "name": "Fx_BrokenPipe",
+ "tris": 1224,
+ "min": [
+  -0.92,
+  -0.1219,
+  -0.0002
+ ],
+ "max": [
+  0.92237,
+  0.115,
+  0.23434
+ ],
+ "size": [
+  1.84237,
+  0.2369,
+  0.23454
+ ],
+ "objects": {
+  "Fx_BrokenPipe": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Fx_BrokenPipe.Move_PipeR": {
+   "origin": [
+    0.9,
+    0.0,
+    0.115
+   ],
+   "tris": 612
+  },
+  "Fx_BrokenPipe.PipeL": {
+   "origin": [
+    -0.9,
+    0.0,
+    0.115
+   ],
+   "tris": 612
+  },
+  "Fx_BrokenPipe.Slot_Leak": {
+   "origin": [
+    0.0,
+    0.0,
+    0.115
+   ],
+   "tris": 0
+  }
+ }
+}

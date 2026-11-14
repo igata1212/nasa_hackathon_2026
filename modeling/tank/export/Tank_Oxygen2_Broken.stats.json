@@ -1,0 +1,133 @@
+{
+ "name": "Tank_Oxygen2_Broken",
+ "tris": 1506,
+ "min": [
+  -0.262,
+  -0.29303,
+  0.0
+ ],
+ "max": [
+  0.262,
+  0.262,
+  0.645
+ ],
+ "size": [
+  0.524,
+  0.55503,
+  0.645
+ ],
+ "objects": {
+  "Tank_Oxygen2_Broken": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Tank_Oxygen2_Broken.Band": {
+   "origin": [
+    0.0,
+    0.0,
+    0.325
+   ],
+   "tris": 188
+  },
+  "Tank_Oxygen2_Broken.Cradle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.12
+   ],
+   "tris": 188
+  },
+  "Tank_Oxygen2_Broken.Dot_1": {
+   "origin": [
+    -0.19526,
+    -0.15708,
+    0.43796
+   ],
+   "tris": 60
+  },
+  "Tank_Oxygen2_Broken.Dot_2": {
+   "origin": [
+    -0.10665,
+    -0.17823,
+    0.50505
+   ],
+   "tris": 60
+  },
+  "Tank_Oxygen2_Broken.Inside": {
+   "origin": [
+    0.0,
+    0.0,
+    0.325
+   ],
+   "tris": 224
+  },
+  "Tank_Oxygen2_Broken.Label": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Tank_Oxygen2_Broken.Neck": {
+   "origin": [
+    0.0,
+    0.0,
+    0.565
+   ],
+   "tris": 188
+  },
+  "Tank_Oxygen2_Broken.Pad": {
+   "origin": [
+    0.0,
+    0.0,
+    0.625
+   ],
+   "tris": 108
+  },
+  "Tank_Oxygen2_Broken.Petals": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 48
+  },
+  "Tank_Oxygen2_Broken.Plinth": {
+   "origin": [
+    0.0,
+    0.0,
+    0.04
+   ],
+   "tris": 108
+  },
+  "Tank_Oxygen2_Broken.Shell": {
+   "origin": [
+    0.0,
+    0.0,
+    0.325
+   ],
+   "tris": 226
+  },
+  "Tank_Oxygen2_Broken.Slot_Leak": {
+   "origin": [
+    0.10062,
+    -0.16102,
+    0.45795
+   ],
+   "tris": 0
+  },
+  "Tank_Oxygen2_Broken.Slot_Valve": {
+   "origin": [
+    0.0,
+    0.0,
+    0.645
+   ],
+   "tris": 0
+  }
+ }
+}

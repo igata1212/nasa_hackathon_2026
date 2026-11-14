@@ -1,0 +1,77 @@
+{
+ "name": "Ctrl_Ignite",
+ "tris": 1184,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.1375
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.1375
+ ],
+ "objects": {
+  "Ctrl_Ignite": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Ignite.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Ignite.Collar": {
+   "origin": [
+    0.0,
+    0.0,
+    0.055
+   ],
+   "tris": 188
+  },
+  "Ctrl_Ignite.HingeL": {
+   "origin": [
+    -0.045,
+    0.085,
+    0.08875
+   ],
+   "tris": 108
+  },
+  "Ctrl_Ignite.HingeR": {
+   "origin": [
+    0.045,
+    0.085,
+    0.08875
+   ],
+   "tris": 108
+  },
+  "Ctrl_Ignite.Move_Button": {
+   "origin": [
+    0.0,
+    0.0,
+    0.07
+   ],
+   "tris": 188
+  },
+  "Ctrl_Ignite.Move_Cover": {
+   "origin": [
+    0.0,
+    0.085,
+    0.1225
+   ],
+   "tris": 484
+  }
+ }
+}

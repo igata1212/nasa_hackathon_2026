@@ -1,0 +1,141 @@
+{
+ "name": "Console_CommsPower",
+ "tris": 1228,
+ "min": [
+  -0.643,
+  -0.32854,
+  0.0
+ ],
+ "max": [
+  0.643,
+  0.32,
+  1.11093
+ ],
+ "size": [
+  1.286,
+  0.64854,
+  1.11093
+ ],
+ "objects": {
+  "Console_CommsPower": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Board": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_CommsPower.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 176
+  },
+  "Console_CommsPower.Icon": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_CommsPower.Panel": {
+   "origin": [
+    0.0,
+    -0.14382,
+    0.7346
+   ],
+   "tris": 108
+  },
+  "Console_CommsPower.Rim": {
+   "origin": [
+    -0.628,
+    -0.15493,
+    0.73588
+   ],
+   "tris": 404
+  },
+  "Console_CommsPower.Screen_L": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_CommsPower.Screen_R": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_CommsPower.Slot_1": {
+   "origin": [
+    -0.5,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Slot_2": {
+   "origin": [
+    -0.3,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Slot_3": {
+   "origin": [
+    -0.1,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Slot_4": {
+   "origin": [
+    0.1,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Slot_5": {
+   "origin": [
+    0.3,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Slot_6": {
+   "origin": [
+    0.5,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_CommsPower.Top": {
+   "origin": [
+    0.0,
+    0.156,
+    0.78
+   ],
+   "tris": 108
+  }
+ }
+}

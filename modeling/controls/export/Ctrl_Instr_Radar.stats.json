@@ -1,0 +1,61 @@
+{
+ "name": "Ctrl_Instr_Radar",
+ "tris": 1318,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.1681
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.1681
+ ],
+ "objects": {
+  "Ctrl_Instr_Radar": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Instr_Radar.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Instr_Radar.Dial": {
+   "origin": [
+    0.0,
+    0.0,
+    0.05
+   ],
+   "tris": 188
+  },
+  "Ctrl_Instr_Radar.Marks": {
+   "origin": [
+    0.00016,
+    -0.0737,
+    0.04
+   ],
+   "tris": 188
+  },
+  "Ctrl_Instr_Radar.Move_Knob": {
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "tris": 834
+  }
+ }
+}

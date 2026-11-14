@@ -14,3 +14,4 @@
 - 13:47 #29 Unity MCP（CoplayDev/unity-mcp v10.3.0）を追加。.mcp.json でチーム共有
 - 13:51 #31 手描きスケッチ4枚（ゲームの流れ7場面）を docs/design/storyboard.md に画像付きでまとめた（文書化：sonnet）
 - 14:10 #35 #9 の決定に合わせて planning-meeting.md を SPEC.md と揃えた（設計・スコア・イベント・難易度・人数・移動・3Dモデル）
+- 15:00 #34 必ず必要な 3D モデル33個を作成（精度エージェントチーム：計画 Fable、制作 Fable 2・Opus 4、まとめ Opus）。共通の土台 modeling/core/、Unity に FBX、CREDITS.md

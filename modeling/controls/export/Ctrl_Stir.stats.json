@@ -1,0 +1,61 @@
+{
+ "name": "Ctrl_Stir",
+ "tris": 1160,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.125
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.125
+ ],
+ "objects": {
+  "Ctrl_Stir": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Stir.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Stir.Dial": {
+   "origin": [
+    0.0,
+    0.025,
+    0.05
+   ],
+   "tris": 188
+  },
+  "Ctrl_Stir.Marks": {
+   "origin": [
+    0.04288,
+    -0.06423,
+    0.04
+   ],
+   "tris": 188
+  },
+  "Ctrl_Stir.Move_Knob": {
+   "origin": [
+    0.0,
+    0.025,
+    0.06
+   ],
+   "tris": 676
+  }
+ }
+}

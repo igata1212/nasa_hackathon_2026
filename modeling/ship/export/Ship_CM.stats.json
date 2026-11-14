@@ -1,0 +1,85 @@
+{
+ "name": "Ship_CM",
+ "tris": 886,
+ "min": [
+  -1.93959,
+  -1.93959,
+  0.0
+ ],
+ "max": [
+  1.93959,
+  1.93959,
+  3.45
+ ],
+ "size": [
+  3.87918,
+  3.87918,
+  3.45
+ ],
+ "objects": {
+  "Ship_CM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_CM.Cone": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 476
+  },
+  "Ship_CM.DockRing": {
+   "origin": [
+    0.0,
+    0.0,
+    3.26
+   ],
+   "tris": 60
+  },
+  "Ship_CM.Hatch": {
+   "origin": [
+    0.0,
+    -1.33,
+    1.45
+   ],
+   "tris": 108
+  },
+  "Ship_CM.HatchWindow": {
+   "origin": [
+    0.0,
+    -1.36,
+    1.52
+   ],
+   "tris": 28
+  },
+  "Ship_CM.HeatShield": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 190
+  },
+  "Ship_CM.Window0": {
+   "origin": [
+    -0.78,
+    -0.93,
+    1.77
+   ],
+   "tris": 12
+  },
+  "Ship_CM.Window1": {
+   "origin": [
+    0.78,
+    -0.93,
+    1.77
+   ],
+   "tris": 12
+  }
+ }
+}

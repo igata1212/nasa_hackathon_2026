@@ -1,0 +1,157 @@
+{
+ "name": "Ship_LM",
+ "tris": 1616,
+ "min": [
+  -4.67798,
+  -4.7,
+  0.0
+ ],
+ "max": [
+  4.67798,
+  4.7,
+  6.3
+ ],
+ "size": [
+  9.35595,
+  9.4,
+  6.3
+ ],
+ "objects": {
+  "Ship_LM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_LM.AftBay": {
+   "origin": [
+    0.0,
+    1.38,
+    4.65
+   ],
+   "tris": 108
+  },
+  "Ship_LM.Cabin": {
+   "origin": [
+    0.0,
+    -0.78,
+    4.52
+   ],
+   "tris": 188
+  },
+  "Ship_LM.Descent": {
+   "origin": [
+    0.0,
+    0.0,
+    2.35
+   ],
+   "tris": 220
+  },
+  "Ship_LM.DescentNozzle": {
+   "origin": [
+    0.0,
+    0.0,
+    1.17
+   ],
+   "tris": 60
+  },
+  "Ship_LM.Dish": {
+   "origin": [
+    1.05,
+    0.55,
+    5.72
+   ],
+   "tris": 56
+  },
+  "Ship_LM.DockTunnel": {
+   "origin": [
+    0.0,
+    0.0,
+    5.975
+   ],
+   "tris": 60
+  },
+  "Ship_LM.Hatch": {
+   "origin": [
+    0.0,
+    -1.56,
+    3.9
+   ],
+   "tris": 108
+  },
+  "Ship_LM.Jets": {
+   "origin": [
+    -1.4,
+    -0.55,
+    5.25
+   ],
+   "tris": 48
+  },
+  "Ship_LM.Legs": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 240
+  },
+  "Ship_LM.Mid": {
+   "origin": [
+    0.0,
+    0.4,
+    4.5
+   ],
+   "tris": 108
+  },
+  "Ship_LM.Pads": {
+   "origin": [
+    -0.0,
+    -4.25,
+    0.09
+   ],
+   "tris": 144
+  },
+  "Ship_LM.Porch": {
+   "origin": [
+    0.0,
+    -2.45,
+    3.14
+   ],
+   "tris": 12
+  },
+  "Ship_LM.Tank0": {
+   "origin": [
+    -1.45,
+    0.35,
+    4.2
+   ],
+   "tris": 120
+  },
+  "Ship_LM.Tank1": {
+   "origin": [
+    1.45,
+    0.35,
+    4.2
+   ],
+   "tris": 120
+  },
+  "Ship_LM.Window0": {
+   "origin": [
+    -0.52,
+    -1.56,
+    4.98
+   ],
+   "tris": 12
+  },
+  "Ship_LM.Window1": {
+   "origin": [
+    0.52,
+    -1.56,
+    4.98
+   ],
+   "tris": 12
+  }
+ }
+}

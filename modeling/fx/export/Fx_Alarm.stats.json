@@ -1,0 +1,61 @@
+{
+ "name": "Fx_Alarm",
+ "tris": 1102,
+ "min": [
+  -0.15,
+  -0.15,
+  0.0
+ ],
+ "max": [
+  0.15,
+  0.15,
+  0.22
+ ],
+ "size": [
+  0.3,
+  0.3,
+  0.22
+ ],
+ "objects": {
+  "Fx_Alarm": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Fx_Alarm.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.03
+   ],
+   "tris": 188
+  },
+  "Fx_Alarm.Cage": {
+   "origin": [
+    0.0,
+    0.0,
+    0.07
+   ],
+   "tris": 384
+  },
+  "Fx_Alarm.Lamp_Red": {
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "tris": 126
+  },
+  "Fx_Alarm.Move_Shade": {
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "tris": 404
+  }
+ }
+}
