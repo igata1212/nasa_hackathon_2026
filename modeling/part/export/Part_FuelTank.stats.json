@@ -1,0 +1,77 @@
+{
+ "name": "Part_FuelTank",
+ "tris": 1124,
+ "min": [
+  -0.232,
+  -0.232,
+  0.0
+ ],
+ "max": [
+  0.232,
+  0.232,
+  1.0
+ ],
+ "size": [
+  0.464,
+  0.464,
+  1.0
+ ],
+ "objects": {
+  "Part_FuelTank": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_FuelTank.Band1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.69
+   ],
+   "tris": 188
+  },
+  "Part_FuelTank.Band2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.39
+   ],
+   "tris": 188
+  },
+  "Part_FuelTank.Cap": {
+   "origin": [
+    0.0,
+    0.0,
+    0.96
+   ],
+   "tris": 140
+  },
+  "Part_FuelTank.Cradle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.12
+   ],
+   "tris": 188
+  },
+  "Part_FuelTank.Plinth": {
+   "origin": [
+    0.0,
+    0.0,
+    0.04
+   ],
+   "tris": 108
+  },
+  "Part_FuelTank.Shell": {
+   "origin": [
+    0.0,
+    0.0,
+    0.54
+   ],
+   "tris": 312
+  }
+ }
+}

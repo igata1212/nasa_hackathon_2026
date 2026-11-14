@@ -1,0 +1,45 @@
+{
+ "name": "Part_SolarPanel",
+ "tris": 1220,
+ "min": [
+  -1.0,
+  -0.45885,
+  0.0
+ ],
+ "max": [
+  1.0,
+  0.45885,
+  0.52041
+ ],
+ "size": [
+  2.0,
+  0.91771,
+  0.52041
+ ],
+ "objects": {
+  "Part_SolarPanel": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_SolarPanel.Mount": {
+   "origin": [
+    0.0,
+    0.18,
+    0.05
+   ],
+   "tris": 248
+  },
+  "Part_SolarPanel.Panel": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 972
+  }
+ }
+}
