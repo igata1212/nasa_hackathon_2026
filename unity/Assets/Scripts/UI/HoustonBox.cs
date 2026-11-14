@@ -53,14 +53,22 @@ public class HoustonBox
         warnRoot.transform.SetAsLastSibling();
     }
 
-    public void Push(string text)
+    static int Rank(string pr) => pr == "milestone" ? 3 : pr == "critical" ? 2 : pr == "high" ? 1 : 0;
+    int curRank;
+
+    /// <summary>新しい台詞が来たら、表示中・待ちの古い台詞を捨てて新しいものを出す。ただし表示中の台詞のほうが優先度が高い（マイルストーン ＞ critical ＞ high）ときは、新しいほうを捨てる</summary>
+    public void Push(string text, string priority = null)
     {
         if (string.IsNullOrEmpty(text)) return;
-        queue.Enqueue(text);
-        while (queue.Count > 2) queue.Dequeue();   // 早送りで溜まったら古いものを捨てる
+        int r = Rank(priority);
+        if (current != "" && curRank > r) return;
+        queue.Clear();
+        current = text; curRank = r;
+        until = Time.unscaledTime + 4f + text.Length * 0.05f;   // 読む時間（文字数に比例）
+        Draw();
     }
 
-    public void Clear() { queue.Clear(); current = ""; until = 0; noSignal = commsOff = false; warnUntil = 0; warnRoot.SetActive(false); Draw(); }
+    public void Clear() { queue.Clear(); current = ""; curRank = 0; until = 0; noSignal = commsOff = false; warnUntil = 0; warnRoot.SetActive(false); Draw(); }
 
     public void SetLink(bool signalLost, bool commsSwitchOff) { noSignal = signalLost; commsOff = commsSwitchOff; Draw(); }
 
