@@ -19,3 +19,4 @@
 - 15:16 #39 クルーを iizuka のスケッチに合わせて可愛く作り直した（約2頭身、横長バイザー、ひとかたまりの体、NASA の文字なし。Opus）
 - 15:36 #40 宇宙船の内部（船室 Ship_Interior）を作った。ドールハウス型で俯瞰・断面の両方に対応、4席・タンク・窓の配置と Slot（Fable 5.2 high）
 - 16:15 #66 サーバーを Python（reference_sim を使う WebSocket サーバー、Cloudflare Tunnel で公開）に決定。docs/design/architecture.md、SPEC.md・CLAUDE.md を更新
+- 16:47 #69 Python の WebSocket ゲームサーバー（reference_sim をそのまま使う、47 テスト合格）、xlsx からパラメータ JSON（T1〜T5 完全一致）、Unity のオフライン再生用の記録
