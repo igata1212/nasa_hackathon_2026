@@ -1,19 +1,19 @@
 {
  "name": "Crew_CommsPower",
- "tris": 2392,
+ "tris": 2508,
  "min": [
-  -0.323,
-  -0.35693,
+  -0.36988,
+  -0.30743,
   0.0
  ],
  "max": [
-  0.323,
-  0.295,
+  0.36988,
+  0.325,
   1.2
  ],
  "size": [
-  0.646,
-  0.65193,
+  0.73976,
+  0.63243,
   1.2
  ],
  "objects": {
@@ -27,25 +27,25 @@
   },
   "Crew_CommsPower.Arm_L": {
    "origin": [
-    0.245,
+    0.2,
     0.0,
-    0.63
+    0.53
    ],
-   "tris": 260
+   "tris": 120
   },
   "Crew_CommsPower.Arm_R": {
    "origin": [
-    -0.245,
+    -0.2,
     0.0,
-    0.63
+    0.53
    ],
-   "tris": 260
+   "tris": 120
   },
   "Crew_CommsPower.Backpack": {
    "origin": [
     0.0,
-    0.2,
-    0.54
+    0.235,
+    0.44
    ],
    "tris": 120
   },
@@ -53,25 +53,25 @@
    "origin": [
     0.0,
     0.0,
-    0.72
+    0.645
    ],
-   "tris": 720
+   "tris": 1072
   },
   "Crew_CommsPower.Eyes_Normal": {
    "origin": [
-    -0.085,
-    -0.23105,
-    0.945
+    -0.095,
+    -0.27754,
+    0.98978
    ],
    "tris": 96
   },
   "Crew_CommsPower.Eyes_Panic": {
    "origin": [
-    -0.085,
-    -0.23105,
-    0.945
+    -0.095,
+    -0.2764,
+    0.99363
    ],
-   "tris": 208
+   "tris": 256
   },
   "Crew_CommsPower.Eyes_Relief": {
    "origin": [
@@ -85,25 +85,25 @@
    "origin": [
     0.1,
     0.0,
-    0.34
+    0.2
    ],
-   "tris": 248
+   "tris": 120
   },
   "Crew_CommsPower.Leg_R": {
    "origin": [
     -0.1,
     0.0,
-    0.34
+    0.2
    ],
-   "tris": 248
+   "tris": 120
   },
   "Crew_CommsPower.Torso": {
    "origin": [
     0.0,
     0.0,
-    0.34
+    0.2
    ],
-   "tris": 120
+   "tris": 372
   }
  }
 }
