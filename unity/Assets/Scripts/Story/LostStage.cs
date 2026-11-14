@@ -1,8 +1,9 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130・#141）
 // 演出3'：帰れなかったとき（#124。ED-C）。約 4.4 秒。悲しくなりすぎないよう、静かに見せる。
 //   0.0  宇宙を漂う船と、遠くの地球（ゆっくり回る。音も字幕の色も強くしない）
 //   0.8  少しずつ暗くなる → 1.0「Mission lost」（暗い空の上）→ 1.6 原因を1行（OXYGEN / POWER RAN OUT）と、
 //        下の帯にヒューストンの台詞（ED-C）→ 4.4 黒 → エンディングの画面
+// 音（#141）：無線の雑音 → quindar_out（0.8 秒）→ 無音 →「Mission lost」と一緒に jingle_fail。警報やエラー音は入れない。
 // #130：小さい字幕とヒューストンの帯が同じことを言っていたので、小さい字幕は原因にした。帯は自動では出さず、ここで時刻を決める。
 using UnityEngine;
 
@@ -40,6 +41,9 @@ public class LostStage : StoryStage
         if (shown) d.Caption("Mission lost", t > TLine ? Cause(d) : "", soft, 0.75f);
         else d.Caption("", "");
         d.HoustonBar(shown && t > TLine ? d.Line("ED-C") : "");
+        StoryAudio.Loop("static", "radio_static_loop", t < 0.8f ? 0.2f * Win(t, 0f, 0.15f) : 0f);   //「応答なし」
+        StoryAudio.At(0.8f, "quindar_out", 0.5f);
+        if (StoryAudio.Crossed(TTitle)) StoryAudio.EndingJingle();
     }
 
     /// <summary>何が尽きたか（サーバーの result の残りから。分からないときは空）</summary>
