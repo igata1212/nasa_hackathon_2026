@@ -1,0 +1,61 @@
+{
+ "name": "Scene_Ground",
+ "tris": 862,
+ "min": [
+  -400.0,
+  -400.0,
+  0.0
+ ],
+ "max": [
+  400.0,
+  400.0,
+  40.3
+ ],
+ "size": [
+  800.0,
+  800.0,
+  40.3
+ ],
+ "objects": {
+  "Scene_Ground": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Scene_Ground.Hardstand": {
+   "origin": [
+    0.0,
+    0.0,
+    38.8
+   ],
+   "tris": 284
+  },
+  "Scene_Ground.Land": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 510
+  },
+  "Scene_Ground.Road": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 68
+  },
+  "Scene_Ground.Slot_Pad": {
+   "origin": [
+    0.0,
+    0.0,
+    40.3
+   ],
+   "tris": 0
+  }
+ }
+}

@@ -2,6 +2,7 @@
 
 書いた人：iizuka（作成：Fable 5.2、parts_*.json・試し書きの順番・容量の数え方：Opus-5、船室の上限と Ship/ の同居：Fable 5.2）／ 最終更新：2026-11-14
 更新：Taiga（2026-11-14、Fable 5.2）#48 Part_（設計画面の部品、1,500 三角以下）を足した
+更新：Taiga（2026-11-14、Fable 5.2）#52 #53 Scene_（場面の背景、6,000 三角以下）を足した
 
 使い方：
   modeling/core/run.sh modeling/core/check.py modeling/fx                              フォルダ（その種類の FBX 全部）
@@ -23,11 +24,12 @@ import palette as _palette        # noqa: E402
 REPO, MODELING, UNITY_MODELS, KINDS = _export.REPO, _export.MODELING, _export.UNITY_MODELS, _export.KINDS
 MAT_NAME = "M_Core_Palette"
 EXTRA_MATS = ("M_Body_Earth", "M_Body_Moon")
-ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part|Prop)_[A-Z][A-Za-z0-9_]*$")
+ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part|Prop|Scene)_[A-Z][A-Za-z0-9_]*$")
 PART_RE = re.compile(r"^[A-Z][A-Za-z0-9_]*$")
 TRI_LIMIT = {"Ctrl": 1500, "Console": 3000, "Crew": 3000, "Tank": 1500, "Ship": 6000, "Body": 2500, "Fx": 1500,
              "Part": 1500,                 # 設計画面の部品（#48）
-             "Prop": 800}                  # 浮く小物（#64）
+             "Prop": 800,                  # 浮く小物（#64）
+             "Scene": 6000}                # 場面の背景（発射台・地面 #52、管制室 #53）
 TRI_LIMIT_TANK_BROKEN = 2000       # 破れたタンク（名前に Broken を含む）
 TRI_LIMIT_INTERIOR = 10000         # 船室（Ship_ で名前に Interior を含む）。art-direction.md の「船室 10,000 以下」（#40）
 FBX_MAX = 500 * 1024
