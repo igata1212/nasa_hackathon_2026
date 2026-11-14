@@ -67,8 +67,42 @@ def slow_pct(sim):
     return max(cold, co2)
 
 
-def snapshot(sim):
+def thresholds():
+    """UI のゲージ・警告の閾値。parameters.json の値と config.py の値をそのまま集める（Unity に数字を書かせない）。
+    power_frac は容量に対する割合、ほかは単位つきの値（oxygen・fuel は量、co2 は %、temp は ℃）"""
     return {
+        "power_frac": {"half": C.H_POWER_HALF, "low": C.H_POWER_LOW, "crit": C.H_POWER_CRIT},
+        "oxygen": {"mid": C.H_OXYGEN_40, "low": C.H_OXYGEN_20},
+        "fuel": {"low": C.H_FUEL_LOW},
+        "co2": {"warn": P["co2_warn"], "slow": P["co2_slow"]},
+        "temp": {"slow": P["temp_slow_c"], "slower": P["temp_slower_c"]},
+        "end_min": {"oxygen": P["end_oxygen_min"], "power": P["end_power_min"], "temp": P["end_temp_min"]},
+        "strict_margin": P["end_strict_margin"],
+        "req_science_min": P["req_science_min"],
+        "reentry_ready_s": P["reentry_ready_s"],
+    }
+
+
+def route_times(sim):
+    """ルート A・B それぞれの再突入・着水の時刻（route を選ぶ前でも両方わかる）"""
+    out = {}
+    for r in ("a", "b"):
+        re = sim.T_AOS + P["time_p4_return_%s_min" % r] * 60
+        out["t_reentry_" + r] = re
+        out["t_splashdown_" + r] = re + P["time_p5_reentry_min"] * 60
+    return out
+
+
+def science_now(sim, cost):
+    """Req 2 の今の見込み：ここで観測と送信をやめて、無事に帰ってきたとしたときの science。
+    result() を無事帰還の状態のコピーに使うので、計算は reference_sim のまま"""
+    tmp = copy.copy(sim)
+    tmp.ending = "ED-A"
+    return tmp.result(cost)["science"]
+
+
+def snapshot(sim, strict_reason=None, cost=None):
+    out = {
         "t": sim.t, "capacity": sim.capacity, "power": sim.power, "oxygen": sim.oxygen,
         "fuel": sim.fuel, "temp": sim.temp, "co2": sim.co2, "filters": sim.filters,
         "leak_open": sim.leak_open, "leaked": sim.leaked, "sw": dict(sim.sw),
@@ -81,7 +115,13 @@ def snapshot(sim):
         "t_burn_close": sim.T_BURN_CLOSE, "t_reentry": sim.t_reentry(),
         "t_splashdown": sim.t_reentry() + P["time_p5_reentry_min"] * 60,
         "slow_pct": slow_pct(sim),
+        "strict_reason": strict_reason,
+        "thresholds": thresholds(),
     }
+    out.update(route_times(sim))
+    if cost is not None:
+        out["science_now"] = science_now(sim, cost)
+    return out
 
 
 def history_row(sim):
@@ -134,9 +174,9 @@ class Game:
         """入室・再接続したときにその人へ送るもの"""
         msgs = [self.room_msg(), self.design_msg()]
         if self.sim is not None:
-            msgs.append({"type": "state", "t": self.sim.t, "state": snapshot(self.sim)})
+            msgs.append({"type": "state", "t": self.sim.t, "state": self._snapshot()})
         if self.phase in ("ending", "report") and self.result:
-            msgs.append({"type": "result", "result": self.result})
+            msgs.append(self.result_msg())
         if self.phase == "report":
             msgs.append(self.report_msg())
         return msgs
@@ -227,6 +267,7 @@ class Game:
         self.commands = []
         self.fired = set()
         self.result = None
+        self.strict_reason = None
         self.practiced = set()
         self.deadline = None
         self.last_design_status = None
@@ -482,7 +523,10 @@ class Game:
         queue, self.queue = self.queue, []
         for item in queue:
             self._apply(*item)
+        strict_before, t_before = sim.strict, sim.t
         sim.step()
+        if sim.strict and not strict_before:  # sim は理由を持たないので、strict になった瞬間の時刻で見分ける
+            self.strict_reason = "missed_burn" if t_before == sim.T_BURN_CLOSE else "reentry_not_ready"
         self._milestones()
         for ev in self.houston.on_tick(sim):
             self.send(ev)
@@ -493,7 +537,10 @@ class Game:
             self._finish(now)
 
     def _broadcast_state(self):
-        self.send({"type": "state", "t": self.sim.t, "state": snapshot(self.sim)})
+        self.send({"type": "state", "t": self.sim.t, "state": self._snapshot()})
+
+    def _snapshot(self):
+        return snapshot(self.sim, self.strict_reason, self.cost)
 
     def _milestones(self):
         sim, t = self.sim, self.sim.t
@@ -523,11 +570,17 @@ class Game:
         self.next_tick = None
         self._set_phase("ending")
         self.send(milestone_event(out["ending"], t=self.sim.t))
-        self.send({"type": "result", "result": out})
+        self.send(self.result_msg())
         self.deadline = now + self._gs(C.ENDING_HOLD_S)
 
+    def result_msg(self):
+        """result は reference_sim の result() のまま。strict は外に並べる（噴射窓を逃した／再突入の準備不足）"""
+        return {"type": "result", "result": self.result, "strict": self.sim.strict,
+                "strict_reason": self.strict_reason}
+
     def report_msg(self):
-        return {"type": "report", "result": self.result, "design": copy.deepcopy(self.design),
+        return {"type": "report", "result": self.result, "strict": self.sim.strict,
+                "strict_reason": self.strict_reason, "design": copy.deepcopy(self.design),
                 "score_breakdown": score_breakdown(self.sim, self.result, self.cost),
                 "history": self.history, "commands": self.commands}
 
