@@ -211,7 +211,7 @@ def build_houston(book):
         hl.append({"id": "H%02d" % i, "situation": c.get("F", ""), "when": c.get("G", ""),
                    "line": c.get("H", ""), "line_ja": c.get("C", ""),
                    "priority": PRIORITY[c["D"]], "notes": c.get("J", ""), "row": r})
-    # SPEC.md は「17本」と書くが、シートの Milestones は M01-M12 + ED-A/B/C + R01 の16本
+    # シートの Milestones は M01-M12 + ED-A/B/C + R01 の16本（SPEC.md 0章と同じ。#97）
     assert len(ms) == 16 and len(hl) == 28, (len(ms), len(hl))
     return {"_generated_by": GENERATED_BY, "milestone_lines": ms, "reactive_lines": hl}
 
