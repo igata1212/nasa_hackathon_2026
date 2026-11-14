@@ -79,12 +79,12 @@ ck.render_check(root, "fx", parts)                 # renders/ に画像
 | 単位・向き | 1 unit = 1m。Z 上、正面 −Y。ルートは位置0・回転0・スケール1。子もスケール・回転適用済み |
 | 原点 | 床置きは底面中心。操作部品は台座の底の中心。可動部は回転軸の上。地球・月は球の中心 |
 | 宇宙船の例外 | `Ship_` は原点＝ノズル出口の中心、長軸＝+Z（司令船の先端が +Z）。発射台に立てた姿で「底面中心」と同じ扱い（底が z=0） |
-| 命名 | ルート `Ctrl_` `Console_` `Crew_` `Tank_` `Ship_` `Body_` `Fx_`＋大文字始まり。子 `<ルート>.<部品>`。可動部 `.Move_〜`、ランプ `.Lamp_〜`、取り付け位置 `.Slot_〜`。`.001` 不可。入れ子のアセット（`Ship_Stack` の下の `Ship_CM`）はルートと同じ形の名前で、その部品は `Ship_CM.<部品>` |
+| 命名 | ルート `Ctrl_` `Console_` `Crew_` `Tank_` `Ship_` `Body_` `Fx_` `Part_`＋大文字始まり。子 `<ルート>.<部品>`。可動部 `.Move_〜`、ランプ `.Lamp_〜`、取り付け位置 `.Slot_〜`。`.001` 不可。入れ子のアセット（`Ship_Stack` の下の `Ship_CM`）はルートと同じ形の名前で、その部品は `Ship_CM.<部品>` |
 | 決まった部品名 | 操作部品の台座は `.Base`（`ck.ctrl_base`）。コンソールの天板は `.Top`（check.py が高さ 0.80m を見る）。破れたタンクは名前に `Broken` を入れる（三角数の上限が 2,000 になる） |
 | 可動部の表 | 各フォルダに `parts.json`（`ck.write_parts`）。部品名・種類（rotate／translate）・軸（部品のローカル軸、Blender）・範囲・初期値。原点と Unity での軸・符号は自動で入る。角度は度、押し込み量などは m |
 | ベベル | 2〜4cm・2段。最小の太さ 2cm |
 | 書き出し | FBX → `unity/Assets/Models/<種類>/`、glb と `stats.json` → `modeling/<種類>/export/` |
-| フォルダ | `modeling/{controls,console,crew,tank,ship,bodies,fx}/`（`build_*.py`・`renders/`・`export/`・`parts.json`）。Unity は `unity/Assets/Models/{Controls,Console,Crew,Tank,Ship,Bodies,Fx,Core}/`。自分のフォルダ以外に書かない |
+| フォルダ | `modeling/{controls,console,crew,tank,ship,bodies,fx,part}/`（`build_*.py`・`renders/`・`export/`・`parts.json`）。Unity は `unity/Assets/Models/{Controls,Console,Crew,Tank,Ship,Bodies,Fx,Part,Core}/`。自分のフォルダ以外に書かない |
 | 触らない | `modeling/PhysDraft-SpaceCrew3D/` と `unity/Assets/Models/NASA/`。import するスクリプトは `sys.dont_write_bytecode = True` |
 | .blend | コミットしない（スクリプトから作り直せる） |
 | .meta | 手で書かない。Unity に作らせる（Unity を前に出すと取り込みが走る） |
@@ -132,11 +132,11 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 
 | 項目 | 合格 |
 |---|---|
-| 三角数 | 操作部品 1,500／コンソール 3,000／クルー 3,000／タンク 1,500（破れ 2,000）／宇宙船 6,000／地球・月 各 2,500／警報・パイプ 1,500 以下 |
+| 三角数 | 操作部品 1,500／コンソール 3,000／クルー 3,000／タンク 1,500（破れ 2,000）／宇宙船 6,000／地球・月 各 2,500／警報・パイプ 1,500／設計画面の部品（`Part_`）1,500 以下 |
 | スケール | 全部 (1,1,1)。クルー高さ 1.20±0.02m、天板（`.Top`）0.80±0.01m、操作部品の台座（`.Base`）0.2m の倍数 |
 | パレット | `M_Core_Palette` だけ（地球・月を除く）。UV はマス中心から 1/4 マス以内。ランプ色は `Lamp_` だけ |
 | 原点 | ルート (0,0,0)、底面 z=0±1mm（地球・月は中心が原点）。`parts.json` の部品が別オブジェクトで、原点が表の値と一致 |
-| 命名 | `^(Ctrl|Console|Crew|Tank|Ship|Body|Fx)_[A-Z][A-Za-z0-9_]*$`、`.001` なし |
+| 命名 | `^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part)_[A-Z][A-Za-z0-9_]*$`、`.001` なし |
 | 太さ | 部品ごとの外形の、いちばん薄い向きが 2cm 以上 |
 | 容量 | FBX 1つ 500KB 以下、追加合計 20MB 以下（FBX・glb・レンダー・テクスチャなど。`modeling/source/`（ダウンロードした元データ）、midori のフォルダ、NASA の FBX、.blend は数えない） |
 | 再取り込み | FBX を読み直して、三角数・寸法・全部品の原点が書き出し時（`stats.json`）と同じ |
@@ -197,3 +197,15 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 | `check.py` | `Ship/` に外観と船室の FBX が同居するので、フォルダを渡したとき（`check.py modeling/interior`・`check.py modeling/ship`）は、そのフォルダの `export/<名前>.stats.json` がある FBX だけを見る。`parts.json` と `stats.json` も、その FBX を書き出したフォルダの物を使う |
 
 船室の原点は船底の中心（底が z=0）。床の上面は z=0.30 で、置き場所は `.Slot_〜` が持っている。
+
+## 10. 設計画面の部品 `Part_`（#48、追記：Taiga・Fable 5.2、2026-11-14）
+
+設計画面（M01）で選ぶ部品の名前の頭を `Part_` にした（#48 の案。#45 の必須の4つも同じ頭で作れる）。元データは `modeling/part/`、FBX は `unity/Assets/Models/Part/`。core を次のように直した。
+
+| ファイル | 直したこと |
+|---|---|
+| `corekit.py`・`check.py` | ルートの名前に `Part_` を足した |
+| `check.py` | 三角数の上限：`Part_` は 1,500 |
+| `export.py` | `KINDS` に `"part": "Part"` を足した |
+
+設計画面用のアイコン（PNG）は、大きさと背景が未決定。決まるまでは `renders/` の画像（`_2_front.png`）を使う。

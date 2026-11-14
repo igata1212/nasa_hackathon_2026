@@ -9,6 +9,7 @@
   - 文字・ガラス・発光・煙のマテリアルは外した（旗・文字なし、透明なし、発光は Unity 側）
 
 書いた人：iizuka（作成：Fable 5.2、_fin などの注記：Opus-5）／ 最終更新：2026-11-14
+更新：Taiga（2026-11-14、Fable 5.2）#48 ルートの名前に Part_（設計画面の部品）を足した
 ルールは同じフォルダの README.md。1 unit = 1m、Z が上、正面は −Y。
 """
 import sys
@@ -38,7 +39,7 @@ BEVEL_SEG = 2         # ベベルの段数
 BEVEL = 0.02          # ベベルの幅の標準（2〜4cm）。薄い部品は厚みの 1/4 まで自動で縮める
 MIN_THICK = 0.02      # 一番薄いところ
 
-ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx)_[A-Z][A-Za-z0-9_]*$")
+ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part)_[A-Z][A-Za-z0-9_]*$")
 PART_RE = re.compile(r"^[A-Z][A-Za-z0-9_]*$")
 
 # Blender の軸 → Unity の軸（見本 Fx_Alarm と軸の確認用モデルを Unity 6000.6.9f1 に入れて確かめた。README 参照）
