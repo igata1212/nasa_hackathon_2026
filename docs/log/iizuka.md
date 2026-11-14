@@ -18,3 +18,4 @@
 - 15:14 #38 Unity でパレットの色が付かない件を、取り込み時に共通マテリアル M_Core_Palette.mat へ自動で差し替えて解決（31個 OK、エラー0）。確認用シーン ModelCheck.unity
 - 15:15 #41 docs/design を最新だけにし、議事録・調査・計画・参考画像を docs/reference へ。art-direction.md を今の決定で書き直し。CLAUDE.md に「docs と食い違いはすぐ言う」
 - 15:16 #39 クルーを iizuka のスケッチに合わせて可愛く作り直した（約2頭身、横長バイザー、ひとかたまりの体、NASA の文字なし。Opus）
+- 15:36 #40 宇宙船の内部（船室 Ship_Interior）を作った。ドールハウス型で俯瞰・断面の両方に対応、4席・タンク・窓の配置と Slot（Fable 5.2 high）

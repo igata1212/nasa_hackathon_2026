@@ -1,0 +1,21 @@
+{
+ "Ship_Interior": [
+  {
+   "name": "Ship_Interior.Move_Hatch",
+   "type": "rotate",
+   "axis": "X",
+   "min": -110,
+   "max": 0,
+   "default": 0,
+   "note": "てっぺんのハッチ。奥（+Y）の縁が蝶番。− で上へ開く（−110° で全開）。Roof_Back の子",
+   "origin": [
+    0.0,
+    0.8,
+    4.24
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ]
+}
