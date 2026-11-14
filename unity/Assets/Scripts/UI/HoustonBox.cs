@@ -69,6 +69,16 @@ public class HoustonBox
         Current = this;
     }
 
+    /// <summary>#167：吹き出し（と暗幕・先生の小窓）を別の載せ先へ移す（3D の中のモニターの world-space の Canvas など）。
+    /// 置き場所（HoustonStyle の割合）は新しい載せ先の大きさに対して当てる</summary>
+    public void MoveTo(Transform parent)
+    {
+        scrim.transform.SetParent(parent, false);
+        Root.transform.SetParent(parent, false);
+        view.Place(place);
+        dirty = true;
+    }
+
     // ================================================================== 読み取り（HoustonWindow などが使う）
     /// <summary>吹き出しが出ているか</summary>
     public bool Showing => Root.activeSelf;

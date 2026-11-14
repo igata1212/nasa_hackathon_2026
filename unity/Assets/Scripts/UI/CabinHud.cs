@@ -84,6 +84,16 @@ public class CabinHud
 
     /// <summary>画面の領域（部品が slot の外に出すもの：大きい地図など）。#167 で載せ先を替えるときもここから取る</summary>
     internal RectTransform Slot(HudSlot slot) => slots[slot];
+
+    /// <summary>#167：slot を中の部品ごと別の載せ先へ移す（3D の計器に置いた world-space の Canvas の RectTransform など）。
+    /// 載せ先いっぱいに広げる。部品は slot の大きさに合わせて組むので、載せ先の大きさ（px）が元の slot と近いと同じ見た目になる</summary>
+    public void MoveSlot(HudSlot slot, RectTransform parent)
+    {
+        var r = slots[slot];
+        r.SetParent(parent, false);
+        Ui.Fill(r);
+        Refresh();
+    }
     T Add<T>(T part, RectTransform slot) where T : HudPart
     {
         part.Attach(ctx, slot);
