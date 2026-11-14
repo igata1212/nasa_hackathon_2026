@@ -17,3 +17,4 @@
 - 15:00 #34 必ず必要な 3D モデル33個を作成（精度エージェントチーム：計画 Fable、制作 Fable 2・Opus 4、まとめ Opus）。共通の土台 modeling/core/、Unity に FBX、CREDITS.md
 - 15:14 #38 Unity でパレットの色が付かない件を、取り込み時に共通マテリアル M_Core_Palette.mat へ自動で差し替えて解決（31個 OK、エラー0）。確認用シーン ModelCheck.unity
 - 15:15 #41 docs/design を最新だけにし、議事録・調査・計画・参考画像を docs/reference へ。art-direction.md を今の決定で書き直し。CLAUDE.md に「docs と食い違いはすぐ言う」
+- 15:16 #39 クルーを iizuka のスケッチに合わせて可愛く作り直した（約2頭身、横長バイザー、ひとかたまりの体、NASA の文字なし。Opus）
