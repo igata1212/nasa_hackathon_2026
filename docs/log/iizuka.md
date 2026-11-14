@@ -21,3 +21,4 @@
 - 16:15 #66 サーバーを Python（reference_sim を使う WebSocket サーバー、Cloudflare Tunnel で公開）に決定。docs/design/architecture.md、SPEC.md・CLAUDE.md を更新
 - 16:29 #55 Unity の光・空・煙・ランプ・画面の発光・クルーの浮遊、船室を置いた LookDev シーン、Fable のレビュー（55%）の指摘を直した
 - 16:29 #64 無重力：浮いて漂う小物4種（ペン・手順書・宇宙食・ダクトテープ）、ガスは四方に広がる。ヘルメットの輪はやめた
+- 16:39 #65 GMAT の帰還ルート A/B（Taiga 計算）を確認し、ゲーム時間との対応表（time_map.json）と Unity の軌道の地図（OrbitMap シーン、TrajectoryView）を作った
