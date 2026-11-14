@@ -10,3 +10,4 @@
 - 16:50 #51 圧力計 Ctrl_Gauge を作った（針 Move_Needle が Z まわりに ±120°、帯は赤・orange・teal。Fable 5.2）
 - 16:22 #65 GMAT R2026a で帰還ルート A / B の軌道を試作し、data/gmat/ に置いた。Unity での描画は iizuka に渡した（Fable 5.2）
 - 18:40 #120 先生と管制官の FBX に、話すアニメーション Talk（3秒、口・まばたき・頭・腕）を入れた。export.py にアニメーションを焼く口を足した（Fable 5.2）
+- 18:54 #134 食い違いの Issue 13件（#97〜#109）を決めて、SPEC・H08 の台詞（xlsx と JSON）・ui-guidelines に反映した（Fable 5.2）
