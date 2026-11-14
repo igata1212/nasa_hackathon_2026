@@ -244,3 +244,52 @@ def test_requested_seats():
     with pytest.raises(GameError) as e:
         g2.add_player("human", 0)
     assert e.value.code == "no_free_seat"
+
+
+# ---------------------------------------------------------------- UI に要る値（#148）
+def _last(g, typ):
+    return [m for _, m in g.take_outbox() if m.get("type") == typ][-1]
+
+
+def test_state_has_ui_values():
+    g, owner, T0 = new_game_in_flight(DESIGN, 4)
+    st = _last(g, "state")["state"]
+    th = st["thresholds"]
+    assert th["power_frac"] == {"half": 0.5, "low": 0.25, "crit": 0.1}
+    assert th["oxygen"] == {"mid": 40, "low": 20} and th["fuel"] == {"low": 15}
+    assert th["co2"] == {"warn": P["co2_warn"], "slow": P["co2_slow"]}
+    assert th["temp"] == {"slow": P["temp_slow_c"], "slower": P["temp_slower_c"]}
+    assert th["end_min"]["oxygen"] == P["end_oxygen_min"] and th["req_science_min"] == P["req_science_min"]
+    for r in ("a", "b"):  # route が null でも両方わかる
+        re = g.sim.T_AOS + P["time_p4_return_%s_min" % r] * 60
+        assert st["t_reentry_" + r] == re
+        assert st["t_splashdown_" + r] == re + P["time_p5_reentry_min"] * 60
+    assert st["route"] is None and st["t_reentry"] == st["t_reentry_b"]
+    assert st["strict"] is False and st["strict_reason"] is None
+    assert st["science_now"] == 0.0
+
+
+def test_science_now_matches_result_when_surviving():
+    g = play(DESIGN, rs.PLAY_GOOD)
+    # 終わる直前の見込みと、最終の science（無事帰還）が同じ式
+    assert g.result["ending"] in ("ED-A", "ED-B")
+    last = _last(g, "state")["state"]
+    assert last["science_now"] == pytest.approx(g.result["science"], abs=1e-3)
+
+
+@pytest.mark.parametrize("events,reason", [
+    (rs.PLAY_GOOD, None),
+    ([e for e in rs.PLAY_GOOD if e[1] != "ignite"], "missed_burn"),
+    (rs.PLAY_GOOD[:-1], "reentry_not_ready"),
+])
+def test_strict_reason_in_state_result_report(events, reason):
+    g = play(DESIGN, events)
+    out = g.take_outbox()
+    res = [m for _, m in out if m.get("type") == "result"][-1]
+    assert res["result"] == g.result == rs.run(DESIGN, events)  # result 本体は変えない
+    assert res["strict"] is (reason is not None) and res["strict_reason"] == reason
+    g._to_report()
+    rep = [m for _, m in g.take_outbox() if m.get("type") == "report"][-1]
+    assert rep["strict_reason"] == reason
+    st = g.sim
+    assert st.strict is (reason is not None)
