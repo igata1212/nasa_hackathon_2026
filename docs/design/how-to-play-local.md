@@ -13,6 +13,7 @@
 
 ## 人数ごと
 
+- **話し方**：同じ場所で声を出して話す。離れて遊ぶときは Discord・LINE などの通話を横でつなぐ（ゲームの中に声のやりとりは無い。定型の合図のクイックピンだけ、#156）
 - **4人**：1人1席。**3人**：[Pilot] [Comms & Power + Mission Planner] [Life Support]。**2人**：[Pilot + Mission Planner] [Life Support + Comms & Power]
 - **1人**：ボットなしで全席を持って遊べる（下のタブで席を切り替える）。同時押しは、2席を自分が持っていれば **IGNITE (both seats)**（Pilot と Comms & Power）・**SWAP FILTER (both seats)**（Life Support と自分の別の席）のボタンが出て、1回押すと両方の席の分を続けて送る。相手の席をボットに持たせてもよい
 - 2台以上の PC：サーバーの PC の IP で `ws://192.168.x.x:8765`。外から：`cloudflared tunnel --url http://localhost:8765` → `wss://xxxx.trycloudflare.com`
