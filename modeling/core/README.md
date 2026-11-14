@@ -68,9 +68,9 @@ ck.render_check(root, "fx", parts)                 # renders/ に画像
 | | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|
 | 船内 | `cream` #F2E3C6 | `orange` #F28C28 | `teal` #2A9D8F | `navy` #1D2D50 |
-| 席 | `seat_red` #E4572E（仮：Pilot） | `seat_blue` #3A86FF（仮：Mission Planner） | `seat_yellow` #FFC857（仮：Comms & Power） | `seat_green` #6BBF59（仮：Life Support） |
-| 無彩色（提案） | `white` #FBF7EE | `gray_light` #C8CCD4 | `gray` #8B93A1 | `gray_dark` #4B5263 |
-| 黒紺＋ランプ専用（提案） | `visor` #0E1630 | `lamp_green` #2ECC71 | `lamp_yellow` #FFD60A | `lamp_red` #FF3B30 |
+| 席 | `seat_red` #E4572E（Pilot ▲） | `seat_blue` #3A86FF（Mission Planner ◆） | `seat_yellow` #FFC857（Comms & Power ■） | `seat_green` #6BBF59（Life Support ●） |
+| 無彩色 | `white` #FBF7EE | `gray_light` #C8CCD4 | `gray` #8B93A1 | `gray_dark` #4B5263 |
+| 黒紺＋ランプ専用 | `visor` #0E1630 | `lamp_green` #2ECC71 | `lamp_yellow` #FFD60A | `lamp_red` #FF3B30 |
 
 | 項目 | ルール |
 |---|---|
