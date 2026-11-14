@@ -1,0 +1,61 @@
+{
+ "name": "Ctrl_Gauge",
+ "tris": 1124,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.14
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.14
+ ],
+ "objects": {
+  "Ctrl_Gauge": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Gauge.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Gauge.Dial": {
+   "origin": [
+    0.0,
+    0.0,
+    0.09
+   ],
+   "tris": 248
+  },
+  "Ctrl_Gauge.Housing": {
+   "origin": [
+    0.0,
+    0.0,
+    0.065
+   ],
+   "tris": 476
+  },
+  "Ctrl_Gauge.Move_Needle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.09
+   ],
+   "tris": 292
+  }
+ }
+}
