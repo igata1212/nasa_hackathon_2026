@@ -25,3 +25,4 @@
 - 16:47 #69 Python の WebSocket ゲームサーバー（reference_sim をそのまま使う、47 テスト合格）、xlsx からパラメータ JSON（T1〜T5 完全一致）、Unity のオフライン再生用の記録
 - 16:49 #96 Unity のゲームの流れの骨組み（Title → Lobby → Design → Cabin → Ending → Report、1シーンで画面切替）。IGameClient、OfflineClient（記録の再生）、WsClient（ClientWebSocket）
 - 16:49 #113 物語の台本の下書き story/script.md（材料を並べただけ。Taiga が仕上げる）
+- 16:54 #68 アポロ13号の本物の数値を NASA の資料から集めて docs/reference/apollo13-data.md にまとめた（haiku 7体、出典付き、ゲームの数値との対応）
