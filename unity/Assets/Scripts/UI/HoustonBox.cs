@@ -1,5 +1,6 @@
 // 書いた人：Claude ／ 最終更新：2026-11-14
 // ヒューストンの台詞の窓（字幕）。通信途絶中は NO SIGNAL、通信 OFF のときは COMMS OFF
+// 声なしの警告（event kind=warning。通信できない間にヒューストンが言うはずだった台詞）は、窓の上の赤い帯に文字だけ出す
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +8,9 @@ using UnityEngine.UI;
 public class HoustonBox
 {
     public readonly GameObject Root;
-    readonly Text who, line;
+    readonly Text who, line, warn;
+    readonly GameObject warnRoot;
+    float warnUntil;
     readonly Image bg;
     readonly Queue<string> queue = new Queue<string>();
     float until;
@@ -23,22 +26,55 @@ public class HoustonBox
         line = Ui.Label(bg.transform, "", 26, Ui.Cream, TextAnchor.UpperLeft);
         Ui.Anchor(line.rectTransform, 0, 0, 1, 0.78f, 16, 4, 16, 0);
         line.verticalOverflow = VerticalWrapMode.Truncate;
+        line.resizeTextForBestFit = true; line.resizeTextMinSize = 16; line.resizeTextMaxSize = 26;   // 長い台詞（M01 など）が切れないように縮める
+        var wbg = Ui.PanelImg(parent, new Color(0.45f, 0.06f, 0.06f, 0.92f), "HoustonWarning"); warnRoot = wbg.gameObject;
+        Ui.Anchor(wbg.rectTransform, 0.22f, 0.345f, 0.78f, 0.41f);
+        warn = Ui.Label(wbg.transform, "", 22, Ui.Cream, TextAnchor.MiddleLeft, FontStyle.Bold);
+        Ui.Anchor(warn.rectTransform, 0, 0, 1, 1, 16, 2, 16, 2);
+        warn.verticalOverflow = VerticalWrapMode.Truncate;
+        warnRoot.SetActive(false);
         Root.SetActive(false);
     }
 
-    public void Push(string text)
+    /// <summary>置き場所。設計の画面では部品の一覧に重ならないよう左下に寄せる</summary>
+    public void Dock(bool designScreen)
     {
-        if (string.IsNullOrEmpty(text)) return;
-        queue.Enqueue(text);
-        while (queue.Count > 2) queue.Dequeue();   // 早送りで溜まったら古いものを捨てる
+        if (designScreen) Ui.Anchor(bg.rectTransform, 0.03f, 0.02f, 0.6f, 0.17f);
+        else Ui.Anchor(bg.rectTransform, 0.22f, 0.22f, 0.78f, 0.34f);
     }
 
-    public void Clear() { queue.Clear(); current = ""; until = 0; noSignal = commsOff = false; Draw(); }
+    /// <summary>声なしの警告（パネルの文字だけ）。数秒で消える</summary>
+    public void Warn(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return;
+        warn.text = "PANEL WARNING  " + text;
+        warnUntil = Time.unscaledTime + 6f;
+        warnRoot.SetActive(true);
+        warnRoot.transform.SetAsLastSibling();
+    }
+
+    static int Rank(string pr) => pr == "milestone" ? 3 : pr == "critical" ? 2 : pr == "high" ? 1 : 0;
+    int curRank;
+
+    /// <summary>新しい台詞が来たら、表示中・待ちの古い台詞を捨てて新しいものを出す。ただし表示中の台詞のほうが優先度が高い（マイルストーン ＞ critical ＞ high）ときは、新しいほうを捨てる</summary>
+    public void Push(string text, string priority = null)
+    {
+        if (string.IsNullOrEmpty(text)) return;
+        int r = Rank(priority);
+        if (current != "" && curRank > r) return;
+        queue.Clear();
+        current = text; curRank = r;
+        until = Time.unscaledTime + 4f + text.Length * 0.05f;   // 読む時間（文字数に比例）
+        Draw();
+    }
+
+    public void Clear() { queue.Clear(); current = ""; curRank = 0; until = 0; noSignal = commsOff = false; warnUntil = 0; warnRoot.SetActive(false); Draw(); }
 
     public void SetLink(bool signalLost, bool commsSwitchOff) { noSignal = signalLost; commsOff = commsSwitchOff; Draw(); }
 
     public void Tick(float now)
     {
+        if (warnRoot.activeSelf && now >= warnUntil) warnRoot.SetActive(false);
         if (current != "" && now >= until) current = "";
         if (current == "" && queue.Count > 0)
         {

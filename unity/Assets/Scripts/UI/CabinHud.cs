@@ -22,7 +22,7 @@ public class CabinHud
 
     static readonly string[] Attitudes = { "earth", "moon", "sun", "burn", "heatshield" };
 
-    public CabinHud(Transform parent, GameFlow f)
+    public CabinHud(Transform parent, GameFlow f, RenderTexture trajectoryRt = null)
     {
         this.f = f;
         var root = Ui.Rect("Cabin", parent); Root = root.gameObject; Ui.Fill(root);
@@ -46,11 +46,26 @@ public class CabinHud
         foreach (var g in new[] { ("power", "POWER", false), ("oxygen", "OXYGEN", false), ("temp", "TEMP", false), ("co2", "CO2", true), ("fuel", "FUEL", false) })
             AddGauge(gp, g.Item1, g.Item2, g.Item3);
 
+        // 右上：軌道の小窓（GameFlow.trajectory を専用カメラで描いた RenderTexture）
+        if (trajectoryRt != null)
+        {
+            var frame = Ui.PanelImg(root, new Color(0.07f, 0.1f, 0.2f, 0.8f), "TrajectoryMini");
+            Ui.Anchor(frame.rectTransform, 0.79f, 0.66f, 0.99f, 0.92f);
+            var img = Ui.Rect("Map", frame.transform); Ui.Anchor(img, 0, 0, 1, 1, 4, 4, 4, 22);
+            img.gameObject.AddComponent<RawImage>().texture = trajectoryRt;
+            var cap = Ui.Label(frame.transform, "TRAJECTORY", 16, Ui.Orange, TextAnchor.UpperLeft, FontStyle.Bold);
+            Ui.Anchor(cap.rectTransform, 0, 0.88f, 1, 1, 8, 0, 8, 2);
+        }
+
         // 中央上：段階の案内（練習・かき混ぜ）
         banner = Ui.Label(root, "", 34, Ui.Yellow, TextAnchor.MiddleCenter, FontStyle.Bold);
         Ui.Anchor(banner.rectTransform, 0.25f, 0.84f, 0.75f, 0.92f);
         pressText = Ui.Label(root, "", 30, Ui.Orange, TextAnchor.MiddleCenter, FontStyle.Bold);
         Ui.Anchor(pressText.rectTransform, 0.25f, 0.77f, 0.75f, 0.84f);
+        foreach (var tx in new[] { banner, pressText })   // 船室の明るい壁の上でも読めるように縁取り
+        {
+            var ol = tx.gameObject.AddComponent<Outline>(); ol.effectColor = new Color(0.03f, 0.05f, 0.12f, 0.95f); ol.effectDistance = new Vector2(2f, -2f);
+        }
         offlineNote = Ui.Label(root, "", 20, new Color(1, 1, 1, 0.55f), TextAnchor.MiddleRight);
         Ui.Anchor(offlineNote.rectTransform, 0.6f, 0.21f, 0.99f, 0.25f);
 
@@ -90,7 +105,8 @@ public class CabinHud
     {
         var s = f.Model.State;
         var m = f.Model;
-        if (s == null) { clock.text = "T+ 0:00"; return; }
+        // 練習・かき混ぜの間は state がまだ来ない（flight から毎秒）。それでも席のボタンは出す（出さないと練習もかき混ぜもできない）
+        if (s == null) { clock.text = "T+ 0:00"; RefreshSeat(); return; }
         clock.text = "T+ " + Ui.Mmss(s.t);
 
         SetGauge("power", s.power, Mathf.Max(s.capacity, 1f), s.power.ToString("0"));
@@ -141,7 +157,7 @@ public class CabinHud
         if (activeSeat == null || !seats.Contains(activeSeat)) activeSeat = seats[0];
         string ph = f.Model.Phase;
         int key = ph == "stir" ? 1 : 0;
-        banner.text = ph == "practice" ? "PRACTICE: every seat, use one control (done: " + f.Model.Practiced.Count + "/4)"
+        banner.text = ph == "practice" ? "PRACTICE: one control per seat  (" + f.Model.Practiced.Count + "/4)"
                     : ph == "stir" ? "LIFE SUPPORT: STIR THE OXYGEN TANK!" : "";
         offlineNote.text = f.Client is OfflineClient ? "OFFLINE REPLAY: controls are ignored" : "";
         if (activeSeat != lastBuiltSeat || key != lastBuiltPhaseKey || tabRow.childCount != seats.Count)
@@ -169,6 +185,10 @@ public class CabinHud
         }
         var row = Ui.HBox(seatPanel, 12, 0, TextAnchor.MiddleLeft, true); Ui.Fill(row);
         string me = activeSeat;
+        var mine = f.Model.MySeats;
+        bool bothIgnite = mine.Contains(Seats.Pilot) && mine.Contains(Seats.Comms);
+        // 同じ人が swap_filter の相手の席（Pilot / Comms / Planner のどれか）も持っているか
+        string filterMate = mine.Contains(Seats.Life) ? (mine.Contains(Seats.Pilot) ? Seats.Pilot : mine.Contains(Seats.Comms) ? Seats.Comms : mine.Contains(Seats.Planner) ? Seats.Planner : null) : null;
         Color tint = Seats.Tint(me);
         if (f.Model.Phase == "stir")
         {
@@ -181,18 +201,21 @@ public class CabinHud
                 var att = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(att, flexW: 3);
                 foreach (var a in Attitudes) { string aa = a; attBtns[a] = Ui.Btn(att, a.ToUpper(), Ui.Gray, () => f.Client.Send(Cmd.Attitude(me, aa)), 20, Ui.Cream); }
                 Ui.Size(Ui.Btn(row, "CORRECTION BURN", tint, () => f.Client.Send(Cmd.Simple("correction_burn", me)), 24), flexW: 1);
-                Ui.Size(Ui.Btn(row, "IGNITE (with Comms)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
+                if (bothIgnite) Ui.Size(Ui.Btn(row, "IGNITE (both seats)", tint, SendBothIgnite, 24), flexW: 1);
+                else Ui.Size(Ui.Btn(row, "IGNITE (with Comms)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
                 break;
             case Seats.Life:
                 Ui.Size(Ui.Btn(row, "CLOSE VALVE 1", tint, () => f.Client.Send(Cmd.Valve(me, 1)), 26), flexW: 1);
                 Ui.Size(Ui.Btn(row, "CLOSE VALVE 2", tint, () => f.Client.Send(Cmd.Valve(me, 2)), 26), flexW: 1);
-                Ui.Size(Ui.Btn(row, "SWAP CO2 FILTER (with a partner)", tint, () => f.Client.Send(Cmd.Simple("swap_filter", me)), 22), flexW: 1);
+                if (filterMate != null) { string mate = filterMate; Ui.Size(Ui.Btn(row, "SWAP FILTER (both seats)", tint, () => { f.Client.Send(Cmd.Simple("swap_filter", Seats.Life)); f.Client.Send(Cmd.Simple("swap_filter", mate)); }, 22), flexW: 1); }
+                else Ui.Size(Ui.Btn(row, "SWAP CO2 FILTER (with a partner)", tint, () => f.Client.Send(Cmd.Simple("swap_filter", me)), 22), flexW: 1);
                 break;
             case Seats.Comms:
                 var sw = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(sw, flexW: 3);
                 foreach (var n in new[] { "heater", "lights", "nav", "comms" }) AddToggle(sw, "sw:" + n, n.ToUpper(), me, () => { var st = f.Model.State; return st != null && st.Switch(n); }, v => Cmd.Switch(me, n, v), tint);
                 AddToggle(row, "tx", "TRANSMIT", me, () => f.Model.State != null && f.Model.State.transmit, v => Cmd.Transmit(me, v), tint);
-                Ui.Size(Ui.Btn(row, "IGNITE (with Pilot)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
+                if (bothIgnite) Ui.Size(Ui.Btn(row, "IGNITE (both seats)", tint, SendBothIgnite, 24), flexW: 1);
+                else Ui.Size(Ui.Btn(row, "IGNITE (with Pilot)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
                 break;
             case Seats.Planner:
                 var ins = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(ins, flexW: 3);
@@ -203,6 +226,8 @@ public class CabinHud
                 break;
         }
     }
+
+    void SendBothIgnite() { f.Client.Send(Cmd.Simple("ignite", Seats.Pilot)); f.Client.Send(Cmd.Simple("ignite", Seats.Comms)); }
 
     void AddToggle(Transform parent, string key, string label, string seat, System.Func<bool> get, System.Func<bool, Dictionary<string, object>> make, Color tint)
     {

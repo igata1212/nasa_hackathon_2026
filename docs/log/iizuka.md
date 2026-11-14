@@ -26,3 +26,6 @@
 - 16:49 #96 Unity のゲームの流れの骨組み（Title → Lobby → Design → Cabin → Ending → Report、1シーンで画面切替）。IGameClient、OfflineClient（記録の再生）、WsClient（ClientWebSocket）
 - 16:49 #113 物語の台本の下書き story/script.md（材料を並べただけ。Taiga が仕上げる）
 - 16:54 #68 アポロ13号の本物の数値を NASA の資料から集めて docs/reference/apollo13-data.md にまとめた（haiku 7体、出典付き、ゲームの数値との対応）
+- 17:13 #115 Unity（WsClient）と Python サーバーをつないで最後まで通しで遊べた（ED-A 1260.6、reference_sim と一致）。オフライン再生をサーバーの記録の形に、軌道の小窓、パネル警告、遊び方 how-to-play-local.md
+- 17:40 #123 1人で両方の席を持つときの「両方押す」ボタン（点火・フィルター交換）、ヒューストンの字幕を優先度で入れ替え。#51・#52・#53 の FBX の .meta を追加
+- 17:59 #124 スケッチの演出を Unity に入れた（打ち上げ、管制室の先生の小窓（口が動く）、帰還と着水、ED-C の静かな終わり）。StoryDirector、storyboard.md に実装の有無、lookdev/story_1〜8.png

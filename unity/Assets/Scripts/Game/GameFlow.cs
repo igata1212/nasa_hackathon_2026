@@ -33,7 +33,10 @@ public class GameModel
 public class GameFlow : MonoBehaviour
 {
     public TextAsset partsJson;          // Data/Sim/parts.json
-    public TextAsset timelineJson;       // Data/Sim/timeline_t1.json（オフライン再生）
+    public TextAsset timelineJson;       // Data/Sim/timeline_t1_good.json（オフライン再生。正は data/sim/）
+    public TextAsset timelineFailJson;   // Data/Sim/timeline_t4_fail.json
+    public TrajectoryView trajectory;    // 軌道の小窓（船内から遠くに置いた軌道の地図）
+    public Camera trajectoryCamera;      // ↑を描くカメラ。RenderTexture に描いて HUD の隅に出す
     public string wsUrl = "ws://localhost:8765";
     public bool autoOffline;             // true なら Play 直後にオフライン再生へ（確認用）
 
@@ -55,7 +58,13 @@ public class GameFlow : MonoBehaviour
         cgo.AddComponent<GraphicRaycaster>();
         var root = (RectTransform)cgo.transform;
 
-        cabin = new CabinHud(root, this);
+        RenderTexture miniRt = null;
+        if (trajectoryCamera != null)
+        {
+            miniRt = new RenderTexture(640, 360, 24) { name = "TrajectoryMini", antiAliasing = 4 };
+            trajectoryCamera.targetTexture = miniRt;
+        }
+        cabin = new CabinHud(root, this, miniRt);
         title = new TitleScreen(root, this);
         lobby = new LobbyScreen(root, this);
         design = new DesignScreen(root, this);
@@ -70,16 +79,22 @@ public class GameFlow : MonoBehaviour
 
     void OnDestroy() { Client?.Close(); }
 
+    void OnApplicationQuit() { Client?.Close(); }
+
     void Start()
     {
         if (autoOffline) StartOffline();
     }
 
     // ------------------------------------------------------------------ 接続
-    public void StartOffline()
+    public void StartOffline() => StartOffline(false);
+
+    /// <summary>記録の再生。fail=true なら T4（最安の設計 + バルブを閉じるだけ → ED-C）</summary>
+    public void StartOffline(bool fail)
     {
-        if (timelineJson == null) { Toast("timeline が割り当てられていない"); return; }
-        Use(new OfflineClient(timelineJson));
+        var ta = fail ? timelineFailJson : timelineJson;
+        if (ta == null) { Toast("timeline が割り当てられていない"); return; }
+        Use(new OfflineClient(ta));
         Client.Connect("0000", "Player", true);
     }
 
@@ -98,13 +113,14 @@ public class GameFlow : MonoBehaviour
         if (Client != null) { Client.OnPhase -= OnPhase; Client.OnState -= OnState; Client.OnEvent -= OnEvent; Client.OnMessage -= OnMessage; Client.Close(); }
         Client = c;
         Model = new GameModel();
+        houston.Clear();
         c.OnPhase += OnPhase; c.OnState += OnState; c.OnEvent += OnEvent; c.OnMessage += OnMessage;
     }
 
     // ------------------------------------------------------------------ 受信
     void OnPhase(string p)
     {
-        if (p == "design") { Model.ResetFlight(); houston.Clear(); }
+        if (p == "design") { Model.ResetFlight(); houston.Clear(); if (trajectory != null) trajectory.SetState(0f, ""); }
         ShowPhase(p);
     }
 
@@ -112,20 +128,21 @@ public class GameFlow : MonoBehaviour
     {
         Model.State = s;
         cabin.Refresh();
-        houston.SetLink(s.inFarside, !s.Switch("comms"));
+        houston.SetLink(!s.hasSignal, !s.Switch("comms"));
+        if (trajectory != null) trajectory.SetState(s.t, s.route);
     }
 
     void OnEvent(GameEvent e)
     {
         switch (e.kind)
         {
-            case "houston": houston.Push(e.text); break;
+            case "houston": houston.Push(e.text, e.priority); break;
             case "launch":
                 Model.LaunchStatus = e.status == "ok" ? "" : e.status;
                 design.Refresh();
                 break;
             case "press": cabin.ShowPress(e); break;
-            case "warning": break;   // 声なしの警告。NO SIGNAL / COMMS OFF は state から出すので今は何もしない
+            case "warning": houston.Warn(e.text); break;   // 声なしの警告（通信できないとき）。パネルの文字だけ
             case "practice":
                 var done = J.Arr(e.raw, "done");
                 Model.Practiced.Clear();
@@ -181,10 +198,12 @@ public class GameFlow : MonoBehaviour
         lobby.Root.SetActive(p == "lobby");
         design.Root.SetActive(p == "design");
         cabin.Root.SetActive(inCabin);
+        if (trajectoryCamera != null) trajectoryCamera.enabled = inCabin;
         debugBar.SetActive(Client is OfflineClient && (inCabin || p == "ending"));
         ending.Root.SetActive(p == "ending");
         report.Root.SetActive(p == "report");
         houston.Root.transform.SetAsLastSibling();
+        houston.Dock(p == "design");
         if (p == "lobby") lobby.Refresh();
         if (p == "design") design.Refresh();
         if (inCabin) cabin.Refresh();

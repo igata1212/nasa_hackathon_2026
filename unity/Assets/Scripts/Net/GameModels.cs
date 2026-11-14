@@ -1,6 +1,6 @@
 // 書いた人：Claude ／ 最終更新：2026-11-14
 // サーバーから届くメッセージを、画面が使いやすい形にしたもの。数値はサーバーの値をそのまま入れる（ここに数値を書かない）。
-// 形の元：tmp/wt/server/server/game/room.py の snapshot()・milestone_event()・Game.room_msg()
+// 形の元：server/game/room.py の snapshot()・milestone_event()・Game.room_msg()
 using System.Collections.Generic;
 
 public class GameState

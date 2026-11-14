@@ -1,7 +1,7 @@
 // 書いた人：Claude ／ 最終更新：2026-11-14
 // ゲームの流れとサーバー（または記録の再生）のつなぎ口。
 // 画面は IGameClient だけを見る。OfflineClient（記録の再生）と WsClient（WebSocket）を差し替えられる。
-// メッセージの形は tmp/wt/server/server/game/room.py に合わせてある（architecture.md の案より細かい）。
+// メッセージの形は server/game/room.py に合わせてある（architecture.md の案より細かい）。
 //
 //   サーバー → クライアント（"type"）
 //     welcome  {room, player_id, seats[], speed}       入室できた

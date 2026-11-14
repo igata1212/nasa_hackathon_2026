@@ -23,7 +23,9 @@ public class TitleScreen
         var row = Ui.HBox(col, 12, 0, TextAnchor.MiddleCenter, true); Ui.Size(row, h: 64);
         Ui.Btn(row, "CREATE ROOM", Ui.Orange, () => f.StartOnline(url.text, name.text, "", true), 26);
         Ui.Btn(row, "JOIN", Ui.Teal, () => f.StartOnline(url.text, name.text, room.text, false), 26, Ui.Cream);
-        var off = Ui.Btn(col, "PLAY OFFLINE (replay)", Ui.Gray, () => f.StartOffline(), 24, Ui.Cream); Ui.Size(off, h: 56);
+        var offRow = Ui.HBox(col, 12, 0, TextAnchor.MiddleCenter, true); Ui.Size(offRow, h: 56);
+        Ui.Btn(offRow, "REPLAY: SUCCESS (T1)", Ui.Gray, () => f.StartOffline(false), 22, Ui.Cream);
+        Ui.Btn(offRow, "REPLAY: FAILURE (T4)", Ui.Gray, () => f.StartOffline(true), 22, Ui.Cream);
     }
 }
 
