@@ -29,18 +29,18 @@ public class CrisisBanner : HudPart
         public string glyph;   // アイコンが無いときの文字（酸素 = O2、ui-guidelines 4章）
         public string title;   // 短い言葉（Baloo 32）
         public string seat;    // 直す席（席バッジ）。null なら出さない
-        public string line;    // だれが何をするか（1行）
+        public string line;    // 何をするか（短く。だれがやるかは席のバッジが言う。#146：席の名前を重ねて書くと帯が切れた）
     }
 
     // 並び = 待機のアイコンの並び（#76 の表の順：必須 → 余裕があれば）
     static readonly Crisis[] Crises =
     {
-        new Crisis { cause = "leak",   icon = "valve",       title = "OXYGEN LEAK", seat = Seats.Life,    line = "Life Support: close the leaking valve" },
-        new Crisis { cause = "power",  icon = "power",       title = "LOW POWER",   seat = Seats.Comms,   line = "Comms & Power: shut down extra systems" },
-        new Crisis { cause = "oxygen", glyph = "O2",         title = "LOW OXYGEN",  seat = Seats.Planner, line = "Mission Planner: pick the faster route" },
-        new Crisis { cause = "co2",    icon = "co2",         title = "HIGH CO2",    seat = Seats.Life,    line = "Life Support + a teammate: swap the filter" },
-        new Crisis { cause = "temp",   icon = "temperature", title = "TOO COLD",    seat = Seats.Comms,   line = "Comms & Power: turn the heater on" },
-        new Crisis { cause = "fuel",   icon = "fuel",        title = "LOW FUEL",    seat = Seats.Pilot,   line = "Pilot: turn the ship less" },
+        new Crisis { cause = "leak",   icon = "valve",       title = "OXYGEN LEAK", seat = Seats.Life,    line = "Close the valve" },
+        new Crisis { cause = "power",  icon = "power",       title = "LOW POWER",   seat = Seats.Comms,   line = "Switch things off" },
+        new Crisis { cause = "oxygen", glyph = "O2",         title = "LOW OXYGEN",  seat = Seats.Planner, line = "Pick the faster route" },
+        new Crisis { cause = "co2",    icon = "co2",         title = "HIGH CO2",    seat = Seats.Life,    line = "Swap the filter together" },
+        new Crisis { cause = "temp",   icon = "temperature", title = "TOO COLD",    seat = Seats.Comms,   line = "Heater on" },
+        new Crisis { cause = "fuel",   icon = "fuel",        title = "LOW FUEL",    seat = Seats.Pilot,   line = "Turn the ship less" },
     };
     /// <summary>表に無い原因（UrgencyFx の debugLevel の "debug" など）</summary>
     static readonly Crisis Unknown = new Crisis { cause = "", icon = "alarm", title = "WARNING", line = "Check the gauges" };

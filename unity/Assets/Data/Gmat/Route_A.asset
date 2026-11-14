@@ -1824,16 +1824,16 @@ MonoBehaviour:
   - t: 0
     h: 52.7671
     label: accident
-  - t: 120
+  - t: 90
     h: 73.9941
     label: los
-  - t: 300
+  - t: 210
     h: 74.366
     label: aos
-  - t: 360
+  - t: 260
     h: 76.1806
     label: burn
-  - t: 420
+  - t: 300
     h: 139.1644
     label: reentry
   moonCenterXKm: 404419.5

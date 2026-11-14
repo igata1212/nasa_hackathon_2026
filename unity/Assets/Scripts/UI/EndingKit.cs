@@ -394,7 +394,8 @@ public static class EndingWidgets
     {
         var head = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft);
         if (icon != null) UiKit.Icon(head, icon, T.IconM, T.Ink);
-        Flex(head, title, TextStyle.Sub, T.Ink);
+        // #146（Fable）：見出しの書体（Baloo 2）は行が高く、… で切る設定だと縦に入らず全部消えた（見出しが空だった）。切らない
+        Flex(head, title, TextStyle.Sub, T.Ink).overflowMode = TextOverflowModes.Overflow;
         var r = right ? UiKit.Text(head, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineRight) : null;
         UiKit.DashedLine(panel, T.Line);
         UiKit.Space(panel, T.S1);

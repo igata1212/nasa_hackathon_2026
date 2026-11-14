@@ -18,7 +18,14 @@ public static class UiTokens
     public static readonly Color Shadow = WithAlpha(Ink, 0.18f);
     public static readonly Color Scrim = WithAlpha(Ink, 0.45f);        // 開発用パネルの後ろ
     public static readonly Color Selection = WithAlpha(Go, 0.3f);      // 入力欄の選択範囲
-    public static readonly Color Clear = new Color(0f, 0f, 0f, 0f);    // 押せる範囲だけの透明な面
+    public static readonly Color Clear = new Color(0f, 0f, 0f, 0f);
+    // 船内の計器（ゲージ・地図・タイムラインの帯）だけは暗い面（ui-guidelines 1章の6・2章。Fable 5.2、2026-11-14 のダーク/ライトの判断）。
+    //   声（吹き出し）・操作（ボタン・カード）・警告の帯は明るいまま。タイトル・設計・レポートも明るいまま
+    public static readonly Color HudFace = WithAlpha(Ink, 0.94f);      // 計器の面（色空間が Linear なので 0.94 でほぼ紺）
+    public static readonly Color HudText = Panel;                      // 計器の上の文字・数字・生還ライン
+    public static readonly Color HudSub = WithAlpha(Panel, 0.72f);     // 計器の上の補助
+    public static readonly Color HudGroove = WithAlpha(Panel, 0.22f);  // 計器の上の溝
+    public static readonly Color HudSeg = Hex("5E6B8C");               // タイムラインの帯の静かな区間（再突入）    // 押せる範囲だけの透明な面
 
     // 席の色（席バッジの面だけ。文字色には使わない）
     public static readonly Color SeatRed = Hex("E4572E"), SeatGreen = Hex("6BBF59"), SeatYellow = Hex("FFC857"), SeatBlue = Hex("3A86FF");

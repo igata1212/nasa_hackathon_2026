@@ -28,6 +28,7 @@ public static class HoustonStyle
     public const string Role = "Mission Control on Earth";
     /// <summary>最初の1回だけ出す、少し長い説明（補助ラベルの代わりに出す）</summary>
     public const string RoleFirst = "Mission Control on Earth: they guide you by radio";
+    public const bool RoleAlways = false;  // true なら補助ラベルをいつも出す。#146（Fable）：文字を減らすため、最初の RoleFirstS 秒とブリーフィングだけ
     public const float RoleFirstS = 20f;   // 長い説明を出しておく秒（最初の台詞が出てから）
     public const string RoleIcon = "earth";
 
@@ -70,7 +71,7 @@ public static class HoustonStyle
     // ================================================================== 置き場所（段階ごと）
     // 船内：画面の下の席パネル（CabinHud.Layout の Bottom：0〜0.24）の上、真ん中。左に先生の小窓（HoustonWindow、192×120）が出るので x0 は 0.1 より右
     //   上の端は名前タグを入れて約 0.47。CabinHud の真ん中（CenterMid：0.47 から上）・左（Left：0.39 から上）と重ならない（#146）
-    public static readonly HoustonPlace Cabin = new HoustonPlace("cabin", 0.22f, 0.78f, 0.25f, 0f, 0f, 168f, 120);
+    public static readonly HoustonPlace Cabin = new HoustonPlace("cabin", 0.22f, 0.78f, 0.25f, 0f, 0f, 140f, 100);   // #146（Fable）：2行ぶんに低くした（船室が見えるように）
     // 設計：部品の一覧（0.2 より上）と打ち上げのボタン（右下）を避けて左下に小さく。先生の小窓は出ない（x0 < 0.1）
     public static readonly HoustonPlace Design = new HoustonPlace("design", 0.03f, 0.6f, 0.02f, 0f, 0f, 124f, 80);
     // エンディング：題・要件・SCORE・ボタンが真ん中の列にあるので、右の列に出す（ED-C の台詞が SCORE に重ならない）
@@ -78,7 +79,7 @@ public static class HoustonStyle
     // レポート：PLAY AGAIN（下の真ん中）の右の隅
     public static readonly HoustonPlace Report = new HoustonPlace("report", 0.64f, 0.98f, 0.02f, 0f, 0f, 150f, 70);
     // ブリーフィング：真ん中より少し下に大きく。後ろを暗くする。先生の小窓が左に出る
-    public static readonly HoustonPlace Briefing = new HoustonPlace("briefing", 0.2f, 0.8f, 0.3f, 0f, 0f, 200f, 120);
+    public static readonly HoustonPlace Briefing = new HoustonPlace("briefing", 0.33f, 0.9f, 0.36f, 0f, 0f, 220f, 120);   // #146（Fable）：左に先生の大きい小窓（WindowBriefing）が入るぶん右へ
 
     /// <summary>段階 → 置き場所</summary>
     public static HoustonPlace PlaceFor(string phase)
@@ -92,6 +93,10 @@ public static class HoustonStyle
         }
     }
 
+    /// <summary>先生の小窓（Story/HoustonWindow）の大きさ。ブリーフィングは顔が主役なので大きく（描く絵は 384×240）</summary>
+    public static readonly Vector2 WindowSmall = new Vector2(192f, 120f), WindowBriefing = new Vector2(352f, 220f);
+    public const float WindowGap = 8f, WindowGapBriefing = 16f;
+    public static readonly Color BriefingScrimColor = T.WithAlpha(T.Ink, 0.97f);   // #146（Fable）：色空間が Linear なので 0.97 でやっと暗い紺に見える。後ろの設計の画面の文字が読めないくらい暗く（先生と台詞だけを見せる）
     public static bool BriefingScrim = true;   // ブリーフィングの間、後ろを暗くする（後ろは押せない。どこを押しても次へ）
 
     // ================================================================== 大きさ（px。基準 1600×900）

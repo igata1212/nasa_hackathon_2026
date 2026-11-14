@@ -43,7 +43,7 @@ public class BurnCheck : HudPart
         public const string RouteOk = "ROUTE {0}", RouteAuto = "No route yet (auto)";
         public const string ShieldOk = "SHIELD FORWARD", ShieldTodo = "Turn to HEAT SHIELD";
         public const string You = "YOU";
-        public const string AllSet = "All set! Count 3-2-1 out loud, then press IGNITE together.";
+        public const string AllSet = "Count 3-2-1, then press IGNITE together!";
         // 同時押し
         public const string PressTogether = "PRESS TOGETHER";
         public const string Together = "TOGETHER!";
@@ -369,7 +369,7 @@ public class BurnCheck : HudPart
         for (int i = 0; i < todos.Count; i++) todos[i].Root.gameObject.SetActive(i < nTodo);
         for (int i = 0; i < dones.Count; i++) dones[i].Root.gameObject.SetActive(i < nDone);
         todoCol.gameObject.SetActive(nTodo > 0);
-        doneRow.gameObject.SetActive(nDone > 0);
+        doneRow.gameObject.SetActive(nDone > 0 && nTodo == 0);   // #146（Fable）：まだの項目がある間は、それだけを出す（できた項目の列は全部そろってから）
 
         // 全部そろった：声に出して一緒に押す
         bool allSet = mode == Mode.Burn && inWindow && nTodo == 0 && !signal;

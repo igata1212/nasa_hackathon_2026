@@ -39,7 +39,7 @@ public class CabinHud
         (HudSlot.Left,      0.01f, 0.39f, 0.2f,  0.9f),    // 状態（ゲージ。高さ 424 が等倍で入る）
         (HudSlot.TopRight,  0.79f, 0.64f, 0.99f, 0.9f),    // 軌道の地図（小窓）
         (HudSlot.CenterTop, 0.22f, 0.79f, 0.78f, 0.9f),    // 練習の案内・危機の帯（同時には出ない。危機の帯は上端から 72／96 下がる）
-        (HudSlot.CenterMid, 0.22f, 0.47f, 0.78f, 0.79f),   // 同時押しの合図・点火の準備（上端から下へ伸びる）
+        (HudSlot.CenterMid, 0.22f, 0.42f, 0.78f, 0.79f),   // 同時押しの合図・点火の準備（上端から下へ伸びる）
         (HudSlot.Right,     0.79f, 0.45f, 0.99f, 0.63f),   // 要件トラッカー（#90。まだ空）。オフライン再生の操作（GameFlow）・切断の札（ConnectionUi）も地図の下に出る
         (HudSlot.Bottom,    0.01f, 0.01f, 0.99f, 0.24f),   // 席タブ（48）＋席のパネル（143）
         (HudSlot.MapBig,    0.21f, 0.255f, 0.79f, 0.9f),   // 大きく開いた軌道の地図（左のゲージと下の席のパネルにかぶらない。いちばん手前）
@@ -154,7 +154,7 @@ public class CabinHud
         if (activeSeat == null || !seats.Contains(activeSeat)) activeSeat = seats[0];
         ctx.ActiveSeat = activeSeat;
         int key = ctx.Model.Phase == "stir" ? 1 : 0;
-        offlineNote.text = ctx.Offline ? "OFFLINE REPLAY: controls are ignored" : "";
+        offlineNote.text = ctx.Offline && ctx.Flow.showReplayControls ? "OFFLINE REPLAY: controls are ignored" : "";   // #146（Fable）：再生の操作を出しているときだけ
         if (activeSeat != lastBuiltSeat || key != lastBuiltPhaseKey || tabs.Count != seats.Count)
         {
             lastBuiltSeat = activeSeat; lastBuiltPhaseKey = key;

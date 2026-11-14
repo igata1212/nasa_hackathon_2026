@@ -91,8 +91,9 @@ public class HoustonWindow : MonoBehaviour
         // 字幕の窓の左（下をそろえる）
         frame.anchorMin = frame.anchorMax = new Vector2(0f, 0f);
         frame.pivot = new Vector2(1f, 0f);
-        frame.sizeDelta = new Vector2(192f, 120f);
-        frame.anchoredPosition = new Vector2(-8f, 0f);
+        bool brief = HoustonBox.Current != null && HoustonBox.Current.BriefingPlaying;   // #146：ブリーフィングは大きく（大きさは HoustonStyle）
+        frame.sizeDelta = brief ? HoustonStyle.WindowBriefing : HoustonStyle.WindowSmall;
+        frame.anchoredPosition = new Vector2(-(brief ? HoustonStyle.WindowGapBriefing : HoustonStyle.WindowGap), 0f);
         frame.SetAsLastSibling();
 
         string txt = line != null ? line.text : "";

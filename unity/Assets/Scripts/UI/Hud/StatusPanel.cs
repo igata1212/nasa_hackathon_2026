@@ -12,6 +12,8 @@
 // 生還ライン（ink の縦線）：電力・酸素＝end_min（strict のときは ＋strict_margin。reference_sim の result と同じ）、温度＝end_min.temp、燃料＝点火に要る量（選んだルートの fuel_burn_a/b。選ぶ前は B）
 // 練習・かき混ぜの間（state が来ない）は、設計の合計で満タンの静かな表示（#74「M03・M04 は静かな表示」）
 // 左の領域（CabinHud.Layout の Left）に入りきらないときは、パネルごと縮める（Fit）。Detail：パネル全体（照明 OFF で暗くしてよい）
+// #146（Fable）：1画面の文字を減らした。名前（POWER など）は出さず、アイコン＋ゲージ＋数字だけ。注意・危険のときだけ、その行の上に言葉（LOW など）を出す。
+//   向き・データ・生還ラインの説明の行は消した（向きは Pilot のパネル、データは Planner・Comms のパネルにある）
 // 共通のゲージ（#71 の UiKitHud.Gauge）ができたら、下の MiniGauge だけを差し替える
 using System.Collections.Generic;
 using TMPro;
@@ -31,7 +33,8 @@ public class StatusPanel : HudPart
         public const float Gap = T.S1;                 // 行の間
         public const float NameH = 22, BarH = 30;      // ゲージの行：上に名前（＋状態）、下にゲージと数字
         public const float RowH = NameH + BarH;
-        public const float ChipD = 48, ChipIcon = 32;  // 左の円とアイコン
+        public const float ChipD = 44, ChipIcon = 28;  // 左の円とアイコン
+        public const float RowSafeH = ChipD;           // 安全のとき（言葉の行を出さない）の行の高さ
         public const float GaugeH = 28;                // ゲージのピル（ガイドライン 3章）
         public const float NumW = 88;                  // 数字の箱（右寄せで桁ぶれを防ぐ）
         public const TextStyle Num = TextStyle.Sub;    // ガイドラインは 40（TextStyle.Number）。左の領域が狭いので 32
@@ -40,7 +43,7 @@ public class StatusPanel : HudPart
         public const float InfoH = 32, InfoIcon = T.IconS, ValueIcon = 28;   // 下の行（向き・データ）
         public const float LegendH = 28, LegendBarH = 22;
         // 高さの合計：内側 32 ＋ ゲージ 52×5 ＋ 間 8×5 ＋ 下の行 32×2 ＋ 説明 28 ＝ 424。Left（#146：1600×900 で 459）に等倍で入る（入らなければ Fit で縮む）
-        public const float TintCaution = 0.22f, TintDanger = 0.14f;   // 注意・危険の行の後ろに敷く色の濃さ
+        public const float TintCaution = 0.4f, TintDanger = 0.75f;   // 注意・危険の行の後ろに敷く色の濃さ
         public const float TintPadX = T.S1, TintPadY = 2f;
         public const float StripeScale = 2f;           // 縞のタイル 64 を 32 に（細いゲージで縞が見えるように）
         public const float PulseHz = 1f, PulseAmp = 0.08f;            // 危険の円が弾む（カウントダウンのチップと同じ 1.08 倍）
@@ -84,6 +87,7 @@ public class StatusPanel : HudPart
         public TextMeshProUGUI chipText, name, word, value;
         public MiniGauge gauge;
         public Level level = (Level)(-1);
+        public LayoutElement size; public RectTransform top;
     }
 
     readonly Dictionary<string, Row> rows = new Dictionary<string, Row>();
@@ -98,7 +102,7 @@ public class StatusPanel : HudPart
         panel = Ui.Rect("Panel", root);
         panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 1f);
         panel.anchoredPosition = Vector2.zero;
-        UiKit.Surface(panel, T.RadiusL, T.Panel);
+        UiKit.Surface(panel, T.RadiusL, T.HudFace);   // 計器は暗い面（UiTokens の Hud*）
         var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
         int pad = Mathf.RoundToInt(Look.Pad);
         vl.padding = new RectOffset(pad, pad, pad, pad);
@@ -108,13 +112,7 @@ public class StatusPanel : HudPart
 
         foreach (var d in Defs) rows[d.key] = BuildRow(panel, d);
 
-        // 下の行は詰めて並べる（行の高さに余白があるので間をあけない）
-        var info = UiKit.Col(panel, 0f, TextAnchor.UpperLeft, 0f, 0f, true);
-        info.name = "Info";
-        facingText = InfoRow(info, "attitude", LabelFacing, out facingIcon);
-        dataText = InfoRow(info, "science", LabelData, out _);
-        // TIME（T+）の行は出さない：時計はタイムラインの帯（TimelineBar）の左に1つだけ（#146 で2つあったのを1つに）
-        BuildLegend(info);
+        // #146（Fable）：向き・データ・生還ラインの説明の行は出さない（席のパネルにある。ここはゲージだけ）
 
         Quiet();
     }
@@ -124,7 +122,7 @@ public class StatusPanel : HudPart
         var r = new Row { def = d };
         var row = UiKit.Row(parent, T.S1, TextAnchor.MiddleLeft);
         row.name = "Row_" + d.key;
-        var le = Ui.Size(row, h: Look.RowH); le.minHeight = Look.RowH;
+        var le = Ui.Size(row, h: Look.RowSafeH); le.minHeight = Look.RowSafeH; r.size = le;
 
         // 注意・危険のときに行の後ろに敷く色（レイアウトの外）
         r.tint = UiKit.Round(row, T.RadiusS, T.Clear, "Tint"); UiKit.Ignore(r.tint);
@@ -145,19 +143,19 @@ public class StatusPanel : HudPart
             UiKit.Fill(r.chipText.rectTransform);
         }
 
-        var col = UiKit.Col(row, 0f, TextAnchor.UpperLeft, 0f, 0f, true);
+        var col = UiKit.Col(row, 0f, TextAnchor.MiddleLeft, 0f, 0f, true);
         Ui.Size(col, flexW: 1f);
         // 上の行：名前＋（注意・危険のとき）アイコンと言葉
         var top = UiKit.Row(col, T.S1 * 0.5f, TextAnchor.MiddleLeft);
         Ui.Size(top, h: Look.NameH).minHeight = Look.NameH;
-        r.name = UiKit.Text(top, d.label, TextStyle.Label, T.Ink, TextAlignmentOptions.MidlineLeft);
-        r.statusIcon = UiKit.Icon(top, "caution", Look.StatusIcon, T.Ink);
-        r.word = UiKit.Text(top, "", TextStyle.Label, T.Ink, TextAlignmentOptions.MidlineLeft);
+        r.top = top;
+        r.statusIcon = UiKit.Icon(top, "caution", Look.StatusIcon, T.HudText);
+        r.word = UiKit.Text(top, "", TextStyle.Label, T.HudText, TextAlignmentOptions.MidlineLeft);
         // 下の行：ゲージ＋数字
         var bottom = UiKit.Row(col, T.S1, TextAnchor.MiddleLeft);
         Ui.Size(bottom, h: Look.BarH).minHeight = Look.BarH;
         r.gauge = new MiniGauge(bottom);
-        r.value = UiKit.Text(bottom, "", Look.Num, T.Ink, TextAlignmentOptions.MidlineRight, false);
+        r.value = UiKit.Text(bottom, "", Look.Num, T.HudText, TextAlignmentOptions.MidlineRight, false);
         UiKit.Fixed(r.value, Look.NumW, Look.BarH);
 
         SetLevel(r, Level.Safe);
@@ -237,8 +235,6 @@ public class StatusPanel : HudPart
         if (need > 0f && s.fuel < need) lv = Level.Danger;
         Draw("fuel", s.fuel, fMax, Floor(s.fuel, "fuel"), lv, need);
 
-        SetFacing(s.attitude);
-        dataText.text = string.Format(DataFormat, Mathf.FloorToInt(s.dataSent), Mathf.FloorToInt(s.dataCollected));
     }
 
     /// <summary>state が来ない間（練習・かき混ぜ）：設計の合計で満タン、色は安全、時間は 0</summary>
@@ -254,8 +250,6 @@ public class StatusPanel : HudPart
         Draw("temp", t0, Mathf.Max(t0, 1f), GameParams.Has("temp_start") ? Floor(t0, "temp") : "", Level.Safe, -1f);
         Draw("co2", c0, Co2Scale, GameParams.Has("co2_start") ? Mathf.CeilToInt(c0) + Unit("co2") : "", Level.Safe, -1f);
         Draw("fuel", fuel, Mathf.Max(fuel, 1f), tot != null ? Floor(fuel, "fuel") : "", Level.Safe, -1f);
-        SetFacing("earth");
-        dataText.text = string.Format(DataFormat, 0, 0);
     }
 
     void Draw(string key, float v, float max, string text, Level lv, float line, bool falling = false)
@@ -266,7 +260,14 @@ public class StatusPanel : HudPart
         r.gauge.Set(Mathf.Clamp01(v / m), line >= 0f ? Mathf.Clamp01(line / m) : -1f, falling);
         r.value.text = text;
         r.word.text = falling ? WordLeak : r.def.words[(int)lv];
-        r.word.gameObject.SetActive(r.word.text != "");
+        bool say = r.word.text != "";
+        r.word.gameObject.SetActive(say);
+        if (r.top.gameObject.activeSelf != say)
+        {
+            r.top.gameObject.SetActive(say);
+            float h = say ? Look.RowH : Look.RowSafeH;
+            r.size.preferredHeight = r.size.minHeight = h;
+        }
     }
 
     void SetLevel(Row r, Level lv)
@@ -282,15 +283,17 @@ public class StatusPanel : HudPart
         r.tint.color = danger ? T.WithAlpha(T.Danger, Look.TintDanger) : caution ? T.WithAlpha(T.Accent, Look.TintCaution) : T.Clear;
         r.statusIcon.gameObject.SetActive(lv != Level.Safe);
         if (lv != Level.Safe) r.statusIcon.sprite = T.Icon(danger ? "danger" : "caution");
-        r.statusIcon.color = danger ? T.Danger : T.Ink;
-        r.word.color = danger ? T.Danger : T.Ink;
-        r.value.color = danger ? T.Danger : T.Ink;
-        r.gauge.SetLevel(danger ? T.Danger : caution ? T.Accent : T.Go, danger);
+        // 暗い面の上：文字はいつも HudText（紺の上の crimson は読めない）。危険は行の後ろの赤・円・縞・言葉で伝える
+        r.statusIcon.color = T.HudText;
+        r.word.color = T.HudText;
+        r.value.color = T.HudText;
+        r.gauge.SetLevel(danger ? T.Panel : caution ? T.Accent : T.Go, danger);
         if (!danger) r.chip.localScale = Vector3.one;
     }
 
     void SetFacing(string attitude)
     {
+        if (facingText == null) return;
         if (!Facing.TryGetValue(attitude ?? "", out var f)) f = (attitude?.ToUpperInvariant() ?? "", null);
         facingText.text = f.word;
         var sp = f.icon != null ? T.Icon(f.icon) : null;
@@ -382,7 +385,7 @@ public class StatusPanel : HudPart
         {
             var track = Ui.Rect("Gauge", parent);
             var le = Ui.Size(track, h: Look.GaugeH, flexW: 1f); le.minHeight = Look.GaugeH;
-            var groove = UiKit.Pill(track, T.Line, Look.GaugeH, "Groove"); UiKit.Fill(groove.rectTransform);
+            var groove = UiKit.Pill(track, T.HudGroove, Look.GaugeH, "Groove"); UiKit.Fill(groove.rectTransform);
 
             fillImg = UiKit.Pill(track, T.Go, Look.GaugeH, "Fill");
             fill = fillImg.rectTransform;
@@ -396,18 +399,18 @@ public class StatusPanel : HudPart
                 var sr = Ui.Rect("Stripes", fill); UiKit.Fill(sr);
                 stripes = sr.gameObject.AddComponent<Image>();
                 stripes.sprite = sp; stripes.type = Image.Type.Tiled; stripes.pixelsPerUnitMultiplier = Look.StripeScale;
-                stripes.color = T.Panel; stripes.raycastTarget = false;   // 画像が白の 40%
+                stripes.color = T.Danger; stripes.raycastTarget = false;   // 画像が白の 40%
                 stripes.enabled = false;
             }
 
-            var li = UiKit.Round(track, Look.LineW * 0.5f, T.Ink, "Line");
+            var li = UiKit.Round(track, Look.LineW * 0.5f, T.HudText, "Line");
             line = li.rectTransform;
             line.anchorMin = line.anchorMax = new Vector2(0f, 0.5f); line.pivot = new Vector2(0.5f, 0.5f);
             line.sizeDelta = new Vector2(Look.LineW, Look.GaugeH + Look.LineOver * 2f);
             line.gameObject.SetActive(false);
 
             var cs = T.Theme != null ? T.Theme.caretDown : null;
-            var ci = UiKit.Shape(track, cs, T.Ink, 0f, "Caret");
+            var ci = UiKit.Shape(track, cs, T.HudText, 0f, "Caret");
             caret = ci.rectTransform;
             caret.anchorMin = caret.anchorMax = new Vector2(0f, 0.5f); caret.pivot = new Vector2(0f, 0.5f);
             caret.sizeDelta = new Vector2(Look.CaretW, Look.CaretH);

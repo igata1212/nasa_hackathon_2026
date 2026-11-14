@@ -27,16 +27,16 @@ public class CabinOverlay : HudPart
     {
         public static readonly Color Scrim = T.Ink;     // 暗幕の色（不透明度は ScrimAlpha）
         public const float ScrimAlpha = 0.55f;          // 照明 OFF で船室（3D）を暗くする量
-        public const float DetailAlpha = 0.3f;          // 照明 OFF のときの、ほかの部品の Detail の不透明度（1 = そのまま）
+        public const float DetailAlpha = 0.9f;          // 照明 OFF のときの、ほかの部品の Detail の不透明度（1 = そのまま）。#146：0.3 だと T1（照明 OFF のまま飛ぶ）で HUD がずっと読めないので、暗くするのは船室（3D）だけにした
         public const float FadeSec = 0.35f;             // 暗くなる・明るくなるのにかかる秒
         public const float ReapplySec = 0.5f;           // 照明 OFF の間、作り直された部品（席のパネル）に掛け直す間隔
         public const int ScrimBelowFrame = 1;           // 暗幕の Canvas の順番 = UrgencyFx.frameSortingOrder − これ（赤い枠の下）
         public const int ScrimOrderFallback = 8;        // UrgencyFx が無いとき（GameCanvas = 10・赤い枠 = 9 の下）
         // #88 SLOW の札
-        // 札の置き場所（Cabin に対する割合）。#146：席のパネル（CabinHud.Layout の Bottom：上 0.24）のすぐ上の右。
-        //   左下はヒューストンの先生の小窓（吹き出しの左下）とかぶるので右へ移した。札の右下をここに合わせる
-        public const float SlowX = 0.99f, SlowY = 0.24f;
-        public static readonly Vector2 SlowPivot = new Vector2(1f, 0f);
+        // 札の置き場所（Cabin に対する割合）。#146：左の列、ゲージのパネル（短くした）の下・先生の小窓（上の端 0.385）の上。
+        //   右下はヒューストンの吹き出しの下に潜った。札の左下をここに合わせる
+        public const float SlowX = 0.01f, SlowY = 0.39f;
+        public static readonly Vector2 SlowPivot = new Vector2(0f, 0f);
         public const float SlowBadgeD = T.IconM;        // 直す席のバッジ
         public const string SlowFormat = "SLOW +{0}%";  // 1行目（{0} = slow_pct）
     }
@@ -44,8 +44,8 @@ public class CabinOverlay : HudPart
     /// <summary>遅くなる理由（#88）：key・アイコン・理由の言葉・直す席・直し方。文言は Taiga が決める（今は H16・H18 に合わせた仮）</summary>
     static readonly (string key, string icon, string why, string seat, string fix)[] SlowReasons =
     {
-        ("cold", "temperature", "Too cold", Seats.Comms, "heater on"),
-        ("co2",  "co2",         "Too much CO2", Seats.Life, "swap the filter"),
+        ("cold", "temperature", "Cold", Seats.Comms, "heater on"),
+        ("co2",  "co2",         "CO2", Seats.Life, "swap filter"),
     };
 
     Image scrim;

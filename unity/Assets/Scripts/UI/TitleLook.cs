@@ -19,9 +19,9 @@ public static class TitleLook
     public const string HintNeedCode = "Type the 4-digit room code first,\nthen press [JOIN].";   // 鍵のかかった JOIN を押したとき
 
     // 部屋：人数で1つだけ出す（LobbyScreen.Refresh）
-    public const string LobbySolo = "Tell your friends the [ROOM] code!\nPlaying alone? Press [START MISSION].";
-    public const string LobbySome = "Fewer than 4? Some of you get 2 seats.\nAll here? Press [START MISSION]!";
-    public const string LobbyFull = "Full crew, one seat each!\nPress [START MISSION] when ready.";
+    public const string LobbySolo = "Share the code, or [START MISSION] alone!";
+    public const string LobbySome = "All here? Press [START MISSION]!";
+    public const string LobbyFull = "Full crew! Press [START MISSION].";
 
     public static readonly Color KeyColor = T.Go;   // [ ] の中の色（読みにくければ T.Ink に）
 

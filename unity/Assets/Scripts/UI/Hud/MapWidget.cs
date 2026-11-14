@@ -23,10 +23,11 @@ public class MapWidget : HudPart
     // ------------------------------------------------------------------ 文言（Fable の採点で直すときはここだけ。{0} は 分:秒 か数）
     static class Words
     {
-        public const string Title = "MAP (tap to zoom)";
+        public const string Title = "MAP";
         public const string BigTitle = "TWO WAYS HOME";
         public const string Close = "TAP TO CLOSE";
         public const string SourceShort = "NASA GMAT";
+        public const string HomeInShort = "{0}";   // 小さい地図の下（A・B の札の横に 分:秒 だけ。#146：home in を付けると2つが重なった）
         public const string Source = "Orbit lines: calculated with NASA GMAT";
         public const string Picker = "Mission Planner picks the route";
         public const string Earth = "EARTH", Moon = "MOON", NoRadio = "FAR SIDE (no radio)", BurnHere = "BURN HERE";
@@ -81,7 +82,7 @@ public class MapWidget : HudPart
         if (hasRoutes) hBurn = KnotH(routeA, "burn", Mathf.Lerp(routeA.hours[0], routeA.hours[routeA.hours.Length - 1], 0.5f));
 
         // 小さい地図（カード全体が押せる）
-        var face = UiKit.Surface(root, T.RadiusM, T.Panel);
+        var face = UiKit.Surface(root, T.RadiusM, T.HudFace);   // 計器は暗い面
         face.raycastTarget = true;
         var btn = root.gameObject.AddComponent<Button>();
         btn.targetGraphic = face; btn.transition = Selectable.Transition.None;
@@ -95,13 +96,15 @@ public class MapWidget : HudPart
         else Fallback(area);
         var cap = FreeText(area, Words.Title, TextStyle.Label, Caption, new Vector2(0f, 1f), new Vector2(T.S1, -T.S1 * 0.5f));
         cap.alignment = TextAlignmentOptions.TopLeft;
-        var src = FreeText(area, Words.SourceShort, TextStyle.Label, Caption, new Vector2(1f, 0f), new Vector2(-T.S1, T.S1 * 0.5f));
-        src.alignment = TextAlignmentOptions.BottomRight;
+        // #146：右下は B の札に重なったので右上へ
+        var src = FreeText(area, Words.SourceShort, TextStyle.Label, Caption, new Vector2(1f, 1f), new Vector2(-T.S1, -T.S1 * 0.5f));
+        src.alignment = TextAlignmentOptions.TopRight;
 
         // 下：A・B の家までの時間
         var row = UiKit.Row(root, T.S2, TextAnchor.MiddleCenter);
         Ui.Anchor(row, 0, 0, 1, 0, T.S1, 0, T.S1, 0);
         row.pivot = new Vector2(0.5f, 0f); row.sizeDelta = new Vector2(row.sizeDelta.x, SmallCompareH);
+        UiKit.Icon(row, "earth", T.IconS, T.HudSub);   // 「家まで」の印（文字の代わり）
         smallA = Compare.MakeSmall(row, "a");
         smallB = Compare.MakeSmall(row, "b");
         RefreshCompare(null);
@@ -302,8 +305,8 @@ public class MapWidget : HudPart
         float hb = s != null && s.tSplashdownB > 0f ? s.tSplashdownB : GameParams.Get("time_p4_return_b_min");
         string adjA = ha <= hb ? Words.Faster : Words.Slower, adjB = ha <= hb ? Words.Slower : Words.Faster;
         string homeA = Home(s, "a"), homeB = Home(s, "b");
-        smallA.Set(route, homeA, adjA, null);
-        smallB.Set(route, homeB, adjB, null);
+        smallA.Set(route, Home(s, "a", Words.HomeInShort), adjA, null);
+        smallB.Set(route, Home(s, "b", Words.HomeInShort), adjB, null);
         if (bigA != null)
         {
             bigA.Set(route, homeA, adjA, string.Format(Words.Fuel, Mathf.RoundToInt(GameParams.Get("fuel_burn_a"))));
@@ -311,11 +314,11 @@ public class MapWidget : HudPart
         }
     }
 
-    static string Home(GameState s, string r)
+    static string Home(GameState s, string r, string format = Words.HomeIn)
     {
         if (s == null) return Words.HomeUnknown;
         float at = s.RouteSplashdown(r);
-        return at > 0f ? string.Format(Words.HomeIn, Ui.Mmss(Mathf.Max(0f, at - s.t))) : Words.HomeUnknown;
+        return at > 0f ? string.Format(format, Ui.Mmss(Mathf.Max(0f, at - s.t))) : Words.HomeUnknown;
     }
 
     /// <summary>A・B の札と「家まで何分」。小さい地図は1行、大きい地図はカード（速い・遅い、燃料、選んだ印）</summary>
@@ -339,7 +342,7 @@ public class MapWidget : HudPart
             var c = new Compare { id = id };
             var r = UiKit.Row(row, T.S1, TextAnchor.MiddleLeft);
             c.tag = Tag(r, id, SmallTag, out c.letter);
-            c.main = UiKit.Text(r, "", TextStyle.Label, T.Ink, TextAlignmentOptions.MidlineLeft);
+            c.main = UiKit.Text(r, "", TextStyle.Tag, T.HudText, TextAlignmentOptions.MidlineLeft);
             return c;
         }
 
@@ -367,7 +370,7 @@ public class MapWidget : HudPart
             if (sub == null)
             {
                 main.text = string.IsNullOrEmpty(home) ? adj : home;
-                main.color = on ? T.Ink : T.InkSub;
+                main.color = on ? T.HudText : T.HudSub;
                 return;
             }
             main.text = adj + (string.IsNullOrEmpty(home) ? "" : " · " + home);

@@ -35,7 +35,7 @@ public static class DesignCopy
 {
     // ------------------------------------------------------------------ 見出し・要件
     public const string Title = "BUILD YOUR SHIP";
-    public const string Subtitle = "Load parts. Stay under both limits. Launch!";
+    public const string Subtitle = "";   // #146（Fable）：文字を減らした（題・要件のチップ・右の MASS／COST で足りる）
     public const string GoalsLabel = "GOALS";
 
     // SPEC 8章の Req 1〜4。3・4 は設計で決まる（サーバーの判定で ✓・✗ が付く）。1・2 は飛んでから決まる
@@ -48,8 +48,8 @@ public static class DesignCopy
     };
 
     // ------------------------------------------------------------------ 部品（この順に 2列で並べる。parts.json にあってここに無い部品は後ろに足す）
-    public const string PartsHint = "Tap + to load a part, - to take it off.";
-    public const string BodyNote = "Ship body (always on board):";
+    public const string PartsHint = "";
+    public const string BodyNote = "Ship body";
 
     public static readonly DesignPartCopy[] Parts =
     {
@@ -86,14 +86,14 @@ public static class DesignCopy
     public static readonly DesignChoiceCopy[] Paths =
     {
         // 自由帰還でも帰りの点火（ignite）は要る。要らないのは軌道修正（correction_burn）だけ（SPEC 6・7章）
-        new DesignChoiceCopy("free_return", "Free-return", "Loops around the Moon and heads home.", new DesignStatCopy("science", "x1")),
-        new DesignChoiceCopy("science", "Science", "Longer near the Moon. Needs a course fix.",
+        new DesignChoiceCopy("free_return", "Free-return", "Safe and simple.", new DesignStatCopy("science", "x1")),
+        new DesignChoiceCopy("science", "Science", "More science. Costs fuel.",
             new DesignStatCopy("science", "x{sci_trajectory_mult}"), new DesignStatCopy("fuel", "-{fuel_correction_burn}%")),
     };
 
     // ------------------------------------------------------------------ 判定（サーバーの totals.status と launch の結果）
-    public const string OkTitle = "READY TO LAUNCH";
-    public const string OkHint = "Mass and cost are both under the line.";
+    public const string OkTitle = "GOOD TO GO";
+    public const string OkHint = "";
     public const string MassTitle = "TOO HEAVY";
     public const string BudgetTitle = "OVER BUDGET";
 

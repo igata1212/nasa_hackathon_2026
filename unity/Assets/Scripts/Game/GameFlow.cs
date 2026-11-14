@@ -53,6 +53,8 @@ public class GameFlow : MonoBehaviour
     HoustonBox houston;
     GameToast toast;   // #132 短いお知らせ（UI/GameToast.cs）
     ConnectionUi conn; // #94 切れたら自動でつなぎ直す・RECONNECTING・ほかの人の切断の印（UI/ConnectionUi.cs）
+    /// <summary>オフライン再生の操作（PAUSE・SKIP・x1…）を出すか。#146（Fable）：ピッチの映像に入るので、ふだんは隠す（開発のときだけインスペクターで ON）</summary>
+    public bool showReplayControls = false;
     GameObject debugBar; Text speedLabel;
 
     void Awake()
@@ -224,7 +226,7 @@ public class GameFlow : MonoBehaviour
         design.Root.SetActive(p == "design");
         cabin.Root.SetActive(inCabin);
         if (trajectoryCamera != null) trajectoryCamera.enabled = inCabin;
-        debugBar.SetActive(Client is OfflineClient && (inCabin || p == "ending"));
+        debugBar.SetActive(showReplayControls && Client is OfflineClient && (inCabin || p == "ending"));
         ending.Root.SetActive(p == "ending");
         report.Root.SetActive(p == "report");
         houston.Root.transform.SetAsLastSibling();

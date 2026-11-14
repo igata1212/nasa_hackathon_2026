@@ -128,9 +128,10 @@ public class HoustonBubble
         // 右上の上：SKIP（ブリーフィングだけ）
         skip = UiKit.SecondaryButton(Root, S.Skip, null, () => OnSkip?.Invoke());
         var sle = skip.Root.GetComponent<LayoutElement>();
-        skip.Root.anchorMin = skip.Root.anchorMax = new Vector2(1f, 1f); skip.Root.pivot = new Vector2(1f, 0f);
+        // #146（Fable）：吹き出しの右下の外。右上だと後ろの設計の画面の文字に重なって見えた
+        skip.Root.anchorMin = skip.Root.anchorMax = new Vector2(1f, 0f); skip.Root.pivot = new Vector2(1f, 1f);
         skip.Root.sizeDelta = new Vector2(sle.preferredWidth, sle.preferredHeight);
-        skip.Root.anchoredPosition = new Vector2(0f, T.TagH * 0.5f + S.SkipGap - (T.Hit - T.SecondaryH) * 0.5f);
+        skip.Root.anchoredPosition = new Vector2(0f, -S.SkipGap + (T.Hit - T.SecondaryH) * 0.5f);
         skip.Root.gameObject.SetActive(false);
 
         Root.gameObject.SetActive(false);
@@ -166,7 +167,7 @@ public class HoustonBubble
     {
         nameText.text = speakerName;
         nameFace.color = tag;
-        roleTag.gameObject.SetActive(houston);
+        roleTag.gameObject.SetActive(houston && (firstTime || S.RoleAlways));   // #146（Fable）：説明のラベルは最初の間だけ（小窓に MISSION CONTROL と出ている）
         roleText.text = firstTime ? S.RoleFirst : S.Role;
         body.gameObject.SetActive(true);
         body.text = marked;
@@ -182,7 +183,7 @@ public class HoustonBubble
     {
         nameText.text = S.Name;
         nameFace.color = T.InkSub;
-        roleTag.gameObject.SetActive(true);
+        roleTag.gameObject.SetActive(S.RoleAlways);
         roleText.text = S.Role;
         body.gameObject.SetActive(false);
         linkView.gameObject.SetActive(true);

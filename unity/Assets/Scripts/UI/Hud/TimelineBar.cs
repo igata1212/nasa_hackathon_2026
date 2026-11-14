@@ -20,7 +20,7 @@ public class TimelineBar : HudPart
     static class Words
     {
         public const string Clock = "T+ {0}";
-        public const string Practice = "PRACTICE: try your controls. The clock starts at the accident.";
+        public const string Practice = "PRACTICE";
         public const string Stir = "GET READY";
         // 帯の中（長い順。入らなければ次の短いもの、最後はアイコンだけ）
         public static readonly string[] FarSide = { "FAR SIDE (no radio)", "NO RADIO", "" };
@@ -77,19 +77,19 @@ public class TimelineBar : HudPart
         // 照明 OFF で暗くしてよいもの：面・時計・帯
         var detail = Ui.Rect("Detail", bar); UiKit.Fill(detail);
         Detail = detail.gameObject.AddComponent<CanvasGroup>();
-        UiKit.Surface(detail, TrackH, T.Panel);
+        UiKit.Surface(detail, TrackH, T.HudFace);   // 計器は暗い面
 
-        clock = UiKit.Text(detail, "", TextStyle.Number, T.Ink, TextAlignmentOptions.MidlineLeft);
+        clock = UiKit.Text(detail, "", TextStyle.Number, T.HudText, TextAlignmentOptions.MidlineLeft);
         var cr = clock.rectTransform;
         cr.anchorMin = new Vector2(0f, 0f); cr.anchorMax = new Vector2(0f, 1f); cr.pivot = new Vector2(0f, 0.5f);
         cr.sizeDelta = new Vector2(ClockW, 0f); cr.anchoredPosition = new Vector2(T.S3, 0f);
 
-        idle = UiKit.Text(detail, "", TextStyle.Body, T.Ink, TextAlignmentOptions.Midline);
+        idle = UiKit.Text(detail, "", TextStyle.Body, T.HudSub, TextAlignmentOptions.Midline);
         Ui.Anchor(idle.rectTransform, 0, 0, 1, 1, ClockW + T.S3, 0, T.S3, 0);
 
         track = Ui.Rect("Track", detail);
         Ui.Anchor(track, 0, 0, 1, 1, ClockW + T.S3 * 2f, TrackInsetY, ChipReserveW + T.S3 * 2f, TrackInsetY);
-        var groove = UiKit.Pill(track, T.Line, TrackH, "Groove"); UiKit.Fill(groove.rectTransform);
+        var groove = UiKit.Pill(track, T.HudGroove, TrackH, "Groove"); UiKit.Fill(groove.rectTransform);
 
         far = MakeSeg("FarSide");
         burn = MakeSeg("BurnWindow");
@@ -100,14 +100,14 @@ public class TimelineBar : HudPart
         splash.rectTransform.anchorMin = splash.rectTransform.anchorMax = new Vector2(1f, 0.5f);
         splash.rectTransform.sizeDelta = new Vector2(T.IconS, T.IconS);
 
-        past = UiKit.Pill(track, T.Shadow, TrackH, "Past").rectTransform;
+        past = UiKit.Pill(track, T.WithAlpha(T.Ink, 0.55f), TrackH, "Past").rectTransform;
         Ui.Anchor(past, 0, 0, 0, 1);
 
         nowLine = Ui.Rect("Now", track);
         nowLine.anchorMin = new Vector2(0f, 0f); nowLine.anchorMax = new Vector2(0f, 1f); nowLine.pivot = new Vector2(0.5f, 0.5f);
         nowLine.offsetMin = new Vector2(-NowW * 0.5f, -NowOver); nowLine.offsetMax = new Vector2(NowW * 0.5f, NowOver);
-        nowLine.gameObject.AddComponent<Image>().color = T.Ink;
-        var knob = UiKit.Pill(nowLine, T.Ink, NowKnob, "Knob").rectTransform;
+        nowLine.gameObject.AddComponent<Image>().color = T.HudText;
+        var knob = UiKit.Pill(nowLine, T.HudText, NowKnob, "Knob").rectTransform;
         knob.anchorMin = knob.anchorMax = new Vector2(0.5f, 1f); knob.sizeDelta = new Vector2(NowKnob, NowKnob); knob.anchoredPosition = Vector2.zero;
 
         // 右：次まで（暗くしない）
@@ -150,7 +150,7 @@ public class TimelineBar : HudPart
         if (end <= 0f) return;
 
         // 月の裏側（通信途絶＝観測の窓）
-        SetSeg(far, s.tLos, s.tAos, end, T.Ink, T.Panel, "comms_lost", Words.FarSide, SeatsObserve, mine);
+        SetSeg(far, s.tLos, s.tAos, end, T.HudSeg, T.Panel, "comms_lost", Words.FarSide, SeatsObserve, mine);
 
         // 噴射窓
         bool missed = s.strictReason == "missed_burn";
@@ -164,14 +164,14 @@ public class TimelineBar : HudPart
         float splashAt = s.tSplashdown;
         if (!both)
         {
-            SetSeg(reA, 0f, 0f, end, T.InkSub, T.Panel, "heat_shield", Words.Reentry, SeatsReentry, mine);
-            SetSeg(reB, s.tReentry, s.tSplashdown, end, T.InkSub, T.Panel, "heat_shield", Words.Reentry, SeatsReentry, mine);
+            SetSeg(reA, 0f, 0f, end, T.HudSeg, T.Panel, "heat_shield", Words.Reentry, SeatsReentry, mine);
+            SetSeg(reB, s.tReentry, s.tSplashdown, end, T.HudSeg, T.Panel, "heat_shield", Words.Reentry, SeatsReentry, mine);
         }
         else if (route == "a" || route == "b")
         {
             var on = route == "a" ? reA : reB; var off = route == "a" ? reB : reA;
-            SetSeg(on, s.RouteReentry(route), s.RouteSplashdown(route), end, T.InkSub, T.Panel, "heat_shield", Words.Reentry, SeatsReentry, mine);
-            SetSeg(off, 0f, 0f, end, T.InkSub, T.Panel, "heat_shield", Words.Reentry, NoSeats, mine);
+            SetSeg(on, s.RouteReentry(route), s.RouteSplashdown(route), end, T.HudSeg, T.Panel, "heat_shield", Words.Reentry, SeatsReentry, mine);
+            SetSeg(off, 0f, 0f, end, T.HudSeg, T.Panel, "heat_shield", Words.Reentry, NoSeats, mine);
             splashAt = s.RouteSplashdown(route);
         }
         else

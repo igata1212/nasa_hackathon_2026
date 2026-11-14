@@ -54,7 +54,7 @@ public class HoustonBox
     public HoustonBox(Transform parent, GameFlow flow = null)
     {
         this.flow = flow != null ? flow : parent.GetComponentInParent<GameFlow>();
-        var sc = Ui.PanelImg(parent, UiTokens.Scrim, "HoustonScrim"); UiKit.Fill(sc.rectTransform);
+        var sc = Ui.PanelImg(parent, S.BriefingScrimColor, "HoustonScrim"); UiKit.Fill(sc.rectTransform);
         var sb = sc.gameObject.AddComponent<UnityEngine.UI.Button>();
         sb.transition = UnityEngine.UI.Selectable.Transition.None;
         sb.onClick.AddListener(Next);
@@ -278,7 +278,7 @@ public class HoustonBox
             bool more = page + 1 < pages.Count || brief;
             string foot = brief ? S.TapNext + "   " + (bIndex + 1) + " / " + briefing.Count
                                 : pages.Count > 1 ? (page + 1) + " / " + pages.Count : "";
-            view.ShowLine(S.SpeakerName(cur.speaker), S.IsHouston(cur.speaker), S.TagColor(cur.priority), introUntil > 0f,
+            view.ShowLine(S.SpeakerName(cur.speaker), S.IsHouston(cur.speaker), S.TagColor(cur.priority), introUntil > 0f || brief,
                           HoustonScript.Mark(p, S.Highlight), p, S.SeatsIn(cur.text), more, foot);
         }
         else if (lost) view.ShowLink(noSignal, noSignal ? (FarSide ? S.NoSignalFarSide : S.NoSignalOther) : S.CommsOffHint);

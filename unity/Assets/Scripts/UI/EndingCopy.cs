@@ -80,9 +80,9 @@ public static class EndingCopy
 
     // ================================================================== 事後レポート：見出し
     public const string ReportTitle = "MISSION REPORT";
-    public const string GoalsTitle = "MISSION GOALS", GoalsIcon = null;
+    public const string GoalsTitle = "GOALS", GoalsIcon = "check";
     public const string ScoreTitle = "SCORE", ScoreIcon = "score";
-    public const string MomentsTitle = "KEY MOMENTS", MomentsIcon = "clock";
+    public const string MomentsTitle = "TIMELINE", MomentsIcon = "clock";
 
     // ================================================================== 事後レポート：要件4つ（SPEC 8章。キーは result.requirements）
     public class Req
