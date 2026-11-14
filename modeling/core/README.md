@@ -126,7 +126,7 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 - **共通マテリアルがないとき**（消した、など）：FBX は差し替えずに（灰色で）取り込み、取り込みのあと `OnPostprocessAllAssets` が共通マテリアルを作る。それを待っている FBX は Unity が自動で読み直し、こんどは差し替わる。手でマテリアルを作らない。
 - **パレットの色を変えたとき**：`python3 modeling/core/palette.py` で `palette.png` を作り直すだけ。共通マテリアルはその画像を指しているので、そのまま新しい色になる。
 - **確かめ方**：メニュー Tools/Models/Core Palette を確かめる（UnityMCP なら `execute_code` で `CorePalette.Report();`）。`[CorePalette] 合計 OK=31 NG=0 対象外=2` が出れば全部差し替わっている（2026-11-14）。見た目は `Assets/Scenes/ModelCheck.unity`（33個を並べた確認用シーン）。
-- **次にやること**：ランプ（`.Lamp_〜` の部品）の発光。いまはランプも共通マテリアル（光らない）。計画どおり Unity で `Lamp_` の部品のマテリアルを発光するものに差し替える（取り込み時にするか、ゲームの中で状態に合わせて切り替えるかは未決定）。
+- **ランプの発光**（#55）：FBX のランプは共通マテリアルのまま（光らない）。ゲームの中で `LampGlow`（`Assets/Scripts/Visual/LampGlow.cs`）を付けると、子の `.Lamp_Red`／`.Lamp_Yellow`／`.Lamp_Green` を発光マテリアル `Assets/Art/Materials/M_Lamp_*.mat` に差し替えて点滅させる。取り込み時に差し替えるかは未決定（`docs/design/art-direction.md`）。
 
 ## 5. チェック基準（`check.py` が FBX を読み直して判定）
 
