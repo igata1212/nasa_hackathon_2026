@@ -14,7 +14,7 @@
   Eyes_Normal / Eyes_Panic / Eyes_Relief   ふつう・焦る・ほっとする。バイザーのやや下に、間隔を広めに。
               Unity で1つだけ表示する（FBX には3つとも入る）
   Torso       席の色のやわらかい胴（角の丸い球＝超楕円体）＋胸の席アイコン（白）
-  Backpack    明るい灰の角丸の箱＋背中の席アイコン（席の色）
+  Backpack    席の色の角丸の箱＋背中の席アイコン（白）
   Arm_L / Arm_R   席の色の短く太いカプセル。付け根は胴に埋める。原点は肩。腕は下ろして少し外に開いた姿で作ってある
   Leg_L / Leg_R   席の色の短く太いカプセル（底は少し平ら）。付け根は胴に埋める。原点は股
 似すぎの線引き（docs/design/art-research.md 4章）：ヘルメットと胴が別のかたまり（白と席の色、首のリング）、
@@ -219,8 +219,8 @@ def build(name):
     ck.set_origin(torso, (0, 0, HIP_Z))
 
     # --- 背中の装置＋背中のアイコン ---
-    pack = ck.box("PackBody", (0, 0.235, 0.44), (0.32, 0.15, 0.34), "gray_light", bevel=0.04)
-    back = icon("PackIcon", shape, (0, 0.31, 0.44), seat)
+    pack = ck.box("PackBody", (0, 0.235, 0.44), (0.32, 0.15, 0.34), seat, bevel=0.04)
+    back = icon("PackIcon", shape, (0, 0.31, 0.44), "white")
     backpack = ck.join([pack, back], "Backpack")
 
     # --- 腕（下ろして少し外へ開く）。原点は肩。付け根は胴に埋める ---

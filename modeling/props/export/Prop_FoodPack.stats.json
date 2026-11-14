@@ -1,0 +1,45 @@
+{
+ "name": "Prop_FoodPack",
+ "tris": 584,
+ "min": [
+  -0.1,
+  -0.078,
+  -0.034
+ ],
+ "max": [
+  0.1,
+  0.078,
+  0.034
+ ],
+ "size": [
+  0.2,
+  0.156,
+  0.068
+ ],
+ "objects": {
+  "Prop_FoodPack": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Prop_FoodPack.Bag": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 432
+  },
+  "Prop_FoodPack.Band": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 152
+  }
+ }
+}

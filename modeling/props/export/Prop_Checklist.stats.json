@@ -1,0 +1,53 @@
+{
+ "name": "Prop_Checklist",
+ "tris": 648,
+ "min": [
+  -0.15,
+  -0.11,
+  -0.031
+ ],
+ "max": [
+  0.15,
+  0.11,
+  0.031
+ ],
+ "size": [
+  0.3,
+  0.22,
+  0.062
+ ],
+ "objects": {
+  "Prop_Checklist": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Prop_Checklist.Cover": {
+   "origin": [
+    -0.015,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Prop_Checklist.Pages": {
+   "origin": [
+    0.135,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Prop_Checklist.Rings": {
+   "origin": [
+    -0.119,
+    -0.07,
+    0.0
+   ],
+   "tris": 432
+  }
+ }
+}
