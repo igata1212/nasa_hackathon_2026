@@ -15,8 +15,8 @@
 
 | 名前 | GitHub | 担当 |
 |---|---|---|
-| iizuka | `tada246` | Unity・通信・GMAT 連携・GitHub 運用 |
-| Taiga | `igata1212` | 企画・物語・パラメータ・3D アセット・UI |
+| iizuka | `tada246` | Unity・サーバー（Python）・通信・GMAT 連携・GitHub 運用 |
+| Taiga | `igata1212` | 物語・台詞・パラメータ・UI・3D アセットなど上の層 |
 | midori | `midori11111111` | 3D モデル（`modeling/PhysDraft-SpaceCrew3D`）、物語の英語レビューなど。海外在住・英語。この人向けの Issue は英語で書く |
 
 Issue の担当を付けるときは GitHub の名前を使う：`gh issue edit N --add-assignee igata1212`
@@ -85,6 +85,7 @@ Issue の担当を付けるときは GitHub の名前を使う：`gh issue edit 
 - `.meta` ファイルは必ずアセットと一緒にコミットする（片方だけだと参照が壊れる）
 - シーンは1人1つを基本にする。共有シーンを触るときは Issue に書いておく
 - **数値はコードに書かない**。`parameters.json` / `parts.json` から読む。JSON は `docs/design/` の xlsx から作り、`reference_sim.py` と同じフォルダに置く（同じフォルダから読むため）。ロジックで迷ったら `docs/design/reference_sim.py` が正
+- シミュレーションはサーバー（Python）で動かす。Unity に移植しない（`docs/design/architecture.md`）
 - 画面に出る文字列は英語（提出用）
 
 ## ファイル
