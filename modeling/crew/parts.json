@@ -1,0 +1,330 @@
+{
+ "Crew_CommsPower": [
+  {
+   "name": "Crew_CommsPower.Helmet",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "origin": [
+    0.0,
+    0.0,
+    0.72
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_CommsPower.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_CommsPower.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_CommsPower.Leg_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_CommsPower.Leg_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Crew_LifeSupport": [
+  {
+   "name": "Crew_LifeSupport.Helmet",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "origin": [
+    0.0,
+    0.0,
+    0.72
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_LifeSupport.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_LifeSupport.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_LifeSupport.Leg_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_LifeSupport.Leg_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Crew_MissionPlanner": [
+  {
+   "name": "Crew_MissionPlanner.Helmet",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "origin": [
+    0.0,
+    0.0,
+    0.72
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_MissionPlanner.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_MissionPlanner.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_MissionPlanner.Leg_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_MissionPlanner.Leg_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Crew_Pilot": [
+  {
+   "name": "Crew_Pilot.Helmet",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -40,
+   "max": 40,
+   "default": 0,
+   "origin": [
+    0.0,
+    0.0,
+    0.72
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Pilot.Arm_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Pilot.Arm_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -45,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.245,
+    0.0,
+    0.63
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Pilot.Leg_L",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Crew_Pilot.Leg_R",
+   "type": "rotate",
+   "axis": "X",
+   "min": -30,
+   "max": 30,
+   "default": 0,
+   "origin": [
+    -0.1,
+    0.0,
+    0.34
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ]
+}

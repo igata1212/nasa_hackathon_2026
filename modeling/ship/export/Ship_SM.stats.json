@@ -1,0 +1,125 @@
+{
+ "name": "Ship_SM",
+ "tris": 1988,
+ "min": [
+  -1.95,
+  -1.95,
+  0.0
+ ],
+ "max": [
+  1.95,
+  1.95,
+  7.5
+ ],
+ "size": [
+  3.9,
+  3.9,
+  7.5
+ ],
+ "objects": {
+  "Ship_SM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_SM.AftShield": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  },
+  "Ship_SM.Bay4": {
+   "origin": [
+    -0.6025,
+    -1.04356,
+    5.125
+   ],
+   "tris": 252
+  },
+  "Ship_SM.Core": {
+   "origin": [
+    0.0,
+    0.0,
+    5.125
+   ],
+   "tris": 60
+  },
+  "Ship_SM.Move_Panel4": {
+   "origin": [
+    0.0,
+    -1.95,
+    2.98
+   ],
+   "tris": 180
+  },
+  "Ship_SM.Nozzle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 224
+  },
+  "Ship_SM.NozzleMount": {
+   "origin": [
+    0.0,
+    0.0,
+    2.68
+   ],
+   "tris": 60
+  },
+  "Ship_SM.Rcs1": {
+   "origin": [
+    1.42836,
+    1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Rcs2": {
+   "origin": [
+    -1.42836,
+    1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Rcs3": {
+   "origin": [
+    -1.42836,
+    -1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Rcs4": {
+   "origin": [
+    1.42835,
+    -1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Skin": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 564
+  },
+  "Ship_SM.TopRing": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  }
+ }
+}

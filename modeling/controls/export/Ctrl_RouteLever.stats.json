@@ -1,0 +1,61 @@
+{
+ "name": "Ctrl_RouteLever",
+ "tris": 1320,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.2525
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.2525
+ ],
+ "objects": {
+  "Ctrl_RouteLever": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_RouteLever.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_RouteLever.Guide": {
+   "origin": [
+    0.0,
+    -0.03,
+    0.065
+   ],
+   "tris": 432
+  },
+  "Ctrl_RouteLever.Marks": {
+   "origin": [
+    -0.06,
+    -0.072,
+    0.0525
+   ],
+   "tris": 564
+  },
+  "Ctrl_RouteLever.Move_Lever": {
+   "origin": [
+    0.0,
+    0.0,
+    0.055
+   ],
+   "tris": 216
+  }
+ }
+}

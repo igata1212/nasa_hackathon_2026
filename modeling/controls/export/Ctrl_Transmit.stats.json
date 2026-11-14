@@ -1,0 +1,61 @@
+{
+ "name": "Ctrl_Transmit",
+ "tris": 924,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.192
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.192
+ ],
+ "objects": {
+  "Ctrl_Transmit": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Transmit.Antenna": {
+   "origin": [
+    0.077,
+    0.077,
+    0.0525
+   ],
+   "tris": 600
+  },
+  "Ctrl_Transmit.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Transmit.Move_Button": {
+   "origin": [
+    -0.01,
+    -0.01,
+    0.065
+   ],
+   "tris": 108
+  },
+  "Ctrl_Transmit.Plinth": {
+   "origin": [
+    -0.01,
+    -0.01,
+    0.0525
+   ],
+   "tris": 108
+  }
+ }
+}

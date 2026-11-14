@@ -1,0 +1,153 @@
+{
+ "Ctrl_AttitudeStick": [
+  {
+   "name": "Ctrl_AttitudeStick.Move_Stick",
+   "type": "rotate",
+   "axis": "X",
+   "min": -25,
+   "max": 25,
+   "default": 0,
+   "note": "前後に倒す（+ で握りが −Y＝手前へ）。原点は根元の球の中心",
+   "origin": [
+    0.0,
+    0.0,
+    0.085
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Ctrl_AttitudeStick.Move_Stick",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -25,
+   "max": 25,
+   "default": 0,
+   "note": "左右に倒す（+ で握りが +X＝右へ）。同じ部品の2つ目の軸",
+   "origin": [
+    0.0,
+    0.0,
+    0.085
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Button": [
+  {
+   "name": "Ctrl_Button.Move_Button",
+   "type": "translate",
+   "axis": "Z",
+   "min": -0.02,
+   "max": 0,
+   "default": 0,
+   "press": 0.02,
+   "note": "押し込み量 0.02m（−Z）",
+   "origin": [
+    0.0,
+    0.0,
+    0.065
+   ],
+   "unity_axis": "Y",
+   "unity_sign": 1,
+   "unit": "m"
+  }
+ ],
+ "Ctrl_Ignite": [
+  {
+   "name": "Ctrl_Ignite.Move_Cover",
+   "type": "rotate",
+   "axis": "X",
+   "min": -105,
+   "max": 0,
+   "default": 0,
+   "note": "跳ね上げカバー。原点はヒンジの軸。0 で閉、−105 で全開（前のつまみが上・後ろへ回る）",
+   "origin": [
+    0.0,
+    0.085,
+    0.1225
+   ],
+   "unity_axis": "X",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Ctrl_Ignite.Move_Button",
+   "type": "translate",
+   "axis": "Z",
+   "min": -0.02,
+   "max": 0,
+   "default": 0,
+   "press": 0.02,
+   "note": "押し込み量 0.02m（−Z）。カバーを開いてから押す。Pilot と Comms & Power の2台を同時押し",
+   "origin": [
+    0.0,
+    0.0,
+    0.07
+   ],
+   "unity_axis": "Y",
+   "unity_sign": 1,
+   "unit": "m"
+  }
+ ],
+ "Ctrl_RouteLever": [
+  {
+   "name": "Ctrl_RouteLever.Move_Lever",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -30,
+   "max": 30,
+   "default": -30,
+   "note": "2位置。−30＝A（左、点1つ）、+30＝B（右、点2つ）。初期は A。形は真上（0）で作ってある",
+   "origin": [
+    0.0,
+    0.0,
+    0.055
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Ctrl_Transmit": [
+  {
+   "name": "Ctrl_Transmit.Move_Button",
+   "type": "translate",
+   "axis": "Z",
+   "min": -0.02,
+   "max": 0,
+   "default": 0,
+   "press": 0.02,
+   "note": "押し込み量 0.02m（−Z）。set_transmit(on) は ON/OFF なので、ON の間は −0.02 で止める（押しっぱなし式）想定",
+   "origin": [
+    -0.01,
+    -0.01,
+    0.065
+   ],
+   "unity_axis": "Y",
+   "unity_sign": 1,
+   "unit": "m"
+  }
+ ],
+ "Ctrl_Valve": [
+  {
+   "name": "Ctrl_Valve.Move_Wheel",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -720,
+   "max": 0,
+   "default": 0,
+   "note": "close_valve：上から見て時計回り（Blender の Z まわり −）に回すと閉まる。2周で全閉。輪は直径 0.30m で台座（0.2m）より左右前後に 5cm はみ出す（高さ 0.15〜0.19m）",
+   "origin": [
+    0.0,
+    0.0,
+    0.17
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ]
+}

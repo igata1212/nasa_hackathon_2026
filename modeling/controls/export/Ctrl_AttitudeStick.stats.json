@@ -1,0 +1,53 @@
+{
+ "name": "Ctrl_AttitudeStick",
+ "tris": 1084,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.3275
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.3275
+ ],
+ "objects": {
+  "Ctrl_AttitudeStick": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_AttitudeStick.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_AttitudeStick.Boot": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0625
+   ],
+   "tris": 188
+  },
+  "Ctrl_AttitudeStick.Move_Stick": {
+   "origin": [
+    0.0,
+    0.0,
+    0.085
+   ],
+   "tris": 788
+  }
+ }
+}

@@ -1,0 +1,109 @@
+{
+ "name": "Crew_Pilot",
+ "tris": 2384,
+ "min": [
+  -0.323,
+  -0.35693,
+  0.0
+ ],
+ "max": [
+  0.323,
+  0.295,
+  1.2
+ ],
+ "size": [
+  0.646,
+  0.65193,
+  1.2
+ ],
+ "objects": {
+  "Crew_Pilot": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Crew_Pilot.Arm_L": {
+   "origin": [
+    0.245,
+    0.0,
+    0.63
+   ],
+   "tris": 260
+  },
+  "Crew_Pilot.Arm_R": {
+   "origin": [
+    -0.245,
+    0.0,
+    0.63
+   ],
+   "tris": 260
+  },
+  "Crew_Pilot.Backpack": {
+   "origin": [
+    0.0,
+    0.2,
+    0.54
+   ],
+   "tris": 116
+  },
+  "Crew_Pilot.Helmet": {
+   "origin": [
+    0.0,
+    0.0,
+    0.72
+   ],
+   "tris": 720
+  },
+  "Crew_Pilot.Eyes_Normal": {
+   "origin": [
+    -0.085,
+    -0.23105,
+    0.945
+   ],
+   "tris": 96
+  },
+  "Crew_Pilot.Eyes_Panic": {
+   "origin": [
+    -0.085,
+    -0.23105,
+    0.945
+   ],
+   "tris": 208
+  },
+  "Crew_Pilot.Eyes_Relief": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 112
+  },
+  "Crew_Pilot.Leg_L": {
+   "origin": [
+    0.1,
+    0.0,
+    0.34
+   ],
+   "tris": 248
+  },
+  "Crew_Pilot.Leg_R": {
+   "origin": [
+    -0.1,
+    0.0,
+    0.34
+   ],
+   "tris": 248
+  },
+  "Crew_Pilot.Torso": {
+   "origin": [
+    0.0,
+    0.0,
+    0.34
+   ],
+   "tris": 116
+  }
+ }
+}

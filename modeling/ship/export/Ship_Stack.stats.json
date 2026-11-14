@@ -1,0 +1,333 @@
+{
+ "name": "Ship_Stack",
+ "tris": 4490,
+ "min": [
+  -4.67798,
+  -4.7,
+  0.0
+ ],
+ "max": [
+  4.67798,
+  4.7,
+  16.85
+ ],
+ "size": [
+  9.35595,
+  9.4,
+  16.85
+ ],
+ "objects": {
+  "Ship_Stack": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_CM": {
+   "origin": [
+    0.0,
+    0.0,
+    7.15
+   ],
+   "tris": 0
+  },
+  "Ship_CM.Cone": {
+   "origin": [
+    0.0,
+    0.0,
+    7.15
+   ],
+   "tris": 476
+  },
+  "Ship_CM.DockRing": {
+   "origin": [
+    0.0,
+    0.0,
+    10.41
+   ],
+   "tris": 60
+  },
+  "Ship_CM.Hatch": {
+   "origin": [
+    0.0,
+    -1.33,
+    8.6
+   ],
+   "tris": 108
+  },
+  "Ship_CM.HatchWindow": {
+   "origin": [
+    0.0,
+    -1.36,
+    8.67
+   ],
+   "tris": 28
+  },
+  "Ship_CM.HeatShield": {
+   "origin": [
+    0.0,
+    0.0,
+    7.15
+   ],
+   "tris": 190
+  },
+  "Ship_CM.Window0": {
+   "origin": [
+    -0.78,
+    -0.93,
+    8.92
+   ],
+   "tris": 12
+  },
+  "Ship_CM.Window1": {
+   "origin": [
+    0.78,
+    -0.93,
+    8.92
+   ],
+   "tris": 12
+  },
+  "Ship_LM": {
+   "origin": [
+    0.0,
+    0.0,
+    10.55
+   ],
+   "tris": 0
+  },
+  "Ship_LM.AftBay": {
+   "origin": [
+    0.0,
+    1.38,
+    12.2
+   ],
+   "tris": 108
+  },
+  "Ship_LM.Cabin": {
+   "origin": [
+    0.0,
+    -0.78,
+    12.33
+   ],
+   "tris": 188
+  },
+  "Ship_LM.Descent": {
+   "origin": [
+    0.0,
+    0.0,
+    14.5
+   ],
+   "tris": 220
+  },
+  "Ship_LM.DescentNozzle": {
+   "origin": [
+    0.0,
+    0.0,
+    15.68
+   ],
+   "tris": 60
+  },
+  "Ship_LM.Dish": {
+   "origin": [
+    -1.05,
+    0.55,
+    11.13
+   ],
+   "tris": 56
+  },
+  "Ship_LM.DockTunnel": {
+   "origin": [
+    0.0,
+    0.0,
+    10.875
+   ],
+   "tris": 60
+  },
+  "Ship_LM.Hatch": {
+   "origin": [
+    0.0,
+    -1.56,
+    12.95
+   ],
+   "tris": 108
+  },
+  "Ship_LM.Jets": {
+   "origin": [
+    1.4,
+    -0.55,
+    11.6
+   ],
+   "tris": 48
+  },
+  "Ship_LM.Legs": {
+   "origin": [
+    0.0,
+    0.0,
+    16.85
+   ],
+   "tris": 240
+  },
+  "Ship_LM.Mid": {
+   "origin": [
+    0.0,
+    0.4,
+    12.35
+   ],
+   "tris": 108
+  },
+  "Ship_LM.Pads": {
+   "origin": [
+    0.0,
+    -4.25,
+    16.76
+   ],
+   "tris": 144
+  },
+  "Ship_LM.Porch": {
+   "origin": [
+    0.0,
+    -2.45,
+    13.71
+   ],
+   "tris": 12
+  },
+  "Ship_LM.Tank0": {
+   "origin": [
+    1.45,
+    0.35,
+    12.65
+   ],
+   "tris": 120
+  },
+  "Ship_LM.Tank1": {
+   "origin": [
+    -1.45,
+    0.35,
+    12.65
+   ],
+   "tris": 120
+  },
+  "Ship_LM.Window0": {
+   "origin": [
+    0.52,
+    -1.56,
+    11.87
+   ],
+   "tris": 12
+  },
+  "Ship_LM.Window1": {
+   "origin": [
+    -0.52,
+    -1.56,
+    11.87
+   ],
+   "tris": 12
+  },
+  "Ship_SM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_SM.AftShield": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  },
+  "Ship_SM.Bay4": {
+   "origin": [
+    -0.6025,
+    -1.04356,
+    5.125
+   ],
+   "tris": 252
+  },
+  "Ship_SM.Core": {
+   "origin": [
+    0.0,
+    0.0,
+    5.125
+   ],
+   "tris": 60
+  },
+  "Ship_SM.Move_Panel4": {
+   "origin": [
+    0.0,
+    -1.95,
+    2.98
+   ],
+   "tris": 180
+  },
+  "Ship_SM.Nozzle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 224
+  },
+  "Ship_SM.NozzleMount": {
+   "origin": [
+    0.0,
+    0.0,
+    2.68
+   ],
+   "tris": 60
+  },
+  "Ship_SM.Rcs1": {
+   "origin": [
+    1.42836,
+    1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Rcs2": {
+   "origin": [
+    -1.42836,
+    1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Rcs3": {
+   "origin": [
+    -1.42836,
+    -1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Rcs4": {
+   "origin": [
+    1.42835,
+    -1.42836,
+    6.3
+   ],
+   "tris": 92
+  },
+  "Ship_SM.Skin": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 564
+  },
+  "Ship_SM.TopRing": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  }
+ }
+}

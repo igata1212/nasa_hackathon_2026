@@ -1,0 +1,40 @@
+{
+ "Fx_Alarm": [
+  {
+   "name": "Fx_Alarm.Move_Shade",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -180,
+   "max": 180,
+   "default": 0,
+   "note": "警報中は回し続ける（1周 約1秒）。範囲は1周ぶん",
+   "origin": [
+    0.0,
+    0.0,
+    0.06
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ],
+ "Fx_BrokenPipe": [
+  {
+   "name": "Fx_BrokenPipe.Move_PipeR",
+   "type": "rotate",
+   "axis": "Y",
+   "min": 0,
+   "max": 6,
+   "default": 0,
+   "note": "ガスが噴き出している間、0〜6° で小刻みに揺らす（+ で折れ口が上がる）。支点は右のフランジの中心。下（−）へは振らない：折れ口が床の高さ（z=0）より下に出るため",
+   "origin": [
+    0.9,
+    0.0,
+    0.115
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ]
+}

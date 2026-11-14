@@ -1,0 +1,141 @@
+{
+ "name": "Console_LifeSupport",
+ "tris": 1308,
+ "min": [
+  -0.643,
+  -0.32854,
+  0.0
+ ],
+ "max": [
+  0.643,
+  0.32,
+  1.11093
+ ],
+ "size": [
+  1.286,
+  0.64854,
+  1.11093
+ ],
+ "objects": {
+  "Console_LifeSupport": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Board": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_LifeSupport.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 176
+  },
+  "Console_LifeSupport.Icon": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 188
+  },
+  "Console_LifeSupport.Panel": {
+   "origin": [
+    0.0,
+    -0.14382,
+    0.7346
+   ],
+   "tris": 108
+  },
+  "Console_LifeSupport.Rim": {
+   "origin": [
+    -0.628,
+    -0.15493,
+    0.73588
+   ],
+   "tris": 404
+  },
+  "Console_LifeSupport.Screen_L": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_LifeSupport.Screen_R": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Console_LifeSupport.Slot_1": {
+   "origin": [
+    -0.5,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Slot_2": {
+   "origin": [
+    -0.3,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Slot_3": {
+   "origin": [
+    -0.1,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Slot_4": {
+   "origin": [
+    0.1,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Slot_5": {
+   "origin": [
+    0.3,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Slot_6": {
+   "origin": [
+    0.5,
+    -0.14895,
+    0.7487
+   ],
+   "tris": 0
+  },
+  "Console_LifeSupport.Top": {
+   "origin": [
+    0.0,
+    0.156,
+    0.78
+   ],
+   "tris": 108
+  }
+ }
+}

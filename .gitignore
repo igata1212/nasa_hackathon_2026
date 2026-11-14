@@ -42,3 +42,7 @@ unity/*.unitypackage
 .DS_Store
 Thumbs.db
 __pycache__/
+
+# Blender の作業ファイル（スクリプトから作り直せる。modeling/core/README.md 参照）
+modeling/**/*.blend
+!modeling/PhysDraft-SpaceCrew3D/**/*.blend

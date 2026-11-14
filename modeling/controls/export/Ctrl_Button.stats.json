@@ -1,0 +1,53 @@
+{
+ "name": "Ctrl_Button",
+ "tris": 484,
+ "min": [
+  -0.1,
+  -0.1,
+  0.0
+ ],
+ "max": [
+  0.1,
+  0.1,
+  0.105
+ ],
+ "size": [
+  0.2,
+  0.2,
+  0.105
+ ],
+ "objects": {
+  "Ctrl_Button": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ctrl_Button.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Ctrl_Button.Collar": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0525
+   ],
+   "tris": 188
+  },
+  "Ctrl_Button.Move_Button": {
+   "origin": [
+    0.0,
+    0.0,
+    0.065
+   ],
+   "tris": 188
+  }
+ }
+}
