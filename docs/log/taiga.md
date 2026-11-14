@@ -9,3 +9,4 @@
 - 17:50 #53 管制室 Scene_MissionControl、ヒューストン先生 Crew_Houston、管制官 Crew_Controller_A・B・C を作った。顔にシェイプキー7個（口・目・眉）。export.py をシェイプキー対応にした（Fable 5.2）
 - 16:50 #51 圧力計 Ctrl_Gauge を作った（針 Move_Needle が Z まわりに ±120°、帯は赤・orange・teal。Fable 5.2）
 - 16:22 #65 GMAT R2026a で帰還ルート A / B の軌道を試作し、data/gmat/ に置いた。Unity での描画は iizuka に渡した（Fable 5.2）
+- 18:40 #120 先生と管制官の FBX に、話すアニメーション Talk（3秒、口・まばたき・頭・腕）を入れた。export.py にアニメーションを焼く口を足した（Fable 5.2）

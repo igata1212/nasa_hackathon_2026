@@ -409,10 +409,11 @@ def write_parts(kind, root, parts):
     return out
 
 
-def export_all(root, kind):
-    """仕上げてから FBX（unity/Assets/Models/<種類>/）と glb・stats.json（modeling/<種類>/export/）を出す。"""
+def export_all(root, kind, anim=None):
+    """仕上げてから FBX（unity/Assets/Models/<種類>/）と glb・stats.json（modeling/<種類>/export/）を出す。
+    anim を渡すと FBX にアニメーションも入る（export.export_fbx を参照。#120）。"""
     finalize(root)
-    return _export.export_all(root, kind)
+    return _export.export_all(root, kind, anim=anim)
 
 
 def render_check(root, kind, parts=None, floor="auto", dummy=True):
