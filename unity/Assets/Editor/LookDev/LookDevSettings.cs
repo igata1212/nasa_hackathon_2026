@@ -29,34 +29,42 @@ public static class LookDevSettings
     public const float ShadowNormalBias = 0.6f;
     public const SoftShadowQuality SoftShadows = SoftShadowQuality.Medium;
     // SSAO（Renderer Feature）
-    public const float SsaoIntensity = 0.6f;
+    public const float SsaoIntensity = 0.4f;
     public const float SsaoRadius = 0.25f;
     public const float SsaoDirect = 0.25f;
 
     // ---- 光 ----
     public static readonly Color KeyColor = LookDevAssets.Hex("#FFE2B8");
-    public const float KeyIntensity = 1.6f;
-    public static readonly Vector3 KeyEuler = new Vector3(48f, -30f, 0f);
-    public const float KeyShadowStrength = 0.85f;
+    public const float KeyIntensity = 1.4f;
+    public static readonly Vector3 KeyEuler = new Vector3(55f, -15f, 0f);
+    public const float KeyShadowStrength = 0.6f;
     public static readonly Color RimColor = LookDevAssets.Hex("#9DB4FF");
     public const float RimIntensity = 0.4f;
     public static readonly Vector3 RimEuler = new Vector3(25f, 150f, 0f);
     // 環境光（Gradient）：上は暖かく、横は中間、下は暗く
-    public static readonly Color AmbientSky = LookDevAssets.Hex("#8E8279");
-    public static readonly Color AmbientEquator = LookDevAssets.Hex("#4A5068");
-    public static readonly Color AmbientGround = LookDevAssets.Hex("#1C1F2B");
+    public static readonly Color AmbientSky = LookDevAssets.Hex("#B8A898");
+    public static readonly Color AmbientEquator = LookDevAssets.Hex("#8A7F86");
+    public static readonly Color AmbientGround = LookDevAssets.Hex("#5A5058");
     public const float ReflectionIntensity = 0.4f;
 
+    // ---- 室内の点光源（H2 が LookDevScene で置く。影は付けない：追加ライトの影は ApplyUrp で切っている） ----
+    public const float AlarmLightIntensity = 2.0f;   // 警報ランプ（Slot_Alarm_1・_2）の Point Light
+    public const float AlarmLightRange = 3.5f;       // m
+    public static readonly Color InteriorLightColor = LookDevAssets.Hex("#FFE2B8");   // 室内灯（Slot_Center の上）
+    public const float InteriorLightIntensity = 1.5f;
+    public const float InteriorLightRange = 5f;      // m
+    public const float InteriorLightHeight = 2.2f;   // Slot_Center からの高さ（m）
+
     // ---- 後処理 ----
-    public const float BloomThreshold = 1.0f;
-    public const float BloomIntensity = 0.35f;
+    public const float BloomThreshold = 0.9f;
+    public const float BloomIntensity = 0.7f;
     public const float BloomScatter = 0.6f;
-    public const float Contrast = 8f;
-    public const float Saturation = 6f;
+    public const float Contrast = 12f;
+    public const float Saturation = 16f;
     public const float PostExposure = 0f;
     public const float VignetteIntensity = 0.12f;
     public const float VignetteSmoothness = 0.45f;
-    public const float WhiteBalanceTemperature = 8f;
+    public const float WhiteBalanceTemperature = 15f;
 
     [MenuItem("Tools/LookDev/URP の設定をそろえる")]
     public static void ApplyUrp()

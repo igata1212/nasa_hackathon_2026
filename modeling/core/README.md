@@ -79,12 +79,12 @@ ck.render_check(root, "fx", parts)                 # renders/ に画像
 | 単位・向き | 1 unit = 1m。Z 上、正面 −Y。ルートは位置0・回転0・スケール1。子もスケール・回転適用済み |
 | 原点 | 床置きは底面中心。操作部品は台座の底の中心。可動部は回転軸の上。地球・月は球の中心 |
 | 宇宙船の例外 | `Ship_` は原点＝ノズル出口の中心、長軸＝+Z（司令船の先端が +Z）。発射台に立てた姿で「底面中心」と同じ扱い（底が z=0） |
-| 命名 | ルート `Ctrl_` `Console_` `Crew_` `Tank_` `Ship_` `Body_` `Fx_`＋大文字始まり。子 `<ルート>.<部品>`。可動部 `.Move_〜`、ランプ `.Lamp_〜`、取り付け位置 `.Slot_〜`。`.001` 不可。入れ子のアセット（`Ship_Stack` の下の `Ship_CM`）はルートと同じ形の名前で、その部品は `Ship_CM.<部品>` |
+| 命名 | ルート `Ctrl_` `Console_` `Crew_` `Tank_` `Ship_` `Body_` `Fx_` `Prop_`＋大文字始まり（`Prop_` は船内に浮く小物。三角 800 以下、原点は中心、`modeling/props/` → `unity/Assets/Models/Props/`）。子 `<ルート>.<部品>`。可動部 `.Move_〜`、ランプ `.Lamp_〜`、取り付け位置 `.Slot_〜`。`.001` 不可。入れ子のアセット（`Ship_Stack` の下の `Ship_CM`）はルートと同じ形の名前で、その部品は `Ship_CM.<部品>` |
 | 決まった部品名 | 操作部品の台座は `.Base`（`ck.ctrl_base`）。コンソールの天板は `.Top`（check.py が高さ 0.80m を見る）。破れたタンクは名前に `Broken` を入れる（三角数の上限が 2,000 になる） |
 | 可動部の表 | 各フォルダに `parts.json`（`ck.write_parts`）。部品名・種類（rotate／translate）・軸（部品のローカル軸、Blender）・範囲・初期値。原点と Unity での軸・符号は自動で入る。角度は度、押し込み量などは m |
 | ベベル | 2〜4cm・2段。最小の太さ 2cm |
 | 書き出し | FBX → `unity/Assets/Models/<種類>/`、glb と `stats.json` → `modeling/<種類>/export/` |
-| フォルダ | `modeling/{controls,console,crew,tank,ship,bodies,fx}/`（`build_*.py`・`renders/`・`export/`・`parts.json`）。Unity は `unity/Assets/Models/{Controls,Console,Crew,Tank,Ship,Bodies,Fx,Core}/`。自分のフォルダ以外に書かない |
+| フォルダ | `modeling/{controls,console,crew,tank,ship,bodies,fx,props}/`（`build_*.py`・`renders/`・`export/`・`parts.json`）。Unity は `unity/Assets/Models/{Controls,Console,Crew,Tank,Ship,Bodies,Fx,Props,Core}/`。自分のフォルダ以外に書かない |
 | 触らない | `modeling/PhysDraft-SpaceCrew3D/` と `unity/Assets/Models/NASA/`。import するスクリプトは `sys.dont_write_bytecode = True` |
 | .blend | コミットしない（スクリプトから作り直せる） |
 | .meta | 手で書かない。Unity に作らせる（Unity を前に出すと取り込みが走る） |
@@ -126,7 +126,7 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 - **共通マテリアルがないとき**（消した、など）：FBX は差し替えずに（灰色で）取り込み、取り込みのあと `OnPostprocessAllAssets` が共通マテリアルを作る。それを待っている FBX は Unity が自動で読み直し、こんどは差し替わる。手でマテリアルを作らない。
 - **パレットの色を変えたとき**：`python3 modeling/core/palette.py` で `palette.png` を作り直すだけ。共通マテリアルはその画像を指しているので、そのまま新しい色になる。
 - **確かめ方**：メニュー Tools/Models/Core Palette を確かめる（UnityMCP なら `execute_code` で `CorePalette.Report();`）。`[CorePalette] 合計 OK=31 NG=0 対象外=2` が出れば全部差し替わっている（2026-11-14）。見た目は `Assets/Scenes/ModelCheck.unity`（33個を並べた確認用シーン）。
-- **ランプの発光**（#55）：FBX のランプは共通マテリアルのまま（光らない）。ゲームの中で `LampGlow`（`Assets/Scripts/Visual/LampGlow.cs`）を付けると、子の `.Lamp_Red`／`.Lamp_Yellow`／`.Lamp_Green` を発光マテリアル `Assets/Art/Materials/M_Lamp_*.mat` に差し替えて点滅させる。取り込み時に差し替えるかは未決定（`docs/design/art-direction.md`）。
+- **ランプの発光**（#55）：FBX のランプは共通マテリアルのまま（光らない）。ゲームの中で `LampGlow`（`Assets/Scripts/Visual/LampGlow.cs`）を付けると、子の `.Lamp_Red`／`.Lamp_Yellow`／`.Lamp_Green` を発光マテリアル `Assets/Art/Materials/M_Lamp_*.mat` に差し替えて点滅させる。船室の天井灯 `Lamp_Cabin` は点滅せず、暖色の白で常に発光する。取り込み時に差し替えるかは未決定（`docs/design/art-direction.md`）。
 
 ## 5. チェック基準（`check.py` が FBX を読み直して判定）
 

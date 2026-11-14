@@ -22,9 +22,10 @@ import palette as _palette        # noqa: E402
 REPO, MODELING, UNITY_MODELS, KINDS = _export.REPO, _export.MODELING, _export.UNITY_MODELS, _export.KINDS
 MAT_NAME = "M_Core_Palette"
 EXTRA_MATS = ("M_Body_Earth", "M_Body_Moon")
-ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx)_[A-Z][A-Za-z0-9_]*$")
+ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Prop)_[A-Z][A-Za-z0-9_]*$")
 PART_RE = re.compile(r"^[A-Z][A-Za-z0-9_]*$")
-TRI_LIMIT = {"Ctrl": 1500, "Console": 3000, "Crew": 3000, "Tank": 1500, "Ship": 6000, "Body": 2500, "Fx": 1500}
+TRI_LIMIT = {"Ctrl": 1500, "Console": 3000, "Crew": 3000, "Tank": 1500, "Ship": 6000, "Body": 2500, "Fx": 1500,
+             "Prop": 800}
 TRI_LIMIT_TANK_BROKEN = 2000       # 破れたタンク（名前に Broken を含む）
 TRI_LIMIT_INTERIOR = 10000         # 船室（Ship_ で名前に Interior を含む）。art-direction.md の「船室 10,000 以下」（#40）
 FBX_MAX = 500 * 1024
@@ -182,14 +183,14 @@ def check_fbx(fbx):
     rp = root.matrix_world.translation
     if rp.length > 0.001:
         errs.append(f"ルートが原点にない {_fmt(rp)}")
-    if pre != "Body":                       # 地球・月は中心が原点
+    if pre not in ("Body", "Prop"):         # 地球・月・小物（Prop_。浮かせて回すので床置きの底面 z=0 は見ない）は中心が原点
         if abs(lo.z) > 0.001:
             errs.append(f"底面 z={lo.z:.4f}（0±0.001）")
         msg.append(f"底面 z={lo.z:.4f}")
     else:
         c = (lo + hi) / 2
         if c.length > 0.001:
-            errs.append(f"球の中心が原点にない {_fmt(c)}")
+            errs.append(f"中心が原点にない {_fmt(c)}")
         msg.append("中心が原点")
     table, src, clash = _load_parts(fbx)
     parts = table.get(name)

@@ -15,7 +15,7 @@ MODELING = os.path.dirname(CORE)
 REPO = os.path.dirname(MODELING)
 UNITY_MODELS = os.path.join(REPO, "unity", "Assets", "Models")
 KINDS = {"controls": "Controls", "console": "Console", "crew": "Crew", "tank": "Tank",
-         "ship": "Ship", "bodies": "Bodies", "fx": "Fx",
+         "ship": "Ship", "bodies": "Bodies", "fx": "Fx", "props": "Props",
          "interior": "Ship"}      # 船室（Ship_Interior）。FBX は外観と同じ Ship/ に、元データは modeling/interior/ に置く（#40）
 
 # Unity で確かめた設定。変えるときは build_axis_check.py のモデルを入れ直して ModelImportReport の出力を見ること。

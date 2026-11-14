@@ -38,7 +38,7 @@ BEVEL_SEG = 2         # ベベルの段数
 BEVEL = 0.02          # ベベルの幅の標準（2〜4cm）。薄い部品は厚みの 1/4 まで自動で縮める
 MIN_THICK = 0.02      # 一番薄いところ
 
-ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx)_[A-Z][A-Za-z0-9_]*$")
+ROOT_RE = re.compile(r"^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Prop)_[A-Z][A-Za-z0-9_]*$")
 PART_RE = re.compile(r"^[A-Z][A-Za-z0-9_]*$")
 
 # Blender の軸 → Unity の軸（見本 Fx_Alarm と軸の確認用モデルを Unity 6000.6.9f1 に入れて確かめた。README 参照）

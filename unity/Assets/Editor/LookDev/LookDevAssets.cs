@@ -24,7 +24,7 @@ public static class LookDevAssets
     public const string LampMaterialFormat = "Assets/Art/Materials/M_Lamp_{0}.mat";
     public const string FloorMesh = "Assets/Art/LookDev/LookDev_Floor.asset";
 
-    // palette.json の色（ランプ）。発光は「色 × 2^EV」（リニア）。Bloom の閾値 1.0 を超えて、ランプだけがにじむ強さ
+    // palette.json の色（ランプ）。発光は「色 × 2^EV」（リニア）。Bloom の閾値 0.9 を超えて、ランプがにじむ強さ
     public static readonly Color LampRed = Hex("#FF3B30"), LampYellow = Hex("#FFD60A"), LampGreen = Hex("#2ECC71");
     public const float LampEmissionEV = 2.5f;
 
@@ -93,7 +93,7 @@ public static class LookDevAssets
         m.SetFloat("_ImageType", 0f);    // 360 度
         m.SetFloat("_MirrorOnBack", 0f);
         m.SetColor("_Tint", new Color(0.5f, 0.5f, 0.5f, 1f));   // 0.5 で元の色のまま
-        m.SetFloat("_Exposure", 1.0f);
+        m.SetFloat("_Exposure", 1.8f);
         m.SetFloat("_Rotation", 200f);   // 銀河が断面カメラの奥に少し見える向き
         EditorUtility.SetDirty(m);
         return m;
@@ -165,44 +165,44 @@ public static class LookDevAssets
             main.duration = 2f;
             main.loop = true;
             main.prewarm = true;
-            main.startLifetime = new ParticleSystem.MinMaxCurve(1.4f, 2.2f);
-            main.startSpeed = new ParticleSystem.MinMaxCurve(0.9f, 1.3f);
-            main.startSize = new ParticleSystem.MinMaxCurve(0.10f, 0.16f);
+            main.startLifetime = new ParticleSystem.MinMaxCurve(2.6f, 3.8f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.5f, 0.8f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.13f, 0.208f);   // 1.3 倍（元は 0.10〜0.16）
             main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
             main.startColor = SmokeColor;
-            main.gravityModifier = -0.03f;   // ほんの少し上へ流れる
+            main.gravityModifier = 0f;   // 無重力：昇らない（#64）
             main.simulationSpace = ParticleSystemSimulationSpace.World;
             main.scalingMode = ParticleSystemScalingMode.Hierarchy;
-            main.maxParticles = 80;
+            main.maxParticles = 120;
 
             var em = ps.emission;
-            em.rateOverTime = 26f;
+            em.rateOverTime = 28f;
 
             var sh = ps.shape;
             sh.enabled = true;
             sh.shapeType = ParticleSystemShapeType.Cone;
-            sh.angle = 16f;
+            sh.angle = 55f;   // 穴の向きに弱く出て、四方に広がる（#64）
             sh.radius = 0.03f;
 
             // 勢いよく出て、すぐ減速して漂う
             var lv = ps.limitVelocityOverLifetime;
             lv.enabled = true;
             lv.limit = 100f;
-            lv.drag = 1.2f;
+            lv.drag = 1.6f;
             lv.multiplyDragByParticleSize = false;
             lv.multiplyDragByParticleVelocity = false;
 
             var sol = ps.sizeOverLifetime;
             sol.enabled = true;
             sol.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
-                new Keyframe(0f, 0.6f), new Keyframe(0.3f, 1.7f), new Keyframe(1f, 3.0f)));
+                new Keyframe(0f, 0.5f), new Keyframe(0.4f, 2.0f), new Keyframe(1f, 4.2f)));
 
             var col = ps.colorOverLifetime;
             col.enabled = true;
             var g = new Gradient();
             g.SetKeys(
                 new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(new Color(0.88f, 0.93f, 1f), 1f) },
-                new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.08f), new GradientAlphaKey(0.65f, 0.55f), new GradientAlphaKey(0f, 1f) });
+                new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.08f), new GradientAlphaKey(0.5f, 0.55f), new GradientAlphaKey(0f, 1f) });
             col.color = g;
 
             var rol = ps.rotationOverLifetime;
@@ -211,7 +211,7 @@ public static class LookDevAssets
 
             var noise = ps.noise;
             noise.enabled = true;
-            noise.strength = 0.12f;
+            noise.strength = 0.05f;
             noise.frequency = 0.8f;
             noise.scrollSpeed = 0.3f;
             noise.quality = ParticleSystemNoiseQuality.Low;
