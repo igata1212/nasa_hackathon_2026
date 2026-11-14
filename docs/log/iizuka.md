@@ -32,3 +32,4 @@
 - 18:42 #72 タイトルと部屋の画面を UI ガイドラインで作り直した（UiTokens・UiKit、TMP の Baloo 2・Nunito、部屋は 3D のクルー4人が並ぶ LobbyStage）。ui-guidelines.md を docs に、素材は Art/UI
 - 20:27 #129 打ち上げの演出を Fable の採点（63点）で直した（字幕を宇宙のカットまで待たせる、炎の円錐3枚、揺れとカメラ、クルーの乗り込み、Baloo 2 の大きい字、暗転をやめる）。Unity で確認
 - 21:42 #130 帰還の演出を Fable の採点（53点）で直した（再突入の熱と筋、傘のガクンと振り子、着水のしぶき、ED-A の紙吹雪、SPLASHDOWN! を Baloo 2、ED-C の原因の1行）。ENDING_HOLD_S 8→16、オフライン記録を作り直し。Unity で確認
+- 22:01 #125 警告の段階で画面の縁を赤く脈打たせ（Vignette と赤い枠）、カメラを揺らし、警報ランプを速めた（UrgencyFx）。Unity で確認
