@@ -1,4 +1,23 @@
 {
+ "Ctrl_Gauge": [
+  {
+   "name": "Ctrl_Gauge.Move_Needle",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -120,
+   "max": 120,
+   "default": -120,
+   "note": "0 で真上（+Y）。+120＝空（左、赤の帯の端）、−120＝満タン（右、teal の帯の端）。値 0〜1（0＝空）→ 角度 = 120 − 240×値。帯：+120〜+60 危険（赤）、+60〜0 注意（orange）、0〜−120 安全（teal）",
+   "origin": [
+    0.0,
+    0.0,
+    0.09
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ],
  "Ctrl_Instr_Camera": [
   {
    "name": "Ctrl_Instr_Camera.Move_Knob",

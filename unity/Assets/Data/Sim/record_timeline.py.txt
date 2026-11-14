@@ -1,0 +1,71 @@
+import sys, json
+SRV="/Users/tadasuke/Projects/nasa_hackathon_2026/tmp/wt/server/server"
+sys.path.insert(0,SRV)
+from game.room import Game
+from game.sim_bridge import rs
+from game.seats import seats_for, PILOT, COMMS, LIFE
+def to_msgs(name, args):
+    if name=="switch": a={"name":args[0],"on":args[1]}
+    elif name=="set_attitude": a={"mode":args[0]}
+    elif name=="set_route": a={"route":args[0]}
+    elif name=="set_transmit": a={"on":args[0]}
+    elif name=="close_valve": a={"tank":2}
+    else: a={}
+    if name=="ignite": seats=[PILOT,COMMS] if args[0] else [PILOT]
+    elif name=="swap_filter": seats=[LIFE,COMMS]
+    else: seats=[seats_for(name,a)[0]]
+    return [dict(a,cmd=name,seat=s) for s in seats]
+design = rs.DESIGN_SCIENCE
+g = Game("0000", speed=1.0)
+p = g.add_player("p0", 0.0)
+owner = {s: p.id for s in p.seats}
+out = {"_note": "Recorded from tmp/wt/server Game (T1 design, PLAY_GOOD). Replace with data/sim/timeline_*.json from the server.", "design_default": None}
+def drain(at):
+    return [{"at": at, "msg": m} for to, m in g.take_outbox()]
+g.take_outbox()
+welcome = {"type":"welcome","room":"0000","player_id":p.id,"seats":p.seats,"speed":1.0}
+out["welcome"] = [welcome]+[m for m in g.sync_msgs()]
+g.handle(p.id, {"type":"start"}, 0.0)
+out["on_start"] = [x["msg"] for x in drain(0)]
+for pid, n in design["parts"].items():
+    g.handle(p.id, {"type":"design","part":pid,"n":n}, 0.0)
+g.handle(p.id, {"type":"design","trajectory":design["trajectory"],"rocket":design["rocket"]}, 0.0)
+g.take_outbox()
+g.handle(p.id, {"type":"launch"}, 0.0)
+launch = [x["msg"] for x in drain(0)]
+for s,c in (("pilot","set_attitude"),("comms_power","set_transmit"),("life_support","close_valve"),("mission_planner","set_route")):
+    g.handle(p.id, {"cmd":c,"seat":s,"mode":"sun","on":True,"tank":2,"route":"a"}, 0.0)
+launch += [x["msg"] for x in drain(0)]
+T0=100.0
+g.handle(p.id, {"cmd":"stir","seat":"life_support"}, T0)
+launch += [x["msg"] for x in drain(0)]
+# practice / stir を飛ばす（オフラインでは操作の練習を再現しない）
+keep=[]
+for m in launch:
+    if m.get("type")=="room" and m["phase"] in ("practice","stir"): continue
+    if m.get("type")=="event" and m.get("kind") in ("practice","cmd"): continue
+    if m.get("type")=="event" and m.get("id")=="M05": continue
+    keep.append(m)
+out["on_launch"]=keep
+queue = sorted(rs.PLAY_GOOD, key=lambda e:e[0])
+flight=[]
+# M05 と最初の state
+flight += [{"at":0,"msg":m} for to,m in [] ]
+k=0
+first=True
+while g.phase=="flight":
+    while queue and queue[0][0] <= g.sim.t:
+        _,name,args=queue.pop(0)
+        for m in to_msgs(name,args):
+            g.handle(owner[m["seat"]], m, T0+g.sim.t+0.1)
+    g.update(T0+g.sim.t+1.0)
+    for to,m in g.take_outbox():
+        flight.append({"at": g.sim.t, "msg": m})
+    k+=1; assert k<2000
+# 最初の M05（flight 開始時に出たもの）は launch から落とした。ここで足す
+flight.insert(0, {"at":0,"msg":[m for m in launch if m.get("id")=="M05"][0]})
+out["flight"]=flight
+g.handle(p.id, {"type":"next"}, T0+g.sim.t+100)
+out["on_next"]=[m for to,m in g.take_outbox()]
+json.dump(out, open(sys.argv[1],"w"), ensure_ascii=False, separators=(",",":"))
+print(len(flight), g.phase, [ (m.get("type"),m.get("kind"),m.get("id")) for m in out["on_next"]][:6], flight[-1]["at"])

@@ -47,3 +47,9 @@ flowchart LR
 - 部屋の作り方（合言葉で入る形にするか）
 - 再接続（切れた席に戻す方法）
 - 遅延の実測と `press_window_s`（0.5秒で足りるか）
+
+## 軌道の表示（Issue #65）
+
+- データの流れ：GMAT（`data/gmat/return_routes.script`）→ `data/gmat/route_a.csv`・`route_b.csv`（正）→ Unity のメニュー `Tools/GMAT/軌道を取り込む` → `unity/Assets/Data/Gmat/Route_A.asset`・`Route_B.asset`（`GmatRoute`）。
+- ゲームの `t`（事故からの秒）と GMAT の時間の対応は `data/gmat/time_map.json`（区切りごとに線形。中身と根拠は `data/README.md`）。サーバーも同じファイルを読めば、`t_los`・`t_aos`・再突入を軌道と合わせられる。
+- 描画は `unity/Assets/Scripts/Visual/TrajectoryView.cs`。入力は `t` と `route`（a/b/空）。確認用シーンは `OrbitMap.unity`、画像は `docs/design/lookdev/orbit_map.png`。地球・月は太らせ、近くの線は球の外へ押し出している。
