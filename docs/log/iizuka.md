@@ -19,4 +19,7 @@
 - 15:16 #39 クルーを iizuka のスケッチに合わせて可愛く作り直した（約2頭身、横長バイザー、ひとかたまりの体、NASA の文字なし。Opus）
 - 15:36 #40 宇宙船の内部（船室 Ship_Interior）を作った。ドールハウス型で俯瞰・断面の両方に対応、4席・タンク・窓の配置と Slot（Fable 5.2 high）
 - 16:15 #66 サーバーを Python（reference_sim を使う WebSocket サーバー、Cloudflare Tunnel で公開）に決定。docs/design/architecture.md、SPEC.md・CLAUDE.md を更新
+- 16:29 #55 Unity の光・空・煙・ランプ・画面の発光・クルーの浮遊、船室を置いた LookDev シーン、Fable のレビュー（55%）の指摘を直した
+- 16:29 #64 無重力：浮いて漂う小物4種（ペン・手順書・宇宙食・ダクトテープ）、ガスは四方に広がる。ヘルメットの輪はやめた
+- 16:39 #65 GMAT の帰還ルート A/B（Taiga 計算）を確認し、ゲーム時間との対応表（time_map.json）と Unity の軌道の地図（OrbitMap シーン、TrajectoryView）を作った
 - 16:47 #69 Python の WebSocket ゲームサーバー（reference_sim をそのまま使う、47 テスト合格）、xlsx からパラメータ JSON（T1〜T5 完全一致）、Unity のオフライン再生用の記録

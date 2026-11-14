@@ -79,12 +79,12 @@ ck.render_check(root, "fx", parts)                 # renders/ に画像
 | 単位・向き | 1 unit = 1m。Z 上、正面 −Y。ルートは位置0・回転0・スケール1。子もスケール・回転適用済み |
 | 原点 | 床置きは底面中心。操作部品は台座の底の中心。可動部は回転軸の上。地球・月は球の中心 |
 | 宇宙船の例外 | `Ship_` は原点＝ノズル出口の中心、長軸＝+Z（司令船の先端が +Z）。発射台に立てた姿で「底面中心」と同じ扱い（底が z=0） |
-| 命名 | ルート `Ctrl_` `Console_` `Crew_` `Tank_` `Ship_` `Body_` `Fx_` `Part_`＋大文字始まり。子 `<ルート>.<部品>`。可動部 `.Move_〜`、ランプ `.Lamp_〜`、取り付け位置 `.Slot_〜`。`.001` 不可。入れ子のアセット（`Ship_Stack` の下の `Ship_CM`）はルートと同じ形の名前で、その部品は `Ship_CM.<部品>` |
+| 命名 | ルート `Ctrl_` `Console_` `Crew_` `Tank_` `Ship_` `Body_` `Fx_` `Part_` `Prop_`＋大文字始まり（`Part_` は設計画面の部品（#48）。`Prop_` は船内に浮く小物：三角 800 以下、原点は中心、`modeling/props/` → `unity/Assets/Models/Props/`）。子 `<ルート>.<部品>`。可動部 `.Move_〜`、ランプ `.Lamp_〜`、取り付け位置 `.Slot_〜`。`.001` 不可。入れ子のアセット（`Ship_Stack` の下の `Ship_CM`）はルートと同じ形の名前で、その部品は `Ship_CM.<部品>` |
 | 決まった部品名 | 操作部品の台座は `.Base`（`ck.ctrl_base`）。コンソールの天板は `.Top`（check.py が高さ 0.80m を見る）。破れたタンクは名前に `Broken` を入れる（三角数の上限が 2,000 になる） |
 | 可動部の表 | 各フォルダに `parts.json`（`ck.write_parts`）。部品名・種類（rotate／translate）・軸（部品のローカル軸、Blender）・範囲・初期値。原点と Unity での軸・符号は自動で入る。角度は度、押し込み量などは m |
 | ベベル | 2〜4cm・2段。最小の太さ 2cm |
 | 書き出し | FBX → `unity/Assets/Models/<種類>/`、glb と `stats.json` → `modeling/<種類>/export/` |
-| フォルダ | `modeling/{controls,console,crew,tank,ship,bodies,fx,part}/`（`build_*.py`・`renders/`・`export/`・`parts.json`）。Unity は `unity/Assets/Models/{Controls,Console,Crew,Tank,Ship,Bodies,Fx,Part,Core}/`。自分のフォルダ以外に書かない |
+| フォルダ | `modeling/{controls,console,crew,tank,ship,bodies,fx,part,props}/`（`build_*.py`・`renders/`・`export/`・`parts.json`）。Unity は `unity/Assets/Models/{Controls,Console,Crew,Tank,Ship,Bodies,Fx,Part,Props,Core}/`。自分のフォルダ以外に書かない |
 | 触らない | `modeling/PhysDraft-SpaceCrew3D/` と `unity/Assets/Models/NASA/`。import するスクリプトは `sys.dont_write_bytecode = True` |
 | .blend | コミットしない（スクリプトから作り直せる） |
 | .meta | 手で書かない。Unity に作らせる（Unity を前に出すと取り込みが走る） |
@@ -126,7 +126,7 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 - **共通マテリアルがないとき**（消した、など）：FBX は差し替えずに（灰色で）取り込み、取り込みのあと `OnPostprocessAllAssets` が共通マテリアルを作る。それを待っている FBX は Unity が自動で読み直し、こんどは差し替わる。手でマテリアルを作らない。
 - **パレットの色を変えたとき**：`python3 modeling/core/palette.py` で `palette.png` を作り直すだけ。共通マテリアルはその画像を指しているので、そのまま新しい色になる。
 - **確かめ方**：メニュー Tools/Models/Core Palette を確かめる（UnityMCP なら `execute_code` で `CorePalette.Report();`）。`[CorePalette] 合計 OK=31 NG=0 対象外=2` が出れば全部差し替わっている（2026-11-14）。見た目は `Assets/Scenes/ModelCheck.unity`（33個を並べた確認用シーン）。
-- **次にやること**：ランプ（`.Lamp_〜` の部品）の発光。いまはランプも共通マテリアル（光らない）。計画どおり Unity で `Lamp_` の部品のマテリアルを発光するものに差し替える（取り込み時にするか、ゲームの中で状態に合わせて切り替えるかは未決定）。
+- **ランプの発光**（#55）：FBX のランプは共通マテリアルのまま（光らない）。ゲームの中で `LampGlow`（`Assets/Scripts/Visual/LampGlow.cs`）を付けると、子の `.Lamp_Red`／`.Lamp_Yellow`／`.Lamp_Green` を発光マテリアル `Assets/Art/Materials/M_Lamp_*.mat` に差し替えて点滅させる。船室の天井灯 `Lamp_Cabin` は点滅せず、暖色の白で常に発光する。取り込み時に差し替えるかは未決定（`docs/design/art-direction.md`）。
 
 ## 5. チェック基準（`check.py` が FBX を読み直して判定）
 
@@ -138,7 +138,7 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 | 原点 | ルート (0,0,0)、底面 z=0±1mm（地球・月は中心が原点）。`parts.json` の部品が別オブジェクトで、原点が表の値と一致 |
 | 命名 | `^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part)_[A-Z][A-Za-z0-9_]*$`、`.001` なし |
 | 太さ | 部品ごとの外形の、いちばん薄い向きが 2cm 以上 |
-| 容量 | FBX 1つ 500KB 以下、追加合計 20MB 以下（FBX・glb・レンダー・テクスチャなど。`modeling/source/`（ダウンロードした元データ）、midori のフォルダ、NASA の FBX、.blend は数えない） |
+| 容量 | FBX 1つ 500KB 以下、追加合計 30MB 以下（#34 では 20MB。モデルが増えたので広げた）（FBX・glb・レンダー・テクスチャなど。`modeling/source/`（ダウンロードした元データ）、midori のフォルダ、NASA の FBX、.blend は数えない） |
 | 再取り込み | FBX を読み直して、三角数・寸法・全部品の原点が書き出し時（`stats.json`）と同じ |
 
 試し書き（`ck.trial()`）のフォルダを渡すと（例：`check.py tmp/modeling_trial/fx`）、試し書きの FBX と、その横の `parts*.json`・`stats.json` を使う（本番より先に見る）。

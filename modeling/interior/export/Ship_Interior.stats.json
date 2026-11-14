@@ -1,6 +1,6 @@
 {
  "name": "Ship_Interior",
- "tris": 9048,
+ "tris": 9816,
  "min": [
   -3.0,
   -3.1,
@@ -31,7 +31,39 @@
     0.0,
     0.0
    ],
-   "tris": 1892
+   "tris": 2660
+  },
+  "Ship_Interior.MonScreen0": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 12
+  },
+  "Ship_Interior.MonScreen1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 12
+  },
+  "Ship_Interior.MonScreen2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 12
+  },
+  "Ship_Interior.MonScreen3": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 12
   },
   "Ship_Interior.Pipe_Intact": {
    "origin": [
@@ -231,7 +263,7 @@
     0.0,
     0.0
    ],
-   "tris": 2444
+   "tris": 2396
   },
   "Ship_Interior.Wall_Front": {
    "origin": [
