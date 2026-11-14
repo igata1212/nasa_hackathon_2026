@@ -12,3 +12,4 @@
 - 18:40 #120 先生と管制官の FBX に、話すアニメーション Talk（3秒、口・まばたき・頭・腕）を入れた。export.py にアニメーションを焼く口を足した（Fable 5.2）
 - 18:54 #134 食い違いの Issue 13件（#97〜#109）を決めて、SPEC・H08 の台詞（xlsx と JSON）・ui-guidelines に反映した（Fable 5.2）
 - 19:05 #110 UI の担当を決めた（Taiga は絵とレイアウトまで、Unity への組み込みは iizuka）。SPEC・architecture.md・CLAUDE.md に書いた（Fable 5.2）
+- 19:09 #136 緊迫感のために数値を詰めた。事故から着水まで 8分 → 6分、漏れ 2%/s → 1%/s、ヒーターを切ったままだと ED-B。xlsx・parameters.json・SPEC 4章と10章・PLAY_GOOD・テストの期待値を合わせた（Fable 5.2）
