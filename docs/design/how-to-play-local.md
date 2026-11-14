@@ -2,7 +2,7 @@
 
 # 手元で通して遊ぶ（サーバー + Unity + ボット）
 
-1. **サーバー**：`cd server && uv run python main.py --port 8765`（確認だけなら `--speed 4` で4倍速。ゲーム内8分 → 2分）
+1. **サーバー**：`cd server && uv run python main.py --port 8765`（確認だけなら `--speed 4` で4倍速。ゲーム内6分 → 1分半）
 2. **Unity**：`unity/` を開き `Assets/Scenes/Game.unity` を Play（無ければ メニュー Tools/GameFlow/シーンを作り直す）。Title で名前、Server URL `ws://localhost:8765`
 3. **部屋**：Title の **CREATE ROOM** → Lobby に4桁の合言葉が出る。ほかの人は合言葉を入れて **JOIN**
 4. **足りない席をボットで埋める**（人が持たない席を `--seats` に書く。START を押す前に入れる）
