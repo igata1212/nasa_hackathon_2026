@@ -1,11 +1,15 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（作成：Claude、#72 UI ガイドラインの見た目にした。2026-11-14）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（作成：Claude、#72 UI ガイドラインの見た目にした。2026-11-14）／ 更新：iizuka（Opus 5.5、2026-11-14、#153）
 // Title（名前・合言葉・部屋を作る／入る）と Lobby（合言葉・4人のクルー・開始）。docs/design/ui-guidelines.md の 6章のワイヤーフレーム。
 // 部屋の画面は、席カードの代わりに 4人のクルーの 3D を手前に並べ、頭の上に名前のタグを出す（iizuka の指示、2026-11-14。LobbyStage）。
 // 色と大きさは UiTokens、部品は UiKit。開発用（Server URL・記録の再生）は右上の歯車で開くパネルに入れた
+// #153：あつ森の方向へ。動く背景（TitleBackdrop）、左右の下から顔を出すクルー（TitleStage）、1文字ずつ弾むロゴ（UiLetterWave）、
+// 順に跳ねる席バッジ（UiHop）、次に何をするかを話すヒューストンの吹き出し（UiHintBubble）、押すと縮んで弾むボタン（UiSquish）。
+// 動きの値と案内の文は TitleLook の1か所
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using T = UiTokens;
+using L = TitleLook;
 
 public class TitleScreen
 {
@@ -16,25 +20,44 @@ public class TitleScreen
     readonly UiInput name, room, url;
     readonly UiButton join;
     readonly GameObject dev;
+    readonly UiHintBubble hint;
 
     public TitleScreen(Transform parent, GameFlow f)
     {
         this.f = f;
         var bg = Ui.PanelImg(parent, T.Bg, "Title"); Root = bg.gameObject; Ui.Fill(bg.rectTransform);
+        TitleBackdrop.Build(bg.rectTransform);                       // 模様・星・ロケット・地球と雲（一番奥）
+        var crewView = Ui.Rect("Crew", bg.transform).gameObject.AddComponent<RawImage>();
+        Ui.Fill(crewView.rectTransform);
+        Root.AddComponent<TitleStage>().Init(crewView);              // 左右の下から顔を出すクルー（背景の上、文字の下）
         var safe = UiKit.SafeArea(bg.transform);
 
         var main = UiKit.Col(safe, 0f, TextAnchor.MiddleCenter, T.ScreenEdge, T.ScreenEdge);
         UiKit.Fill(main);
+        // 席バッジ：順にぽんと出て、ときどき順に跳ねる（跳ねる分はレイアウトの外の入れ物の中で動かす）
         var seats = UiKit.Row(main, T.S2);
-        foreach (var s in Seats.All) UiKit.SeatBadge(seats, s, T.BadgeS);
+        for (int i = 0; i < Seats.All.Length; i++)
+        {
+            var holder = Ui.Rect("Hop_" + Seats.All[i], seats);
+            UiKit.Fixed(holder, T.BadgeS, T.BadgeS);
+            var badge = UiKit.SeatBadge(holder, Seats.All[i], T.BadgeS);
+            UiHop.Add(badge.Root, i * L.HopStagger);
+            UiPopIn.Add(holder, L.BadgeDelay + i * L.BadgeStagger, 0f);
+        }
         UiKit.Space(main, T.S3);
-        UiKit.Text(main, "MISSION RETURN", TextStyle.Title, T.Ink);
-        UiKit.Text(main, "Bring the crew home. Together.", TextStyle.Body, T.InkSub);
-        UiKit.Space(main, T.S4);
+        var logo = UiKit.Text(main, "MISSION RETURN", TextStyle.Title, T.Ink);
+        logo.gameObject.AddComponent<UiLetterWave>();
+        UiPopIn.Add(UiKit.Text(main, "Bring the crew home. Together.", TextStyle.Body, T.InkSub), L.SubtitleDelay);
+        UiKit.Space(main, L.BubbleGapTop);
+
+        // ヒューストンの吹き出し：今の入力の状態で「次に何をするか」を1つだけ話す。しっぽは名前の欄を指す
+        hint = UiHintBubble.Create(main, L.BubbleTitleW, L.BubbleTitleH, UiHintBubble.Tail.Down, L.BubbleTitleTailX, L.BubbleDelay);
+        UiKit.Space(main, T.S3);
 
         // 名前と合言葉。左の列（名前 → 部屋を作る）と右の列（合言葉 → 入る）
         var form = UiKit.Panel(main, T.S2, "Form");
         Ui.Size(form, w: T.TitleFormW, flexW: 0f);
+        UiPopIn.Add(form, L.FormDelay);
         var cols = UiKit.Row(form, T.S3, TextAnchor.UpperCenter);
         var left = UiKit.Col(cols, T.S2, TextAnchor.UpperCenter, 0f, 0f, true);
         var right = UiKit.Col(cols, T.S2, TextAnchor.UpperCenter, 0f, 0f, true);
@@ -42,15 +65,18 @@ public class TitleScreen
 
         name = UiKit.Input(left, "seat", "Your name", PlayerPrefs.GetString(NameKey, ""));
         name.Field.characterLimit = T.NameMaxChars;
-        UiKit.PrimaryButton(left, "CREATE ROOM", "create", () => Go(true));
+        name.Field.onValueChanged.AddListener(_ => RefreshHint());
+        UiSquish.Add(UiKit.PrimaryButton(left, "CREATE ROOM", "create", () => Go(true)), L.BreatheAmp);
 
         room = UiKit.Input(right, "room_code", "Room code", "");
         room.Field.contentType = TMP_InputField.ContentType.IntegerNumber;
         room.Field.characterLimit = T.RoomCodeChars;
-        room.Field.onValueChanged.AddListener(_ => RefreshJoin());
+        room.Field.onValueChanged.AddListener(_ => { RefreshJoin(); RefreshHint(); });
         room.Field.onSubmit.AddListener(_ => { if (CanJoin) Go(false); });
         join = UiKit.SecondaryButton(right, "JOIN", "enter", () => Go(false));
+        UiSquish.Add(join, 0f, () => hint.Say(L.Rich(L.HintNeedCode)));   // 鍵のかかった JOIN を押したら、首を振って理由を話す
         RefreshJoin();
+        RefreshHint();
 
         // 開発用（右上の歯車）
         var gear = UiKit.IconButton(safe, "settings", "DEV", () => dev.SetActive(true));
@@ -58,6 +84,17 @@ public class TitleScreen
         gear.Root.anchoredPosition = new Vector2(-T.ScreenEdge, -T.ScreenEdge);
         dev = BuildDev(bg.transform, out url);
         dev.SetActive(false);
+    }
+
+    /// <summary>吹き出しの文：合言葉を打っている途中 → 4桁そろった → 名前が空 → 名前あり の順に見て、1つだけ</summary>
+    void RefreshHint()
+    {
+        int code = room.Text.Length;
+        string s = code >= T.RoomCodeChars ? L.HintJoin
+                 : code > 0 ? L.HintCode
+                 : name.Text.Trim().Length == 0 ? L.HintName
+                 : L.HintCreate;
+        hint.Say(L.Rich(s));
     }
 
     bool CanJoin => room.Text.Length == T.RoomCodeChars;
@@ -101,6 +138,7 @@ public class LobbyScreen
     readonly TextMeshProUGUI roomCode, count;
     readonly UiCrewTag[] tags = new UiCrewTag[Seats.All.Length];
     readonly LobbyStage stage;
+    readonly UiHintBubble hint;
 
     public LobbyScreen(Transform parent, GameFlow f)
     {
@@ -123,7 +161,9 @@ public class LobbyScreen
         UiKit.Icon(chip, "room_code", T.IconM, T.Ink);
         UiKit.Text(chip, "ROOM", TextStyle.Sub, T.Ink);
         roomCode = UiKit.Text(chip, "", TextStyle.Big, T.Ink);
-        UiKit.Text(head, "Share the code with your crew.\nSeats are dealt by the number of players.", TextStyle.Label, T.Panel, TextAlignmentOptions.MidlineLeft);
+        UiPopIn.Add(chip, L.LobbyChipDelay);
+        // ヒューストンの吹き出し（しっぽは左の合言葉を指す）。人数で「次に何をするか」を1つだけ話す
+        hint = UiHintBubble.Create(head, L.BubbleLobbyW, L.BubbleLobbyH, UiHintBubble.Tail.Left, 0f, L.LobbyBubbleDelay);
         Ui.Size(UiKit.Space(head, 0f), flexW: 1f);
         var people = UiKit.Chip(head, T.Panel, T.ChipH, "People");
         UiKit.Icon(people, "crew", T.IconM, T.Ink);
@@ -131,7 +171,9 @@ public class LobbyScreen
 
         UiKit.Space(main, 0f, true);
         var bottom = UiKit.Row(main, 0f);
-        UiKit.PrimaryButton(bottom, "START MISSION", "rocket", () => f.Client.Send(Cmd.Type("start")));
+        var start = UiKit.PrimaryButton(bottom, "START MISSION", "rocket", () => f.Client.Send(Cmd.Type("start")));
+        UiSquish.Add(start, L.BreatheAmp);
+        UiPopIn.Add(bottom, L.LobbyStartDelay);
 
         stage = Root.AddComponent<LobbyStage>();
         stage.Init(view, tagRects);
@@ -151,5 +193,7 @@ public class LobbyScreen
             tags[i].Set(who == null ? null : string.IsNullOrEmpty(who.name) ? "Player" : who.name, self, main);
             stage.SetSeat(i, who != null, self);
         }
+        int n = f.Model.Players.Count;
+        hint.Say(L.Rich(n >= Seats.All.Length ? L.LobbyFull : n >= 2 ? L.LobbySome : L.LobbySolo));
     }
 }
