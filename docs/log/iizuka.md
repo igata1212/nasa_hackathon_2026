@@ -11,3 +11,4 @@
 - 13:31 #21 tmp/ にあった 3D モデル一式（PhysDraft-SpaceCrew3D）を modeling/ に移動。tmp/ を .gitignore に追加。作った人は未確認
 - 13:35 #23 柔らかいモデルの傾向（Overcooked・Fall Guys・Among Us）を docs/design/art-research.md にまとめ、参考画像15枚を追加（調査：haiku 3体、まとめ：sonnet）
 - 13:40 #25 3D モデルの作者を midori と記録（README・メンバー表）
+- 13:47 #29 Unity MCP（CoplayDev/unity-mcp v10.3.0）を追加。.mcp.json でチーム共有

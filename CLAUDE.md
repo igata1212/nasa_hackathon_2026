@@ -78,6 +78,7 @@ Issue の担当を付けるときは GitHub の名前を使う：`gh issue edit 
 ## Unity
 
 - バージョンは全員 **6000.6.9f1**（URP）。Unity Hub で「Add → `unity/` フォルダ」で開く。違うバージョンで開くと全ファイルが書き換わるので、開く前に確認する
+- **Unity MCP**（Claude から Unity を操作する。CoplayDev/unity-mcp v10.3.0）：Unity を開き、Window → MCP for Unity で Start Server を押してから Claude Code を開き直す。接続先はリポジトリ直下の `.mcp.json`。Unity を閉じると使えない。`uv` が要る
 - `.meta` ファイルは必ずアセットと一緒にコミットする（片方だけだと参照が壊れる）
 - シーンは1人1つを基本にする。共有シーンを触るときは Issue に書いておく
 - **数値はコードに書かない**。`parameters.json` / `parts.json` から読む。JSON は `docs/design/` の xlsx から作り、`reference_sim.py` と同じフォルダに置く（同じフォルダから読むため）。ロジックで迷ったら `docs/design/reference_sim.py` が正
