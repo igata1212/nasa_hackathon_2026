@@ -9,3 +9,4 @@
 - 13:12 #16 3人目の GitHub（midori11111111）をメンバー表に追加
 - 13:25 #18 見た目の方向性（Overcooked 風）と作り方の計画を docs/design/art-direction.md に保存
 - 13:31 #21 tmp/ にあった 3D モデル一式（PhysDraft-SpaceCrew3D）を modeling/ に移動。tmp/ を .gitignore に追加。作った人は未確認
+- 13:35 #23 柔らかいモデルの傾向（Overcooked・Fall Guys・Among Us）を docs/design/art-research.md にまとめ、参考画像15枚を追加（調査：haiku 3体、まとめ：sonnet）
