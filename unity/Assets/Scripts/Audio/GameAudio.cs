@@ -8,6 +8,7 @@
 //   噴射（軌道修正・帰還の噴射）    thruster_burn_loop を burnS 秒（サーバーでは一瞬なので長さはここで決める）
 //   再突入（t ≥ t_reentry）        reentry_rumble_loop
 //   スイッチ（sw・transmit）       ui_switch_on / ui_switch_off。練習で操作した：ui_confirm（小さく）。打ち上げ不可・同時押しの失敗：ui_error
+//   ボタン                        ui_click：UiKit のボタンは UiPress が鳴らす。古い Ui.Btn（設計画面など）はここで拾う（ClickFallback。船内は除く）
 //   ジングル（Kenney Music Jingles）  部屋に人が増えた：jingle_join／打ち上げの LIFTOFF! のあと：jingle_liftoff（舞台が鳴らす）
 //                                 エンディング：ED-A jingle_success・ED-B jingle_close・ED-C jingle_fail（舞台が SPLASHDOWN!／Mission lost で鳴らす。
 //                                 演出を飛ばした・流さなかったときは、エンディングに入って少ししてからここで鳴らす）
@@ -17,8 +18,13 @@
 // 音量は BGM・効果音・声の3つ（SoundPrefs。タイトルの DEV パネルでミュート）。AudioListener はメインカメラのものを使う（無いときだけ足す）。
 // WebGL は最初のタップ（クリック）まで音が出ない（ブラウザの決まり。仕様）。
 // GameFlow・UrgencyFx は変えない：シーンに置いて指すだけ（Editor/Audio/AudioScene.cs が組む）。GameFlow.Client が差し替わったら付け直す。
+// BGM の作者表記（Spacedman は CC BY 4.0 で表記が必須）：タイトル画面の下に小さく1行（musicCredit）。TitleLobbyScreens は触らず、ここで別の Canvas に出す。
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public enum SoundBus { Music, Sfx, Voice }
 
@@ -68,6 +74,8 @@ public class GameAudio : MonoBehaviour
     [Tooltip("月の裏側（空なら飛行の曲）")] public AudioClip musicFarside;
     [Tooltip("危機の段階 2 以上（空なら今の曲を crisisDuck まで下げる）")] public AudioClip musicCrisis;
     [Tooltip("エンディング・報告（空なら無音）")] public AudioClip musicEnding;
+    [Tooltip("タイトル画面の下に出す作者表記（CC BY 4.0 で必須。空なら出さない）")]
+    public string musicCredit = "Music: Spacedman by Shane Ivers - silvermansound.com";
     [Range(0f, 1f)] public float musicLevel = 0.35f;
     [Range(0f, 1f)] public float crisisDuck = 0.55f;
     public float musicFadeS = 1.5f;
@@ -126,6 +134,26 @@ public class GameAudio : MonoBehaviour
             Debug.LogWarning("[Audio] AudioListener が無いので足した（ふだんはメインカメラのものを使う）");
             gameObject.AddComponent<AudioListener>();
         }
+        BuildCredit();
+    }
+
+    GameObject credit;
+
+    /// <summary>BGM の作者表記。GameFlow の画面（sortingOrder 10）の上に重ねる別の Canvas。押せない（raycast しない）</summary>
+    void BuildCredit()
+    {
+        if (string.IsNullOrEmpty(musicCredit)) return;
+        var cgo = new GameObject("MusicCredit");
+        cgo.transform.SetParent(transform, false);
+        var canvas = cgo.AddComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 11;
+        var scaler = cgo.AddComponent<CanvasScaler>();   // GameFlow の GameCanvas と同じ
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1600, 900); scaler.matchWidthOrHeight = 0.5f;
+        var t = UiKit.Text(UiKit.SafeArea(cgo.transform), musicCredit, TextStyle.Label, UiTokens.InkSub, TextAlignmentOptions.Bottom);
+        var r = t.rectTransform;
+        r.anchorMin = new Vector2(0f, 0f); r.anchorMax = new Vector2(1f, 0f); r.pivot = new Vector2(0.5f, 0f);
+        r.anchoredPosition = new Vector2(0f, UiTokens.ScreenEdge * 0.5f); r.sizeDelta = new Vector2(0f, UiTokens.TextLabel * 1.5f);
+        credit = cgo;
+        credit.SetActive(false);
     }
 
     void OnDestroy()
@@ -273,6 +301,8 @@ public class GameAudio : MonoBehaviour
     {
         Hook();
         float now = Time.unscaledTime, dt = Time.unscaledDeltaTime;
+        if (credit != null) { bool show = flow != null && flow.Model.Phase == "title"; if (credit.activeSelf != show) credit.SetActive(show); }
+        ClickFallback();
 
         for (int i = later.Count - 1; i >= 0; i--)
         {
@@ -436,20 +466,44 @@ public class GameAudio : MonoBehaviour
     /// <summary>ボタンを押した音（UiPress から）</summary>
     public static void Click() { var a = I; if (a != null) a.Sfx("ui_click", a.clickVol); }
 
+    readonly List<RaycastResult> clickHits = new List<RaycastResult>();
+
+    /// <summary>古いボタン（Ui.Btn。設計画面の ±・READY FOR LAUNCH など。UiPress が無い）を押したときも ui_click。
+    /// 船内（練習・飛行）のボタンはスイッチの音が状態の差で鳴るので鳴らさない。UiPress の付いたボタンは UiPress が鳴らす</summary>
+    void ClickFallback()
+    {
+        if (phase == "practice" || phase == "stir" || phase == "flight" || StoryPlaying) return;
+        var es = EventSystem.current;
+        if (es == null) return;
+        Vector2 pos;
+        var m = Mouse.current; var ts = Touchscreen.current;
+        if (m != null && m.leftButton.wasPressedThisFrame) pos = m.position.ReadValue();
+        else if (ts != null && ts.primaryTouch.press.wasPressedThisFrame) pos = ts.primaryTouch.position.ReadValue();
+        else return;
+        clickHits.Clear();
+        es.RaycastAll(new PointerEventData(es) { position = pos }, clickHits);
+        if (clickHits.Count == 0) return;
+        var go = clickHits[0].gameObject;
+        var sel = go.GetComponentInParent<Selectable>();
+        if (sel == null || !sel.IsInteractable() || go.GetComponentInParent<UiPress>() != null) return;
+        Sfx("ui_click", clickVol);
+    }
+
     /// <summary>演出が始まる：演出の音を消し、船内の交信の音（待っている quindar）をやめる。BGM は止める（舞台が入れるまで）</summary>
     public void StoryBegin()
     {
         StoryStop();
+        storyMusic = null;
         later.RemoveAll(x => x.tag == "quindar_in" || x.tag == "quindar_out");
     }
 
-    /// <summary>演出が終わった：演出の音をすぐ止める（BGM は段階の決まりに戻る）</summary>
+    /// <summary>演出が終わった：演出の音をすぐ止める（BGM は段階の決まりに戻る）。
+    /// 演出の BGM（storyMusic）は残す：舞台は片づけたあと 0.35 秒かけて船内へ戻り、その間も Playing なので、ここで消すと BGM が一度切れて頭から鳴り直す</summary>
     public void StoryStop()
     {
         StoryHush();
         foreach (var l in loops.Values) if (l.story) { l.target = l.vol = 0f; l.src.Stop(); l.playing = false; }
         later.RemoveAll(x => x.story);
-        storyMusic = null;
     }
 
     public void StoryFadeOut(float s)
