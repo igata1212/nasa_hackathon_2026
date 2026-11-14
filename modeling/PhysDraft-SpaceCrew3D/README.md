@@ -1,5 +1,7 @@
 # PhysDraft SpaceCrew 3D
 
+作った人：midori（`midori11111111`）／ リポジトリに追加：iizuka（2026-11-14）
+
 3人協力の宇宙航海ゲーム用の3Dアセット。すべてBlender 5.3 + Pythonスクリプトで生成し、`export/` にGLB（Web/three.js向け）を出力する。
 
 ## 中身

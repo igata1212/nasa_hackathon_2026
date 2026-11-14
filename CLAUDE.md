@@ -15,7 +15,7 @@
 |---|---|---|
 | iizuka | `tada246` | Unity・通信・GMAT 連携・GitHub 運用 |
 | Taiga | `igata1212` | 企画・物語・パラメータ・3D アセット・UI |
-| 3人目 | `midori11111111` | 物語の英語レビューなど。海外在住・英語。この人向けの Issue は英語で書く |
+| midori | `midori11111111` | 3D モデル（`modeling/PhysDraft-SpaceCrew3D`）、物語の英語レビューなど。海外在住・英語。この人向けの Issue は英語で書く |
 
 Issue の担当を付けるときは GitHub の名前を使う：`gh issue edit N --add-assignee igata1212`
 
