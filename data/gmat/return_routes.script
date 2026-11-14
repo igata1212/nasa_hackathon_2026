@@ -1,0 +1,311 @@
+%  return_routes.script
+%
+%  Mission Return - return routes A / B (prototype, Issue #65)
+%  Author: Taiga / 2026-11-14 / GMAT R2026a
+%
+%  An Apollo-13-style flight: free-return swing around the far side of the
+%  Moon, then a speed-up burn two hours after pericynthion ("PC+2").
+%    Route A : large burn  -> fast return, more fuel
+%    Route B : small burn  -> slow return, less fuel
+%  Both routes are re-targeted to the same Earth entry corridor.
+%
+%  Output (GMAT "output" folder):
+%    route_a.csv, route_b.csv   trajectory, 185 km above Earth after launch -> entry interface (121.92 km)
+%    route_summary.csv          burn sizes and flight times
+%
+%  Knobs to play with: PeriluneAlt, DvA, DvB, BurnDelaySec (set just after
+%  BeginMissionSequence).
+
+%----------------------------------------
+%---------- Coordinate systems
+%----------------------------------------
+
+% Moon-centred, rotating with the Earth-Moon line. +X = away from Earth (far side).
+Create CoordinateSystem MoonRot;
+MoonRot.Origin    = Luna;
+MoonRot.Axes      = ObjectReferenced;
+MoonRot.XAxis     = R;
+MoonRot.ZAxis     = N;
+MoonRot.Primary   = Earth;
+MoonRot.Secondary = Luna;
+
+% Earth-centred, rotating with the Earth-Moon line (Moon stays on +X). For drawing.
+Create CoordinateSystem EarthMoonRot;
+EarthMoonRot.Origin    = Earth;
+EarthMoonRot.Axes      = ObjectReferenced;
+EarthMoonRot.XAxis     = R;
+EarthMoonRot.ZAxis     = N;
+EarthMoonRot.Primary   = Earth;
+EarthMoonRot.Secondary = Luna;
+
+Create CoordinateSystem MoonMJ2000Eq;
+MoonMJ2000Eq.Origin = Luna;
+MoonMJ2000Eq.Axes   = MJ2000Eq;
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+% All three start at pericynthion on the far side of the Moon, on the
+% Earth-Moon line, moving retrograde. Epoch = Apollo 13 pericynthion.
+
+Create Spacecraft sc0;
+sc0.DateFormat       = UTCGregorian;
+sc0.Epoch            = '15 Apr 1970 00:21:00.000';
+sc0.CoordinateSystem = MoonRot;
+sc0.DisplayStateType = Cartesian;
+sc0.X  = 1991.7;
+sc0.Y  = 0;
+sc0.Z  = 0;
+sc0.VX = 0;
+sc0.VY = -2.45;
+sc0.VZ = 0;
+
+Create Spacecraft scTA;
+scTA.DateFormat       = UTCGregorian;
+scTA.Epoch            = '15 Apr 1970 00:21:00.000';
+scTA.CoordinateSystem = MoonRot;
+scTA.DisplayStateType = Cartesian;
+scTA.X  = 1991.7;
+scTA.Y  = 0;
+scTA.Z  = 0;
+scTA.VX = 0;
+scTA.VY = -2.45;
+scTA.VZ = 0;
+
+Create Spacecraft scTB;
+scTB.DateFormat       = UTCGregorian;
+scTB.Epoch            = '15 Apr 1970 00:21:00.000';
+scTB.CoordinateSystem = MoonRot;
+scTB.DisplayStateType = Cartesian;
+scTB.X  = 1991.7;
+scTB.Y  = 0;
+scTB.Z  = 0;
+scTB.VX = 0;
+scTB.VY = -2.45;
+scTB.VZ = 0;
+
+Create Spacecraft scA;
+scA.DateFormat       = UTCGregorian;
+scA.Epoch            = '15 Apr 1970 00:21:00.000';
+scA.CoordinateSystem = MoonRot;
+scA.DisplayStateType = Cartesian;
+scA.X  = 1991.7;
+scA.Y  = 0;
+scA.Z  = 0;
+scA.VX = 0;
+scA.VY = -2.45;
+scA.VZ = 0;
+
+Create Spacecraft scB;
+scB.DateFormat       = UTCGregorian;
+scB.Epoch            = '15 Apr 1970 00:21:00.000';
+scB.CoordinateSystem = MoonRot;
+scB.DisplayStateType = Cartesian;
+scB.X  = 1991.7;
+scB.Y  = 0;
+scB.Z  = 0;
+scB.VX = 0;
+scB.VY = -2.45;
+scB.VZ = 0;
+
+%----------------------------------------
+%---------- Forces and propagator
+%----------------------------------------
+
+Create ForceModel FM;
+FM.CentralBody  = Earth;
+FM.PointMasses  = {Earth, Luna, Sun};
+FM.Drag         = None;
+FM.SRP          = Off;
+FM.ErrorControl = RSSStep;
+
+Create Propagator prop;
+prop.FM              = FM;
+prop.Type            = RungeKutta89;
+prop.InitialStepSize = 60;
+prop.Accuracy        = 1e-11;
+prop.MinStep         = 0.001;
+prop.MaxStep         = 600;
+prop.MaxStepAttempts = 50;
+
+%----------------------------------------
+%---------- Burns (PC+2). V = along Earth-relative velocity, B = in-plane sideways
+%----------------------------------------
+
+Create ImpulsiveBurn burnA;
+burnA.CoordinateSystem = Local;
+burnA.Origin           = Earth;
+burnA.Axes             = VNB;
+burnA.Element1         = 0;
+burnA.Element2         = 0;
+burnA.Element3         = 0;
+burnA.DecrementMass    = false;
+
+Create ImpulsiveBurn burnB;
+burnB.CoordinateSystem = Local;
+burnB.Origin           = Earth;
+burnB.Axes             = VNB;
+burnB.Element1         = 0;
+burnB.Element2         = 0;
+burnB.Element3         = 0;
+burnB.DecrementMass    = false;
+
+%----------------------------------------
+%---------- Solver
+%----------------------------------------
+
+Create DifferentialCorrector DC;
+DC.ShowProgress      = true;
+DC.ReportStyle       = Normal;
+DC.ReportFile        = 'return_routes_DC.data';
+DC.MaximumIterations = 200;
+DC.DerivativeMethod  = CentralDifference;
+
+%----------------------------------------
+%---------- Output
+%----------------------------------------
+
+Create ReportFile rfA;
+rfA.Filename     = 'route_a.csv';
+rfA.Precision    = 14;
+rfA.WriteHeaders = true;
+rfA.LeftJustify  = On;
+rfA.ZeroFill     = Off;
+rfA.FixedWidth   = false;
+rfA.Delimiter    = ',';
+rfA.Add = {scA.UTCModJulian, scA.EarthMJ2000Eq.X, scA.EarthMJ2000Eq.Y, scA.EarthMJ2000Eq.Z, scA.MoonMJ2000Eq.X, scA.MoonMJ2000Eq.Y, scA.MoonMJ2000Eq.Z, scA.EarthMoonRot.X, scA.EarthMoonRot.Y, scA.EarthMoonRot.Z, scA.Earth.Altitude, scA.Luna.Altitude};
+
+Create ReportFile rfB;
+rfB.Filename     = 'route_b.csv';
+rfB.Precision    = 14;
+rfB.WriteHeaders = true;
+rfB.LeftJustify  = On;
+rfB.ZeroFill     = Off;
+rfB.FixedWidth   = false;
+rfB.Delimiter    = ',';
+rfB.Add = {scB.UTCModJulian, scB.EarthMJ2000Eq.X, scB.EarthMJ2000Eq.Y, scB.EarthMJ2000Eq.Z, scB.MoonMJ2000Eq.X, scB.MoonMJ2000Eq.Y, scB.MoonMJ2000Eq.Z, scB.EarthMoonRot.X, scB.EarthMoonRot.Y, scB.EarthMoonRot.Z, scB.Earth.Altitude, scB.Luna.Altitude};
+
+Create ReportFile rfSum;
+rfSum.Filename     = 'route_summary.csv';
+rfSum.Precision    = 10;
+rfSum.WriteHeaders = true;
+rfSum.LeftJustify  = On;
+rfSum.ZeroFill     = Off;
+rfSum.FixedWidth   = false;
+rfSum.Delimiter    = ',';
+rfSum.WriteReport  = false;
+
+% 3D view for the GMAT GUI (ignored by GmatConsole). Moon stays on the right.
+Create OrbitView view;
+view.Add                    = {scA, scB, Earth, Luna};
+view.CoordinateSystem       = EarthMoonRot;
+view.ViewPointReference     = Earth;
+view.ViewPointVector        = [ 0 0 900000 ];
+view.ViewDirection          = Earth;
+view.ViewUpCoordinateSystem = EarthMoonRot;
+view.ViewUpAxis             = Y;
+view.SolverIterations       = None;
+view.XYPlane                = Off;
+view.Axes                   = Off;
+
+Create Variable PeriluneAlt DvA DvB BurnDelaySec EntryRadPer;
+Create Variable vy rPeri tPeri tBurn tStart tStop tDayM1;
+Create Variable hoursLaunchToMoon;
+Create Variable dvA_V dvA_B dvA_total hoursBurnToEntryA;
+Create Variable dvB_V dvB_B dvB_total hoursBurnToEntryB;
+
+%----------------------------------------
+%---------- Mission sequence
+%----------------------------------------
+
+BeginMissionSequence;
+
+PeriluneAlt  = 254.3;      % km above the Moon at closest approach (Apollo 13: 254 km)
+DvA          = 0.262;      % km/s, Route A speed-up (Apollo 13's real PC+2 burn: 0.262)
+DvB          = 0.050;      % km/s, Route B speed-up
+BurnDelaySec = 7200;       % burn this long after pericynthion
+EntryRadPer  = 6420;       % km, vacuum perigee radius for the entry corridor
+
+Toggle rfA rfB view Off;
+
+rPeri  = 1737.4 + PeriluneAlt;
+sc0.X  = rPeri;
+scTA.X = rPeri;
+scTB.X = rPeri;
+scA.X  = rPeri;
+scB.X  = rPeri;
+
+tPeri = sc0.A1ModJulian;
+tBurn = tPeri + BurnDelaySec / 86400;
+
+% --- 1) Free return: pick the flyby speed so the coast back hits the entry corridor
+Target DC;
+   Vary DC(vy = -2.45, {Perturbation = 1e-6, MaxStep = 0.005, Lower = -2.9, Upper = -2.25});
+   sc0.VY = vy;
+   Propagate prop(sc0) {sc0.ElapsedDays = 1};
+   Propagate prop(sc0) {sc0.Earth.Periapsis, sc0.ElapsedDays = 12};
+   Achieve DC(sc0.Earth.RadPer = EntryRadPer, {Tolerance = 0.5});
+EndTarget;
+
+scTA.VY = vy;
+scTB.VY = vy;
+scA.VY  = vy;
+scB.VY  = vy;
+
+% --- 2) Route A: fixed speed-up, solve the sideways part to stay in the corridor
+burnA.Element1 = DvA;
+Propagate prop(scTA) {scTA.A1ModJulian = tBurn};
+Target DC;
+   Vary DC(burnA.Element3 = 0, {Perturbation = 1e-6, MaxStep = 0.01, Lower = -1, Upper = 1});
+   Maneuver burnA(scTA);
+   Propagate prop(scTA) {scTA.ElapsedDays = 0.5};
+   Propagate prop(scTA) {scTA.Earth.Periapsis, scTA.ElapsedDays = 12};
+   Achieve DC(scTA.Earth.RadPer = EntryRadPer, {Tolerance = 0.5});
+EndTarget;
+
+% --- 3) Route B: same, smaller burn
+burnB.Element1 = DvB;
+Propagate prop(scTB) {scTB.A1ModJulian = tBurn};
+Target DC;
+   Vary DC(burnB.Element3 = 0, {Perturbation = 1e-6, MaxStep = 0.01, Lower = -1, Upper = 1});
+   Maneuver burnB(scTB);
+   Propagate prop(scTB) {scTB.ElapsedDays = 0.5};
+   Propagate prop(scTB) {scTB.Earth.Periapsis, scTB.ElapsedDays = 12};
+   Achieve DC(scTB.Earth.RadPer = EntryRadPer, {Tolerance = 0.5});
+EndTarget;
+
+% --- 4) Fly Route A for the record: back to 185 km above Earth (launch side), then forward
+tStop  = tPeri - 6;
+tDayM1 = tPeri - 1;
+Propagate BackProp prop(scA) {scA.A1ModJulian = tDayM1};
+Propagate BackProp prop(scA) {scA.Earth.Altitude = 185, scA.A1ModJulian = tStop};
+tStart            = scA.A1ModJulian;
+hoursLaunchToMoon = (tPeri - tStart) * 24;
+
+Toggle rfA view On;
+Propagate prop(scA) {scA.A1ModJulian = tBurn};
+Maneuver burnA(scA);
+Propagate prop(scA) {scA.ElapsedDays = 0.5};
+Propagate prop(scA) {scA.Earth.Altitude = 121.92, scA.ElapsedDays = 12};
+Toggle rfA view Off;
+hoursBurnToEntryA = (scA.A1ModJulian - tBurn) * 24;
+
+% --- 5) Fly Route B for the record
+Propagate BackProp prop(scB) {scB.A1ModJulian = tStart};
+Toggle rfB view On;
+Propagate prop(scB) {scB.A1ModJulian = tBurn};
+Maneuver burnB(scB);
+Propagate prop(scB) {scB.ElapsedDays = 0.5};
+Propagate prop(scB) {scB.Earth.Altitude = 121.92, scB.ElapsedDays = 12};
+Toggle rfB view Off;
+hoursBurnToEntryB = (scB.A1ModJulian - tBurn) * 24;
+
+% --- 6) Summary
+dvA_V     = burnA.Element1;
+dvA_B     = burnA.Element3;
+dvA_total = sqrt(dvA_V^2 + dvA_B^2);
+dvB_V     = burnB.Element1;
+dvB_B     = burnB.Element3;
+dvB_total = sqrt(dvB_V^2 + dvB_B^2);
+
+Report rfSum vy hoursLaunchToMoon dvA_V dvA_B dvA_total hoursBurnToEntryA dvB_V dvB_B dvB_total hoursBurnToEntryB;

@@ -1,0 +1,158 @@
+{
+  "_generated_by": "tools/xlsx_to_json.py（元：ミッション・リターン イベント表.xlsx）",
+  "parts": [
+    {
+      "id": "bus",
+      "name": "Fixed",
+      "category": "Spacecraft bus",
+      "row": 7,
+      "mass": 50,
+      "cost": 30,
+      "min": 1,
+      "max": 1,
+      "benefit": "Structure, engine, life support, two main oxygen tanks (100% oxygen), 100% fuel, standard antenna, 2 CO2 filters",
+      "weakness": "—"
+    },
+    {
+      "id": "battery",
+      "name": "Battery module",
+      "category": "Power",
+      "row": 8,
+      "mass": 12,
+      "cost": 10,
+      "min": 1,
+      "max": 4,
+      "benefit": "+50% power capacity",
+      "weakness": "Mass and cost add up quickly"
+    },
+    {
+      "id": "solar_panel",
+      "name": "Solar panel",
+      "category": "Power",
+      "row": 9,
+      "mass": 6,
+      "cost": 12,
+      "min": 0,
+      "max": 2,
+      "benefit": "+3%/min power while Sun-pointing (+1%/min in other attitudes)",
+      "weakness": "Expensive. Full output only while the ship points at the Sun, when it cannot observe or transmit"
+    },
+    {
+      "id": "spare_o2_tank",
+      "name": "Spare oxygen tank",
+      "category": "Oxygen",
+      "row": 10,
+      "mass": 15,
+      "cost": 12,
+      "min": 0,
+      "max": 2,
+      "benefit": "+20% oxygen, not touched by the accident",
+      "weakness": "Mass and budget you may not need if the leak is closed fast"
+    },
+    {
+      "id": "camera",
+      "name": "Camera",
+      "category": "Instruments",
+      "row": 11,
+      "mass": 10,
+      "cost": 10,
+      "min": 0,
+      "max": 1,
+      "benefit": "Science value 1. Uses 2%/min power, makes 10 data/min",
+      "weakness": "Lowest science value"
+    },
+    {
+      "id": "spectrometer",
+      "name": "Spectrometer",
+      "category": "Instruments",
+      "row": 12,
+      "mass": 15,
+      "cost": 15,
+      "min": 0,
+      "max": 1,
+      "benefit": "Science value 2 (what the Moon is made of). Uses 4%/min power, makes 20 data/min",
+      "weakness": "Highest power use and the most data to send"
+    },
+    {
+      "id": "radar",
+      "name": "Radar sounder",
+      "category": "Instruments",
+      "row": 13,
+      "mass": 12,
+      "cost": 14,
+      "min": 0,
+      "max": 1,
+      "benefit": "Science value 1.5 (what lies under the surface). Uses 3%/min power, makes 15 data/min",
+      "weakness": "Costly for its science value"
+    },
+    {
+      "id": "high_gain_antenna",
+      "name": "High-gain antenna",
+      "category": "Comms",
+      "row": 14,
+      "mass": 10,
+      "cost": 10,
+      "min": 0,
+      "max": 1,
+      "benefit": "Sends 60 data/min instead of 30",
+      "weakness": "Mass and budget"
+    },
+    {
+      "id": "extra_fuel_tank",
+      "name": "Extra fuel tank",
+      "category": "Propulsion",
+      "row": 15,
+      "mass": 12,
+      "cost": 8,
+      "min": 0,
+      "max": 2,
+      "benefit": "+25% fuel",
+      "weakness": "Mass you carry even if you never need it"
+    },
+    {
+      "id": "trajectory_free_return",
+      "name": "Free-return",
+      "category": "Trajectory",
+      "row": 16,
+      "mass": 0,
+      "cost": 0,
+      "benefit": "After the accident, returns to Earth with no burn",
+      "weakness": "Less time to observe (science value x1)"
+    },
+    {
+      "id": "trajectory_science",
+      "name": "Science",
+      "category": "Trajectory",
+      "row": 17,
+      "mass": 0,
+      "cost": 0,
+      "benefit": "Flies close to the Moon for longer (science value x1.5)",
+      "weakness": "After the accident, the burn to get home costs 15% fuel"
+    },
+    {
+      "id": "rocket_small",
+      "name": "Small",
+      "category": "Launch vehicle",
+      "row": 18,
+      "mass": null,
+      "cost": 0,
+      "benefit": "No extra cost",
+      "weakness": "Cannot lift heavy builds"
+    },
+    {
+      "id": "rocket_large",
+      "name": "Large",
+      "category": "Launch vehicle",
+      "row": 19,
+      "mass": null,
+      "cost": 20,
+      "benefit": "Lifts heavy builds",
+      "weakness": "Eats into the budget"
+    }
+  ],
+  "limits": {
+    "budget": 110,
+    "rocket_small_mass": 100,
+    "rocket_large_mass": 140
+  }
+}
