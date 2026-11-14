@@ -1,0 +1,10 @@
+[
+  {"id": "B01", "speaker": "houston", "text": "Hi, crew! This is Houston, NASA's Mission Control in Houston, Texas."},
+  {"id": "B02", "speaker": "houston", "text": "We watch your ship from the ground. I'm like your teacher."},
+  {"id": "B03", "speaker": "houston", "text": "This game is based on Apollo 13, a real trip to the Moon in 1970."},
+  {"id": "B04", "speaker": "houston", "text": "Your mission: study the Moon's far side, the side we never see, and come home."},
+  {"id": "B05", "speaker": "houston", "text": "Four seats: Pilot steers the ship. Life Support keeps the air safe."},
+  {"id": "B06", "speaker": "houston", "text": "Comms & Power runs radio and power. Mission Planner does science and the route."},
+  {"id": "B07", "speaker": "houston", "text": "We talk by radio. But behind the Moon, the Moon blocks it."},
+  {"id": "B08", "speaker": "houston", "text": "Whatever happens, work as a team and keep thinking. You can get home."}
+]
