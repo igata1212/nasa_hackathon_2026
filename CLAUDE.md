@@ -67,6 +67,7 @@
 
 ## Unity
 
+- バージョンは全員 **6000.6.9f1**（URP）。Unity Hub で「Add → `unity/` フォルダ」で開く。違うバージョンで開くと全ファイルが書き換わるので、開く前に確認する
 - `.meta` ファイルは必ずアセットと一緒にコミットする（片方だけだと参照が壊れる）
 - シーンは1人1つを基本にする。共有シーンを触るときは Issue に書いておく
 - **数値はコードに書かない**。`parameters.json` / `parts.json` から読む。JSON は `docs/design/` の xlsx から作り、`reference_sim.py` と同じフォルダに置く（同じフォルダから読むため）。ロジックで迷ったら `docs/design/reference_sim.py` が正
