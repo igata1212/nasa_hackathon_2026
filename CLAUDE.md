@@ -1,6 +1,6 @@
 # 遠慮のNASA — NASA Space Apps 2026
 
-お題：[Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/)。宇宙ミッションの設計から運用までを、最大4人で協力して遊べるゲームにする。ゲームの中身は `SPEC.md` を読む。
+お題：[Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/)。宇宙ミッションの設計から運用までを、最大4人で協力して遊べるゲームにする。ゲームの中身は `docs/design/SPEC.md` を読む。
 
 3人・2日間。迷ったら作らない。作るなら細部まで詰める。
 
@@ -45,7 +45,7 @@
 
 使う方向で考えているもの（確定ではない）：
 
-- [GMAT](https://software.nasa.gov/software/GSC-19468-1)：軌道を計算する。帰還ルート A / B の軌道を出して `data/` に置き、Unity で描く（`SPEC.md` 11・12章）
+- [GMAT](https://software.nasa.gov/software/GSC-19468-1)：軌道を計算する。帰還ルート A / B の軌道を出して `data/` に置き、Unity で描く（`docs/design/SPEC.md` 11・12章）
 - [NASA Mission Viz](https://nasa.github.io/mission-viz/)：軌道やミッションを Web 上で 3D 表示する
 
 ほかの候補は [Resources タブ](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/?tab=resources)。
@@ -69,7 +69,7 @@
 
 - `.meta` ファイルは必ずアセットと一緒にコミットする（片方だけだと参照が壊れる）
 - シーンは1人1つを基本にする。共有シーンを触るときは Issue に書いておく
-- **数値はコードに書かない**。`parameters.json` / `parts.json` から読む。ロジックで迷ったら `reference_sim.py` が正
+- **数値はコードに書かない**。`parameters.json` / `parts.json` から読む。JSON は `docs/design/` の xlsx から作り、`reference_sim.py` と同じフォルダに置く（同じフォルダから読むため）。ロジックで迷ったら `docs/design/reference_sim.py` が正
 - 画面に出る文字列は英語（提出用）
 
 ## ファイル
