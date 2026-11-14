@@ -59,6 +59,9 @@ ICONS = {
     "cost": "cash",                # コスト
     "enter": "enter",              # 部屋に入る
     "create": "add-circle",        # 作る
+    # 6 章のワイヤーフレーム（#72）で使うもの。4 章の表には無い
+    "room_code": "key",            # 合言葉の入力欄
+    "settings": "settings",        # 開発用のパネル（DEV）を開く
     # Ionicons に無いものの代用（ガイドライン 4 章）
     "valve": "aperture",           # バルブ
     "spectrometer": "prism",       # 分光計
