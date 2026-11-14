@@ -33,7 +33,10 @@ public class CabinOverlay : HudPart
         public const int ScrimBelowFrame = 1;           // 暗幕の Canvas の順番 = UrgencyFx.frameSortingOrder − これ（赤い枠の下）
         public const int ScrimOrderFallback = 8;        // UrgencyFx が無いとき（GameCanvas = 10・赤い枠 = 9 の下）
         // #88 SLOW の札
-        public const float SlowX = 0.01f, SlowY = 0.2f; // 札の左下（Cabin に対する割合）。左のゲージ（CabinHud.Layout の Left）の下、席のパネル（Bottom）の上
+        // 札の置き場所（Cabin に対する割合）。#146：席のパネル（CabinHud.Layout の Bottom：上 0.24）のすぐ上の右。
+        //   左下はヒューストンの先生の小窓（吹き出しの左下）とかぶるので右へ移した。札の右下をここに合わせる
+        public const float SlowX = 0.99f, SlowY = 0.24f;
+        public static readonly Vector2 SlowPivot = new Vector2(1f, 0f);
         public const float SlowBadgeD = T.IconM;        // 直す席のバッジ
         public const string SlowFormat = "SLOW +{0}%";  // 1行目（{0} = slow_pct）
     }
@@ -115,7 +118,7 @@ public class CabinOverlay : HudPart
         var card = UiKit.Col(root, T.S1, TextAnchor.UpperLeft, T.S2, T.S2);
         card.name = "SlowCard";
         card.anchorMin = card.anchorMax = new Vector2(Look.SlowX, Look.SlowY);
-        card.pivot = Vector2.zero;
+        card.pivot = Look.SlowPivot;
         card.anchoredPosition = new Vector2(0f, T.S1);
         var fit = card.gameObject.AddComponent<ContentSizeFitter>();
         fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;

@@ -56,7 +56,7 @@ public class MapWidget : HudPart
     const float SmallTag = 28f, BigTag = 40f;      // A・B の札
     const float SmallMark = 22f, BigMark = 34f;    // 噴射の印
     const float SmallCompareH = 40f;
-    // 大きく開いたときの置き場所（Cabin 全体に対する割合 x0, y0, x1, y1）。左のゲージと下の席のパネルにかぶらない所
+    // 大きく開いたときの置き場所（土台 CabinHud が無いときだけ使う。ふだんは CabinHud.Layout の MapBig）
     static readonly Vector4 BigAnchors = new Vector4(0.21f, 0.23f, 0.79f, 0.92f);
     const float BigHeaderH = 56f, BigCompareH = 80f, BigFooterH = 30f;
 
@@ -156,10 +156,15 @@ public class MapWidget : HudPart
 
     void BuildBig()
     {
-        // HUD の一番上（Cabin の直下）に置く。slot の外に出すため。Cabin が隠れれば一緒に隠れる
-        var cabin = Root.parent != null && Root.parent.parent != null ? Root.parent.parent : Root;
-        big = Ui.Rect("MapBig", cabin);
-        Ui.Anchor(big, BigAnchors.x, BigAnchors.y, BigAnchors.z, BigAnchors.w);
+        // 置き場所は CabinHud.Layout の MapBig（#146。いちばん手前の slot）。Cabin が隠れれば一緒に隠れる。土台が無いとき（見本など）だけ親の親に割合で置く
+        var slot = Ctx.Hud != null ? Ctx.Hud.Slot(HudSlot.MapBig) : null;
+        if (slot != null) { big = Ui.Rect("MapBig", slot); Ui.Fill(big); }
+        else
+        {
+            var cabin = Root.parent != null && Root.parent.parent != null ? Root.parent.parent : Root;
+            big = Ui.Rect("MapBig", cabin);
+            Ui.Anchor(big, BigAnchors.x, BigAnchors.y, BigAnchors.z, BigAnchors.w);
+        }
         bigGroup = big.gameObject.AddComponent<CanvasGroup>();
         var face = UiKit.Surface(big, T.RadiusL, T.Panel);
         face.raycastTarget = true;

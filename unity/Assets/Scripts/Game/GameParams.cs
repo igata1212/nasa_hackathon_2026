@@ -1,8 +1,8 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 All・DesignScreen と EndingParams もここから読む）
 // parameters.json の表を読む（#147）。正は docs/design/parameters.json。Unity が読むのは写しの Assets/Data/Sim/parameters.json
 //   UI の部品は数値をコードに書かず、ここから読む：GameParams.TryGet("co2_warn", out var v)
 //   読み込みは GameFlow.Awake が1回（GameFlow.parametersJson。シーンを作り直すまでは空なので、そのときは UrgencyFx.parametersJson を使う）
-//   形は UrgencyFx.LoadParams と同じ（{"params":[{"key","value","unit",...}]}）。UrgencyFx はまだ自分で読んでいる（#147 では触らない）
+//   形は UrgencyFx.LoadParams と同じ（{"params":[{"key","value","unit",...}]}）。UrgencyFx は自分でも読む（GameFlow より先に動くことがあるため。#146 から GameParams を先に見る）
 //   サーバーが送る閾値（#148、state の thresholds）は GameState.Threshold で読む
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +39,8 @@ public static class GameParams
     static void Clear() { values.Clear(); units.Clear(); warned.Clear(); Loaded = false; }
 
     public static bool Has(string key) => values.ContainsKey(key);
+    /// <summary>全部の値（設計の画面の説明の数字など、まとめて写したいとき）</summary>
+    public static IReadOnlyDictionary<string, float> All => values;
     public static bool TryGet(string key, out float v) => values.TryGetValue(key, out v);
 
     /// <summary>値。無ければ警告を1回だけ出して 0（数字を足さないで済むように。ちゃんと分けたいときは TryGet）</summary>

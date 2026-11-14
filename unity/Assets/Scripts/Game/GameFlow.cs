@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 でイベントを CabinHud に配るだけにした・GameParams を読む）／ 更新：iizuka（Opus 5.5、2026-11-14、#132 Toast を GameToast に・#94 接続の表示 ConnectionUi を Toast の隣に）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 でイベントを CabinHud に配るだけにした・GameParams を読む）／ 更新：iizuka（Opus 5.5、2026-11-14、#132 Toast を GameToast に・#94 接続の表示 ConnectionUi を Toast の隣に）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 UI の統合：台詞の id・ブリーフィング・警告の帯は CrisisBanner・ending/report では吹き出しを出さない）
 // ゲームの流れ。段階（title → lobby → design → practice/stir/flight(=Cabin) → ending → report）を IGameClient の OnPhase で切り替える。
 // シーンは分けず、1シーン（Game.unity。船内の 3D は常に置く）の中で UGUI の画面を切り替える。
 // 理由：船内のロードが1回で済む／サーバーの段階が途中で変わっても（再接続・again）画面の出し入れだけで追従できる／軽い。
@@ -40,6 +40,7 @@ public class GameFlow : MonoBehaviour
     public TextAsset timelineJson;       // Data/Sim/timeline_t1_good.json（オフライン再生。正は data/sim/）
     public TextAsset timelineFailJson;   // Data/Sim/timeline_t4_fail.json
     public TextAsset parametersJson;     // Data/Sim/parameters.json（正は docs/design/。GameParams が読む。空なら UrgencyFx のものを使う）
+    public TextAsset briefingJson;       // Data/Story/briefing.json（#152。部屋 → 設計の最初にヒューストンが話す前提知識。空でも Editor では読む）
     public TrajectoryView trajectory;    // 軌道の小窓（船内から遠くに置いた軌道の地図）
     public Camera trajectoryCamera;      // ↑を描くカメラ。RenderTexture に描いて HUD の隅に出す
     public string wsUrl = "ws://localhost:8765";
@@ -77,7 +78,7 @@ public class GameFlow : MonoBehaviour
         design = new DesignScreen(root, this);
         ending = new EndingScreen(root, this);
         report = new ReportScreen(root, this);
-        houston = new HoustonBox(root);
+        houston = new HoustonBox(root, this);
         BuildDebugBar(root);
         toast = new GameToast(root, this);
         conn = new ConnectionUi(root, this, toast);
@@ -135,7 +136,14 @@ public class GameFlow : MonoBehaviour
     // ------------------------------------------------------------------ 受信
     void OnPhase(string p)
     {
-        if (p == "design") { Model.ResetFlight(); houston.Clear(); if (trajectory != null) trajectory.SetState(0f, ""); }
+        string prev = Model.Phase;
+        if (p == "design")
+        {
+            // 部屋 → 設計の最初だけ、設計に入る前にブリーフィング（#152）。流している間に来た M01 は HoustonBox が待たせて、終わってから出す
+            // （サーバーは start と同時に M01 を送るので、Clear より先に流し始める：Clear はブリーフィングと待たせている台詞を消さない）
+            if (prev == "lobby") houston.PlayBriefing(briefingJson, null);
+            Model.ResetFlight(); houston.Clear(); if (trajectory != null) trajectory.SetState(0f, "");
+        }
         ShowPhase(p);
     }
 
@@ -152,12 +160,15 @@ public class GameFlow : MonoBehaviour
     {
         switch (e.kind)
         {
-            case "houston": houston.Push(e.text, e.priority); break;
+            case "houston":
+                // エンディング・レポートの間は画面（EndingScreen・ReportScreen）が台詞を出すので、吹き出しは出さない
+                if (Model.Phase != "ending" && Model.Phase != "report") houston.Push(e.id, e.text, e.priority);   // id で声を引く（#75）
+                break;
             case "launch":
                 Model.LaunchStatus = e.status == "ok" ? "" : e.status;
                 design.Refresh();
                 break;
-            case "warning": houston.Warn(e.text); break;   // 声なしの警告（通信できないとき）。パネルの文字だけ
+            // warning（声なしの警告。通信できないとき）は危機の帯（CrisisBanner）が下の cabin.OnEvent で出す。帯は1本（ui-guidelines 7章）
             case "practice":
                 Model.Practiced.Clear();
                 foreach (var x in e.done) Model.Practiced.Add(x);
@@ -242,17 +253,20 @@ public class GameFlow : MonoBehaviour
     // ------------------------------------------------------------------ オフライン再生の操作（右上）
     void BuildDebugBar(RectTransform root)
     {
-        var bar = Ui.HBox(root, 4, 4, TextAnchor.MiddleLeft, false);
-        Ui.Anchor(bar, 0.005f, 0.36f, 0.2f, 0.43f);   // ゲージの下・席パネルの上（左側）
+        // 右の列、軌道の地図（CabinHud.Layout の TopRight：下 0.64）の下に2段（#146：左はゲージが伸びたので右へ）
+        var bar = Ui.VBox(root, 4, 0, TextAnchor.UpperRight, false);
+        Ui.Anchor(bar, 0.79f, 0.545f, 0.99f, 0.63f);
         debugBar = bar.gameObject;
-        speedLabel = Ui.Label(bar, "", 16, Ui.Cream, TextAnchor.MiddleRight); Ui.Size(speedLabel, w: 110);
+        var top = Ui.HBox(bar, 4, 0, TextAnchor.MiddleRight, false); Ui.Size(top, h: 36);
+        var bottom = Ui.HBox(bar, 4, 0, TextAnchor.MiddleRight, false); Ui.Size(bottom, h: 36);
+        speedLabel = Ui.Label(top, "", 16, Ui.Cream, TextAnchor.MiddleRight); Ui.Size(speedLabel, w: 110);
+        Ui.Size(Ui.Btn(top, "PAUSE", Ui.Gray, () => { if (Client is OfflineClient o) o.Paused = !o.Paused; }, 16, Ui.Cream), w: 70);
+        Ui.Size(Ui.Btn(top, "SKIP", Ui.Gray, () => { if (Client is OfflineClient o) o.SkipToEnd(); }, 16, Ui.Cream), w: 60);
         foreach (var sp in new[] { 1f, 5f, 20f, 60f })
         {
             float s = sp;
-            Ui.Size(Ui.Btn(bar, "x" + s, Ui.Gray, () => { if (Client is OfflineClient o) { o.Speed = s; o.Paused = false; } }, 16, Ui.Cream), w: 52);
+            Ui.Size(Ui.Btn(bottom, "x" + s, Ui.Gray, () => { if (Client is OfflineClient o) { o.Speed = s; o.Paused = false; } }, 16, Ui.Cream), w: 52);
         }
-        Ui.Size(Ui.Btn(bar, "PAUSE", Ui.Gray, () => { if (Client is OfflineClient o) o.Paused = !o.Paused; }, 16, Ui.Cream), w: 70);
-        Ui.Size(Ui.Btn(bar, "SKIP", Ui.Gray, () => { if (Client is OfflineClient o) o.SkipToEnd(); }, 16, Ui.Cream), w: 60);
         debugBar.SetActive(false);
     }
 }

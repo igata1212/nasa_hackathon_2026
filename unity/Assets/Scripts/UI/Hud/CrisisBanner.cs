@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#76）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#76）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 声なしの警告もこの帯に）
 // 作る Issue：#76（事故の警報と危機の帯）
 //
 // 中央上の危機の帯（同時に1本、ui-guidelines 3章「警告の帯」）。練習の案内（#84）と同じ場所で、同時には出ない（帯は flight の間だけ）
@@ -8,6 +8,8 @@
 //   ・ほかの危機は帯の右に小さなアイコンで待機表示（state とサーバーの閾値 thresholds を見るだけ。どれを前に出すかは UrgencyFx が決める）
 //   ・ヒューストンが話している間（houston イベントから少しの間）は帯を小さく（#75 と二重に大きく出さない）。通信途絶・通信 OFF のときは小さくしない（帯が主役）
 //   ・照明 OFF でも暗くしない（Detail を持たない。#87）
+//   ・声なしの警告（event kind=warning：通信途絶・通信 OFF の間のヒューストンの台詞）も、この帯の1行に Look.WarnSec 秒出す（2行まで）。
+//     前は HoustonBox の上に別の赤い帯を出していて、危機の帯と2本並んだ（#146。ui-guidelines 7章：帯は1本）。危機が無いときは NO RADIO の帯で出す
 //   ・画面の縁の赤（UrgencyFx の枠）と溶けないように、帯の外側に panel の輪と影を付ける。帯そのものは脈打たせない（脈は縁だけ）
 // 文言・アイコン・席は下の Crises の表の1か所（文言は Taiga が決める。今は houston_lines.json の H07・H11・H14・H16・H18・H26 に合わせた仮）
 // 見た目の値は Look の1か所。帯の形は自分の中の Band にまとめた（#71 の HudKit.Banner ができたら差し替える）
@@ -42,13 +44,17 @@ public class CrisisBanner : HudPart
     };
     /// <summary>表に無い原因（UrgencyFx の debugLevel の "debug" など）</summary>
     static readonly Crisis Unknown = new Crisis { cause = "", icon = "alarm", title = "WARNING", line = "Check the gauges" };
+    /// <summary>危機が無いときに声なしの警告だけ出す帯（1行はヒューストンの台詞。席は台詞に出てきた席）</summary>
+    static readonly Crisis Radio = new Crisis { cause = "", icon = "comms_lost", title = "NO RADIO", line = "" };
     const string AlarmText = "MASTER ALARM";
 
     // ================================================================== 見た目の値（直すのはここ）
     static class Look
     {
         public const float BandH = 72, BandPadX = 40;   // ui-guidelines 3章「警告の帯」（#71 の T.BannerH・T.BannerPadX と同じ値）
-        public const float MaxW = 920;                  // 帯の最大の幅。CabinHud.Layout の Left（右端 0.2）と TopRight（左端 0.79）の間 ≒ 944 に収める
+        public const float MaxW = 880;                  // 帯の最大の幅。CabinHud.Layout の CenterTop（0.22〜0.78 ＝ 896）に収める（#146）
+        public const float WarnH = 96;                  // 声なしの警告を出している間の帯の高さ（1行を2行まで折り返す）
+        public const float WarnSec = HoustonStyle.WarnS; // 声なしの警告を出しておく秒（前の HoustonBox の帯と同じ）
         public const float BadgeD = T.BadgeS;           // 直す席のバッジ
         public const float StandbyD = T.TagH;           // 待機のアイコンの円
         public const int StandbyMax = 3;                // 待機のアイコンは3つまで
@@ -75,6 +81,7 @@ public class CrisisBanner : HudPart
     float bounceAt = -99f;
     float voiceUntil, voiceK = 1f, lastNow;
     string lastPhase = "";
+    string warnText = "", warnPriority = ""; float warnUntil; bool warnShown;   // 声なしの警告（#146）
     bool alarmDone; float alarmStart, alarmUntil;
 
     protected override void Build(RectTransform root)
@@ -100,6 +107,13 @@ public class CrisisBanner : HudPart
 
     public override void OnEvent(GameEvent e)
     {
+        if (e.kind == "warning")
+        {
+            warnText = HoustonScript.Clean(e.text ?? ""); warnPriority = e.priority ?? "";
+            warnUntil = warnText != "" ? Time.unscaledTime + Look.WarnSec : 0f;
+            dirty = true; bounceAt = Time.unscaledTime;
+            return;
+        }
         if (e.kind != "houston") return;
         if (e.id == "M05") TriggerAlarm();
         if (!string.IsNullOrEmpty(e.text))
@@ -129,10 +143,11 @@ public class CrisisBanner : HudPart
         // 危機の帯
         int level = fx != null && Ctx.Model.Phase == "flight" ? fx.Level : 0;
         string cause = fx != null ? fx.Cause : "";
-        bool show = !alarmOn && level > 0;
+        bool warnOn = now < warnUntil && Ctx.Model.Phase == "flight";
+        bool show = !alarmOn && (level > 0 || warnOn);
         if (band.Root.gameObject.activeSelf != show) band.Root.gameObject.SetActive(show);
-        if (!show) { shownLevel = 0; shownCause = ""; dirty = false; return; }
-        if (dirty || level != shownLevel || cause != shownCause) Apply(level, cause);
+        if (!show) { shownLevel = 0; shownCause = ""; warnShown = false; dirty = false; return; }
+        if (dirty || level != shownLevel || cause != shownCause || warnOn != warnShown) Apply(level, cause, warnOn);
 
         // 大きさ：ヒューストンが話している間は小さく、危機が替わったら弾む
         float target = VoiceActive(now) ? Look.VoiceScale : 1f;
@@ -167,20 +182,25 @@ public class CrisisBanner : HudPart
     }
 
     // ================================================================== 描く
-    void Apply(int level, string cause)
+    void Apply(int level, string cause, bool warn)
     {
         if (level > shownLevel || cause != shownCause) bounceAt = Time.unscaledTime;
-        shownLevel = level; shownCause = cause; dirty = false;
-        var c = Find(cause) ?? Unknown;
-        bool danger = level >= 2;
+        shownLevel = level; shownCause = cause; warnShown = warn; dirty = false;
+        var c = level > 0 ? Find(cause) ?? Unknown : Radio;
+        bool danger = level >= 2 || (warn && warnPriority == "critical");
         Color face = danger ? T.Danger : T.Accent, fg = danger ? T.Panel : T.Ink;
         band.Face.color = face;
         band.LevelIcon.sprite = T.Icon(danger ? "danger" : "caution"); band.LevelIcon.color = fg;
         band.Cause.Set(c, fg, face);
         band.Title.text = c.title; band.Title.color = fg;
-        band.Line.text = c.line; band.Line.color = fg;
-        band.Badge.Root.gameObject.SetActive(c.seat != null);
-        if (c.seat != null) band.Badge.Set(c.seat, Ctx.Model.MySeats.Contains(c.seat), false);
+        band.Title.gameObject.SetActive(!warn);   // 警告の台詞を出す間は短い言葉を隠して、台詞に幅をあげる（2行で 110 字ほど入る）
+        band.Line.text = warn ? warnText : c.line; band.Line.color = fg;
+        band.Line.textWrappingMode = warn ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;   // 警告の台詞は長いので2行まで
+        band.Root.sizeDelta = new Vector2(band.Root.sizeDelta.x, warn ? Look.WarnH : Look.BandH);
+        string seat = c.seat;
+        if (seat == null && warn) { var seats = HoustonStyle.SeatsIn(warnText); if (seats.Count > 0) seat = seats[0]; }
+        band.Badge.Root.gameObject.SetActive(seat != null);
+        if (seat != null) band.Badge.Set(seat, Ctx.Model.MySeats.Contains(seat), false);
         UpdateStandby(Ctx.State);
         Fit();
     }
@@ -227,8 +247,9 @@ public class CrisisBanner : HudPart
     /// <summary>帯の幅を Look.MaxW までに収める：1行の文字を本文（28）→ 補助ラベル（22）に下げ、それでも長ければ … で切る</summary>
     void Fit()
     {
-        float titleW = band.Title.GetPreferredValues(band.Title.text).x;
-        float w = Look.BandPadX * 2f + T.IconM * 2f + titleW + T.S2 * 3f;   // 注意のアイコン・原因のアイコン・短い言葉と、その間（1行の文字の前まで）
+        bool title = band.Title.gameObject.activeSelf;
+        float titleW = title ? band.Title.GetPreferredValues(band.Title.text).x : 0f;
+        float w = Look.BandPadX * 2f + T.IconM * 2f + titleW + T.S2 * (title ? 3f : 2f);   // 注意のアイコン・原因のアイコン・短い言葉と、その間（1行の文字の前まで）
         if (band.Badge.Root.gameObject.activeSelf) w += Look.BadgeD + T.S2;
         if (band.StandbyCount > 0) w += T.S2 + band.StandbyCount * Look.StandbyD + (band.StandbyCount - 1) * T.S1;
         float budget = Mathf.Max(0f, Look.MaxW - w);

@@ -1,16 +1,18 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で土台と部品に分けた）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で土台と部品に分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 統合で領域の割合を直した・大きい地図の slot）
 // Cabin：船内（3D）の上に重ねる HUD の土台。土台がするのは3つだけ：
 //   ① 画面の領域（HudSlot）を作る。置き場所（割合）は下の Layout の1か所で決める（HUD の割り付けが決まったらここだけ直す）
 //   ② 部品（HudPart）に状態・イベント・照明 OFF・毎フレームを配る
 //   ③ 席タブで今の席を選び、その席の SeatPanel を作り直す（席・段階（stir かどうか）・席の数が変わったとき）
 // 部品の中身は Scripts/UI/Hud/（1部品1ファイル。どの Issue が作るかは各ファイルの先頭）。部品の約束は Hud/HudPart.cs
 // GameFlow から見える形：コンストラクタ・Refresh()・OnEvent(e)・Tick(now)・ShowPress(e)・ClearPress()
+// 載せ先（#167）：parent は画面の Canvas でも、3D の中の world-space の Canvas の RectTransform でもよい。割合は parent の大きさに対するもの
+//   部品は slot の RectTransform の中だけに作る（Screen の大きさ・CanvasScaler は使わない）。席や部品を別の Canvas に分けたいときは Layout の slot を差し替える
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>HUD の画面の領域。どの部品がどこに入るかは CabinHud のコンストラクタ</summary>
-public enum HudSlot { Overlay, TopCenter, Left, TopRight, CenterTop, CenterMid, Right, Bottom }
+public enum HudSlot { Overlay, TopCenter, Left, TopRight, CenterTop, CenterMid, Right, Bottom, MapBig }
 
 public class CabinHud
 {
@@ -28,17 +30,21 @@ public class CabinHud
     bool lightsOff;
 
     // 画面の領域（Cabin 全体に対する割合 x0, y0, x1, y1）。並び = 描く順（後ろほど手前）
+    // #146：各部品の大きさに合わせた（1600×900 で：上の帯 81・左 459・真ん中 288・下 207）。ヒューストンの吹き出し（HoustonStyle.Cabin：下 0.25〜約 0.47、
+    //   横 0.22〜0.78）・先生の小窓（吹き出しの左下 192×120）と重ならないように、真ん中は 0.47 から上、左は 0.39 から上
     static readonly (HudSlot slot, float x0, float y0, float x1, float y1)[] Layout =
     {
-        (HudSlot.Overlay,   0f,    0f,    1f,    1f),      // 暗幕・霜（3D の上、ほかの部品の下）
-        (HudSlot.TopCenter, 0f,    0.93f, 1f,    1f),      // タイムラインの帯（時計・月の裏側・噴射窓）
-        (HudSlot.Left,      0.01f, 0.45f, 0.2f,  0.92f),   // 状態（ゲージ）
-        (HudSlot.TopRight,  0.79f, 0.66f, 0.99f, 0.92f),   // 軌道の地図
-        (HudSlot.CenterTop, 0.25f, 0.84f, 0.75f, 0.92f),   // 練習の案内・危機の帯（同時には出ない）
-        (HudSlot.CenterMid, 0.25f, 0.77f, 0.75f, 0.84f),   // 同時押しの合図・点火の準備
-        (HudSlot.Right,     0.79f, 0.45f, 0.99f, 0.65f),   // 要件トラッカー（#90。まだ空）
-        (HudSlot.Bottom,    0.01f, 0.01f, 0.99f, 0.2f),    // 席タブ＋席のパネル
+        (HudSlot.Overlay,   0f,    0f,    1f,    1f),      // 暗幕・霜（3D の上、ほかの部品の下）・SLOW の札（右下）
+        (HudSlot.TopCenter, 0f,    0.91f, 1f,    1f),      // タイムラインの帯（時計・月の裏側・噴射窓・次までのチップ 64）
+        (HudSlot.Left,      0.01f, 0.39f, 0.2f,  0.9f),    // 状態（ゲージ。高さ 424 が等倍で入る）
+        (HudSlot.TopRight,  0.79f, 0.64f, 0.99f, 0.9f),    // 軌道の地図（小窓）
+        (HudSlot.CenterTop, 0.22f, 0.79f, 0.78f, 0.9f),    // 練習の案内・危機の帯（同時には出ない。危機の帯は上端から 72／96 下がる）
+        (HudSlot.CenterMid, 0.22f, 0.47f, 0.78f, 0.79f),   // 同時押しの合図・点火の準備（上端から下へ伸びる）
+        (HudSlot.Right,     0.79f, 0.45f, 0.99f, 0.63f),   // 要件トラッカー（#90。まだ空）。オフライン再生の操作（GameFlow）・切断の札（ConnectionUi）も地図の下に出る
+        (HudSlot.Bottom,    0.01f, 0.01f, 0.99f, 0.24f),   // 席タブ（48）＋席のパネル（143）
+        (HudSlot.MapBig,    0.21f, 0.255f, 0.79f, 0.9f),   // 大きく開いた軌道の地図（左のゲージと下の席のパネルにかぶらない。いちばん手前）
     };
+    const float TabH = 48f, TabGapTop = 4f, ControlsPadBottom = 8f, PadX = 10f;   // 下の領域の中（px）
 
     public CabinHud(Transform parent, GameFlow f, RenderTexture trajectoryRt = null)
     {
@@ -61,19 +67,23 @@ public class CabinHud
         burn = Add(new BurnCheck(), HudSlot.CenterMid);
         Add(new ReqTracker(), HudSlot.Right);
 
-        offlineNote = Ui.Label(root, "", 20, new Color(1, 1, 1, 0.55f), TextAnchor.MiddleRight);
-        Ui.Anchor(offlineNote.rectTransform, 0.6f, 0.21f, 0.99f, 0.25f);
+        offlineNote = Ui.Label(root, "", 18, new Color(1, 1, 1, 0.55f), TextAnchor.UpperRight);
+        Ui.Anchor(offlineNote.rectTransform, 0.79f, 0.47f, 0.99f, 0.535f);   // 地図の下・オフライン再生の操作（GameFlow の debugBar）の下
+        offlineNote.resizeTextForBestFit = true; offlineNote.resizeTextMinSize = 12; offlineNote.resizeTextMaxSize = 18;
 
         // 下：上の段に席タブ、下の段に今の席のパネル
         var bottom = Ui.PanelImg(slots[HudSlot.Bottom], new Color(0.07f, 0.1f, 0.2f, 0.78f), "SeatPanel"); Ui.Fill(bottom.rectTransform);
         var tabRect = Ui.Rect("Tabs", bottom.transform);
-        Ui.Anchor(tabRect, 0, 0.7f, 1, 1, 10, 0, 10, 4);
+        Ui.Anchor(tabRect, 0, 1, 1, 1, PadX, -(TabGapTop + TabH), PadX, TabGapTop);
         tabs = Add(new SeatTabBar(), tabRect);
         controls = Ui.Rect("Controls", bottom.transform);
-        Ui.Anchor(controls, 0, 0, 1, 0.7f, 10, 8, 10, 4);
+        Ui.Anchor(controls, 0, 0, 1, 1, PadX, ControlsPadBottom, PadX, TabGapTop * 2f + TabH);
     }
 
     T Add<T>(T part, HudSlot slot) where T : HudPart => Add(part, slots[slot]);
+
+    /// <summary>画面の領域（部品が slot の外に出すもの：大きい地図など）。#167 で載せ先を替えるときもここから取る</summary>
+    internal RectTransform Slot(HudSlot slot) => slots[slot];
     T Add<T>(T part, RectTransform slot) where T : HudPart
     {
         part.Attach(ctx, slot);

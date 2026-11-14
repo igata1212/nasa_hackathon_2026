@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#75 吹き出しにした・ブリーフィング・声の口）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#75 吹き出しにした・ブリーフィング・声の口）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 載せ先と flow を渡せる）
 // ヒューストン（地上の管制室の先生）の台詞の吹き出し。いつ・何を・どこに出すかを決める（見た目は Houston/HoustonBubble.cs、
 // 文言・置き場所・時間は Houston/HoustonStyle.cs、台詞の下ごしらえは Houston/HoustonScript.cs、声は Houston/HoustonVoice.cs）。
 //   ・台詞は1本ずつ。新しい台詞が来たら古いものを捨てる。表示中のほうが優先度が高い（milestone ＞ critical ＞ high）ときだけ残す（#127）
@@ -9,6 +9,7 @@
 //   ・ブリーフィング（PlayBriefing）：台詞の列を1つずつ出し、押すと次へ。SKIP あり。その間に来たサーバーの台詞（M01 など）は待たせ、終わってから出す
 //   ・置き場所は段階で変える（船内は下の真ん中、設計は左下、エンディングは右の列（SCORE に重ねない）、レポートは右下）
 // GameFlow から見える形は前と同じ：コンストラクタ・Root・Dock・Warn・Push・Clear・SetLink・Tick。足したもの：Push(id,…)・PlayBriefing・SkipBriefing・Next・読み取り
+// #146：声なしの警告（Warn）は GameFlow から呼ばない（危機の帯 CrisisBanner に寄せた。帯は1本）。Warn は残してある
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -48,9 +49,11 @@ public class HoustonBox
     float introUntil;
     bool dirty = true;
 
-    public HoustonBox(Transform parent)
+    /// <param name="parent">載せ先。画面の Canvas でも、3D の中の world-space の Canvas でもよい（#167。置き場所 HoustonStyle の割合は parent の大きさに対するもの）</param>
+    /// <param name="flow">段階・状態を読む先。省くと parent の親から探す（world-space に載せるときは渡す）</param>
+    public HoustonBox(Transform parent, GameFlow flow = null)
     {
-        flow = parent.GetComponentInParent<GameFlow>();
+        this.flow = flow != null ? flow : parent.GetComponentInParent<GameFlow>();
         var sc = Ui.PanelImg(parent, UiTokens.Scrim, "HoustonScrim"); UiKit.Fill(sc.rectTransform);
         var sb = sc.gameObject.AddComponent<UnityEngine.UI.Button>();
         sb.transition = UnityEngine.UI.Selectable.Transition.None;

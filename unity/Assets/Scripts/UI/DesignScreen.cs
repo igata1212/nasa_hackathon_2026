@@ -1,9 +1,9 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#73 UI ガイドラインの見た目にし、足りない理由が分かるようにした）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#73 UI ガイドラインの見た目にし、足りない理由が分かるようにした）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 parameters.json は GameParams から）
 // Design（M01・M02）：部品の ± と合計、ロケット・軌道、打ち上げ判定。#93 の決定：手描きの「素材の画面」はこの画面、「使う／使わない」は部品の ±。
 // 割り付け（1600×900）：左＝見出し・4つの要件・部品のカード 2列×4段（左下はヒューストンの吹き出しのために空ける）／右＝重さと費用のゲージ・ロケット・
 //   はじめの電力・酸素・燃料・軌道・判定・READY FOR LAUNCH。入りきらない画面（iPhone の横）では、部品と右の列の中身が縦にずれる。
 // UI は計算・判定をしない：合計・上限・判定（status）はサーバーの design メッセージの totals、打ち上げの結果は launch イベント（GameFlow が Model に入れる）。
-// 部品の質量・費用・個数の範囲は Data/Sim/parts.json、説明の数字は parameters.json（UrgencyFx が持つものを借りる）。文言は DesignCopy、大きさは DesignTokens
+// 部品の質量・費用・個数の範囲は Data/Sim/parts.json、説明の数字は parameters.json（GameParams。#146）。文言は DesignCopy、大きさは DesignTokens
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -23,7 +23,7 @@ public class DesignValues
     public string Rocket = "";
     static readonly Regex Key = new Regex(@"\{([A-Za-z0-9_.]+)\}");
 
-    public DesignValues(TextAsset partsJson, TextAsset paramsJson)
+    public DesignValues(TextAsset partsJson)
     {
         if (partsJson != null)
         {
@@ -40,12 +40,8 @@ public class DesignValues
             if (lim != null) foreach (var kv in lim) if (kv.Value is double d) fixedVals[kv.Key] = (float)d;
         }
         else Debug.LogWarning("[DesignScreen] parts.json が割り当てられていない（GameFlow.partsJson）");
-        if (paramsJson != null)
-        {
-            foreach (var o in J.Arr(MiniJson.ParseObject(paramsJson.text), "params") ?? new List<object>())
-                if (o is Dictionary<string, object> d && J.Has(d, "key")) fixedVals[J.Str(d, "key")] = J.Num(d, "value");
-        }
-        else Debug.LogWarning("[DesignScreen] parameters.json が見つからない（UrgencyFx.parametersJson を借りている）。説明の数字は - になる");
+        if (GameParams.Loaded) foreach (var kv in GameParams.All) fixedVals[kv.Key] = kv.Value;   // parameters.json（GameFlow.Awake が GameParams に読む。#146）
+        else Debug.LogWarning("[DesignScreen] parameters.json が読めていない（GameParams）。説明の数字は - になる");
     }
 
     public Dictionary<string, object> Part(string id)
@@ -93,7 +89,7 @@ public class DesignScreen
     public DesignScreen(Transform parent, GameFlow f)
     {
         this.f = f;
-        values = new DesignValues(f.partsJson, FindParams());
+        values = new DesignValues(f.partsJson);
 
         var bg = Ui.PanelImg(parent, T.Bg, "Design"); Root = bg.gameObject; Ui.Fill(bg.rectTransform);
         var safe = UiKit.SafeArea(bg.transform);
@@ -102,13 +98,6 @@ public class DesignScreen
         BuildNoGo(bg.transform);
     }
 
-    /// <summary>parameters.json は GameFlow に無いので、同じシーンの UrgencyFx が持つものを借りる（シーンと GameFlow を変えないため）。
-    /// GameParams（P0-a）ができたらそちらに替える</summary>
-    static TextAsset FindParams()
-    {
-        var u = Object.FindAnyObjectByType<UrgencyFx>(FindObjectsInactive.Include);
-        return u != null ? u.parametersJson : null;
-    }
 
     void Send(Dictionary<string, object> msg) => f.Client?.Send(msg);
 

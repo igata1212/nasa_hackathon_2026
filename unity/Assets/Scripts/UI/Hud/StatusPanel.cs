@@ -1,7 +1,7 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#74・#131）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#74・#131）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 時計を消した）
 // 作る Issue：#74（常に見える状態）＋ #131（ゲージの色の閾値を parameters.json に合わせる）
 //
-// 左のパネル。上にゲージ5本（電力・酸素・温度・CO2・燃料）、下に向き・データ・時間、いちばん下に生還ラインの説明。
+// 左のパネル。上にゲージ5本（電力・酸素・温度・CO2・燃料）、下に向き・データ、いちばん下に生還ラインの説明（時計は TimelineBar だけ。#146）。
 //   状態は「色＋アイコン＋言葉」：安全＝青緑（印なし）／注意＝オレンジ＋alert-circle＋LOW など／危険＝クリムゾン＋warning＋斜めの縞＋行の後ろも赤（ui-guidelines 2章 #109）。
 //   緑・黄・赤は使わない。色は UiTokens、文言・アイコン・大きさはこのファイルの上の「直しやすい所」の1か所。
 // 閾値（#131）：state の thresholds（#148。server/game/room.py の thresholds()）が正。比べ方は server/game/houston.py と同じ
@@ -37,9 +37,9 @@ public class StatusPanel : HudPart
         public const TextStyle Num = TextStyle.Sub;    // ガイドラインは 40（TextStyle.Number）。左の領域が狭いので 32
         public const float StatusIcon = 22;            // 名前の横の注意・危険のアイコン
         public const float LineW = 4, LineOver = 6;    // 生還ライン（幅 4、上下に 6 はみ出す）
-        public const float InfoH = 32, InfoIcon = T.IconS, ValueIcon = 28;   // 下の行（向き・データ・時間）
+        public const float InfoH = 32, InfoIcon = T.IconS, ValueIcon = 28;   // 下の行（向き・データ）
         public const float LegendH = 28, LegendBarH = 22;
-        // 高さの合計：内側 32 ＋ ゲージ 52×5 ＋ 間 8×5 ＋ 下の行 32×3 ＋ 説明 28 ＝ 456。今の Left（1600×900 で 423）では 0.93 倍に縮む（Fit）
+        // 高さの合計：内側 32 ＋ ゲージ 52×5 ＋ 間 8×5 ＋ 下の行 32×2 ＋ 説明 28 ＝ 424。Left（#146：1600×900 で 459）に等倍で入る（入らなければ Fit で縮む）
         public const float TintCaution = 0.22f, TintDanger = 0.14f;   // 注意・危険の行の後ろに敷く色の濃さ
         public const float TintPadX = T.S1, TintPadY = 2f;
         public const float StripeScale = 2f;           // 縞のタイル 64 を 32 に（細いゲージで縞が見えるように）
@@ -70,9 +70,8 @@ public class StatusPanel : HudPart
         { "earth", ("EARTH", "earth") }, { "moon", ("MOON", "moon") }, { "sun", ("SUN", "sun") },
         { "burn", ("BURN", "ignition") }, { "heatshield", ("HEAT SHIELD", "heat_shield") },
     };
-    const string LabelFacing = "FACING", LabelData = "DATA SENT", LabelTime = "TIME";
+    const string LabelFacing = "FACING", LabelData = "DATA SENT";
     const string DataFormat = "{0} / {1}";           // 送った量 / 集めた量
-    const string TimePrefix = "T+ ";
     const string Legend = "Keep above the line";     // 生還ライン（ink の縦線）の説明
     const float Co2Scale = 100f;                     // SPEC 3章：co2 は 0〜100（reference_sim も 100 で止める）
 
@@ -90,7 +89,7 @@ public class StatusPanel : HudPart
     readonly Dictionary<string, Row> rows = new Dictionary<string, Row>();
     RectTransform panel;
     Image facingIcon;
-    TextMeshProUGUI facingText, dataText, timeText;
+    TextMeshProUGUI facingText, dataText;
     float fitScale = -1f, fitW = -1f;
 
     protected override void Build(RectTransform root)
@@ -114,7 +113,7 @@ public class StatusPanel : HudPart
         info.name = "Info";
         facingText = InfoRow(info, "attitude", LabelFacing, out facingIcon);
         dataText = InfoRow(info, "science", LabelData, out _);
-        timeText = InfoRow(info, "clock", LabelTime, out _);
+        // TIME（T+）の行は出さない：時計はタイムラインの帯（TimelineBar）の左に1つだけ（#146 で2つあったのを1つに）
         BuildLegend(info);
 
         Quiet();
@@ -240,7 +239,6 @@ public class StatusPanel : HudPart
 
         SetFacing(s.attitude);
         dataText.text = string.Format(DataFormat, Mathf.FloorToInt(s.dataSent), Mathf.FloorToInt(s.dataCollected));
-        timeText.text = TimePrefix + Ui.Mmss(s.t);
     }
 
     /// <summary>state が来ない間（練習・かき混ぜ）：設計の合計で満タン、色は安全、時間は 0</summary>
@@ -258,7 +256,6 @@ public class StatusPanel : HudPart
         Draw("fuel", fuel, Mathf.Max(fuel, 1f), tot != null ? Floor(fuel, "fuel") : "", Level.Safe, -1f);
         SetFacing("earth");
         dataText.text = string.Format(DataFormat, 0, 0);
-        timeText.text = TimePrefix + Ui.Mmss(0f);
     }
 
     void Draw(string key, float v, float max, string text, Level lv, float line, bool falling = false)

@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 吹き出しは HoustonBox.Current から探す）
 // 演出2：管制室の先生の小窓（#124。storyboard.md の場面4「ここが先生」）。
 // 管制室（Scene_MissionControl）と先生（Crew_Houston）・管制官を船内から遠くに組み、専用のカメラで RenderTexture に描いて、
 // ヒューストンの字幕の窓（HoustonBox。GameCanvas/Houston）の左に小窓で出す。字幕が出ている間だけ描く。
@@ -55,7 +55,9 @@ public class HoustonWindow : MonoBehaviour
 
     void Attach()
     {
-        var p = flow != null ? flow.transform.Find("GameCanvas/Houston") : null;
+        // 字幕の吹き出し（HoustonBox.Current.Root）に付く。どこに載せても付いていく（#167）。無いときだけ前の名前で探す
+        Transform p = HoustonBox.Current != null && HoustonBox.Current.Root != null ? HoustonBox.Current.Root.transform : null;
+        if (p == null && flow != null) p = flow.transform.Find("GameCanvas/Houston");
         if (p == null) return;
         panel = (RectTransform)p;
         foreach (var tx in panel.GetComponentsInChildren<Text>(true))   // 見出し「HOUSTON」の次が台詞（HoustonBox の作り順）

@@ -67,12 +67,13 @@ public class ConnectionUi
         public const string NoName = "Player";
     }
 
-    /// <summary>ほかの人が切れた札の置き場所（段階 → 位置・札のどこを合わせるか）。船内は席のパネル（CabinHud の Bottom：下 0.2）のすぐ上の右</summary>
+    /// <summary>ほかの人が切れた札の置き場所（段階 → 位置・札のどこを合わせるか）。船内は右の列、軌道の地図（CabinHud の TopRight：下 0.64）のすぐ下に吊る
+    /// （#146：席のパネルの上の右は SLOW の札（CabinOverlay）が使う。地図の下はオフライン再生の操作と同じ所だが、オンラインとオフラインは同時に無い）</summary>
     static readonly (string phase, Vector2 at, Vector2 pivot)[] StripPlaces =
     {
-        ("practice", new Vector2(0.99f, 0.21f), new Vector2(1f, 0f)),
-        ("stir",     new Vector2(0.99f, 0.21f), new Vector2(1f, 0f)),
-        ("flight",   new Vector2(0.99f, 0.21f), new Vector2(1f, 0f)),
+        ("practice", new Vector2(0.99f, 0.63f), new Vector2(1f, 1f)),
+        ("stir",     new Vector2(0.99f, 0.63f), new Vector2(1f, 1f)),
+        ("flight",   new Vector2(0.99f, 0.63f), new Vector2(1f, 1f)),
     };
     static readonly Vector2 StripDefaultAt = Vector2.one, StripDefaultPivot = Vector2.one;   // ほかは右上の角（端から ScreenEdge）
     /// <summary>札を出さない段階（タイトルは人がいない。ロビーでは切れた人はサーバーから消える）</summary>

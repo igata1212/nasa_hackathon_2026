@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 EndingParams は GameParams から）
 // エンディング（#85）と事後レポート（#86）が共通で使うもの。
 //   EndingTokens  … この2画面だけの寸法（UiTokens の値を組み合わせる。px はここにだけ書く）
 //   EndingLayout  … 画面のどこに何を置くか（親に対する割合）。並べ替えはここだけ直す
@@ -35,9 +35,8 @@ public static class EndingTokens
 // ====================================================================== 置き場所（親に対する割合 x0, y0, x1, y1）
 public static class EndingLayout
 {
-    /// <summary>ヒューストンの吹き出し。今の HoustonBox（HoustonBox.cs の Anchor）と同じ所に置く：
-    /// ending・report の間も HoustonBox が ED-A/B/C・R01 の台詞を出すので、ほかの物をここに置くと重なる（ED-C の SCORE に「(pause)」が重なった）。
-    /// 同じ台詞なら重なっても読める。#75 で HoustonBox が動いたら、ここも合わせる</summary>
+    /// <summary>ヒューストンの吹き出し（画面の中の台詞）。#146 から ending・report の間は HoustonBox を出さない（GameFlow が Push しない）ので、
+    /// 台詞はここだけに出る。ほかの物をここに置かない</summary>
     public static readonly Vector4 HoustonSlot = new Vector4(0.22f, 0.22f, 0.78f, 0.34f);
 
     // エンディング（#85）
@@ -122,30 +121,10 @@ public class EndingFeed : MonoBehaviour
     }
 }
 
-/// <summary>parameters.json の値（生還ライン・Req 2 の最小値・厳しくする幅）。
-/// 今は UrgencyFx が持っている parameters.json を読む（GameFlow に parametersJson が無いため）。
-/// #147 の GameParams が入ったら GameParams.TryGet に、#148 の state.thresholds（GameState.Threshold）が読めるならそちらに替える</summary>
+/// <summary>parameters.json の値（生還ライン・Req 2 の最小値・厳しくする幅）。GameParams から読む（#146。前は UrgencyFx.parametersJson を借りていた）。無ければ NaN</summary>
 public static class EndingParams
 {
-    static Dictionary<string, float> values;
-
-    public static float Get(string key)
-    {
-        if (values == null) Load();
-        return values != null && values.TryGetValue(key, out var v) ? v : float.NaN;
-    }
-
-    static void Load()
-    {
-        var fx = UnityEngine.Object.FindAnyObjectByType<UrgencyFx>(FindObjectsInactive.Include);
-        var ta = fx != null ? fx.parametersJson : null;
-        if (ta == null) { Debug.LogWarning("[Ending] parameters.json が見つからない（UrgencyFx.parametersJson）。生還ラインの表示を省く"); return; }
-        var arr = J.Arr(MiniJson.ParseObject(ta.text), "params");
-        if (arr == null) return;
-        values = new Dictionary<string, float>();
-        foreach (var o in arr)
-            if (o is Dictionary<string, object> d && J.Has(d, "key")) values[J.Str(d, "key")] = J.Num(d, "value");
-    }
+    public static float Get(string key) => GameParams.TryGet(key, out var v) ? v : float.NaN;
 }
 
 /// <summary>2画面が読む値。サーバーの値をそのまま入れる（足し算・判定はしない。例外は Need と Below：下を見よ）</summary>

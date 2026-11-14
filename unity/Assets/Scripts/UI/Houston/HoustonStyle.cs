@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 船内の高さを席のパネルに合わせた）
 // ヒューストン（地上の管制室の先生）の吹き出し（#75）の文言・置き場所・大きさ・時間を1か所に集めたもの。
 // 見た目を直すときはここだけ直す（色は UiTokens の名前で指す。色コードはここにも書かない）。
 // 吹き出しの組み立ては HoustonBubble.cs、出す順番と時間は HoustonBox.cs、台詞の読み込みと区切りは HoustonScript.cs、声は HoustonVoice.cs
@@ -68,8 +68,9 @@ public static class HoustonStyle
     };
 
     // ================================================================== 置き場所（段階ごと）
-    // 船内：画面の下の席パネル（0〜0.2）の上、真ん中。左に先生の小窓（HoustonWindow、192×120）が出るので x0 は 0.1 より右
-    public static readonly HoustonPlace Cabin = new HoustonPlace("cabin", 0.22f, 0.78f, 0.235f, 0f, 0f, 168f, 120);
+    // 船内：画面の下の席パネル（CabinHud.Layout の Bottom：0〜0.24）の上、真ん中。左に先生の小窓（HoustonWindow、192×120）が出るので x0 は 0.1 より右
+    //   上の端は名前タグを入れて約 0.47。CabinHud の真ん中（CenterMid：0.47 から上）・左（Left：0.39 から上）と重ならない（#146）
+    public static readonly HoustonPlace Cabin = new HoustonPlace("cabin", 0.22f, 0.78f, 0.25f, 0f, 0f, 168f, 120);
     // 設計：部品の一覧（0.2 より上）と打ち上げのボタン（右下）を避けて左下に小さく。先生の小窓は出ない（x0 < 0.1）
     public static readonly HoustonPlace Design = new HoustonPlace("design", 0.03f, 0.6f, 0.02f, 0f, 0f, 124f, 80);
     // エンディング：題・要件・SCORE・ボタンが真ん中の列にあるので、右の列に出す（ED-C の台詞が SCORE に重ならない）
