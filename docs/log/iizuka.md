@@ -8,3 +8,4 @@
 - 13:10 #14 メンバーと GitHub アカウントの対応を CLAUDE.md に追加
 - 13:12 #16 3人目の GitHub（midori11111111）をメンバー表に追加
 - 13:25 #18 見た目の方向性（Overcooked 風）と作り方の計画を docs/design/art-direction.md に保存
+- 13:31 #21 tmp/ にあった 3D モデル一式（PhysDraft-SpaceCrew3D）を modeling/ に移動。tmp/ を .gitignore に追加。作った人は未確認

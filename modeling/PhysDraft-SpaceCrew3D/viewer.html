@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpaceCrew Asset Viewer</title>
+<style>
+  :root { --bg: #1e2235; --panel: #141828; --ink: #e8ecf5; --muted: #8f99b3; --line: #2e3550; --accent: #f2661c; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 14px/1.4 system-ui, "Hiragino Sans", sans-serif; overflow: hidden; }
+  #bar { position: fixed; inset: 0 0 auto 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--panel) 88%, transparent); border-bottom: 1px solid var(--line); z-index: 2; }
+  button { background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; font: inherit; cursor: pointer; }
+  button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+  #status { margin-left: auto; color: var(--muted); font-size: 12px; }
+  #labels { position: fixed; inset: 0; pointer-events: none; }
+  .lab { position: absolute; transform: translate(-50%, 0); font-size: 11px; color: var(--muted); white-space: nowrap; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="bar"></div>
+<div id="labels"></div>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { clone as skClone } from "three/addons/utils/SkeletonUtils.js";
+
+const CREW = ["Astronaut_Nav", "Civilian_Nav", "Astronaut_Pilot", "Civilian_Pilot", "Astronaut_Sys", "Civilian_Sys"];
+// [file, x, z(depth: +back), rotY(deg)]  — Blender (x, y) maps to three.js (x, -z)
+const PRESETS = {
+  "クルー": { cam: [0, 3.2, 7], target: [0, 0.8, 0], items: CREW.map((n, i) => [`export/${n}.glb`, (i - 2.5) * 1.0, 0, 0]) },
+  "運ぶ物": { cam: [0, 1.4, 3.2], target: [0, 0.25, 0], items: ["Battery", "Comms", "Toolbox", "Extinguisher", "Oxygen"].map((n, i) => [`export/items/Item_${n}.glb`, (i - 2) * 0.75, 0, 0]) },
+  "事件": { cam: [0, 3, 7.5], target: [0, 0.6, 0], items: ["BrokenPipe", "HullBreach", "Alarm", "Debris", "Fire"].map((n, i) => [`export/incidents/Incident_${n}.glb`, (i - 2) * 1.8, 0, 0]) },
+  "船の部屋": { cam: [0, 9, 9.5], target: [0, 0, 0], items: [
+      ["export/room/Room_Shell.glb", 0, 0, 0], ["export/room/Station_Airlock.glb", 5.1, 0, 0],
+      ["export/room/Station_Pilot.glb", 0, 2.4, 0], ["export/room/Station_Nav.glb", -3, 0.6, 0],
+      ["export/room/Station_Engine.glb", 3.3, 2.1, 0], ["export/room/Station_Comms.glb", -4.2, 2.9, 0],
+      ["export/room/Station_Charger.glb", 2.8, -1.6, 0], ["export/incidents/Incident_Fire.glb", 2.2, 2.4, 0],
+      ["export/Civilian_Nav.glb", -3, -0.3, 180, "Idle"], ["export/Civilian_Sys.glb", 2.65, 1.45, 225, "Work"],
+      ["export/Civilian_Pilot.glb", 0.0, -1.6, 90, "Carry"], ["export/items/Item_Battery.glb", 0.3, -1.6, 90, null, 0.46],
+  ] },
+  "月面": { cam: [-11, 6.5, 13], target: [0, 0.5, 0], items: [
+      ["export/exterior/Moon_Terrain.glb", 0, 0, 0], ["export/exterior/Moon_LandingPad.glb", 0, 0, 0],
+      ["export/exterior/Ship_Lander.glb", 0, 0, -30, null, 0.1], ["export/exterior/Moon_Base.glb", 6.5, 3.5, 0],
+      ["export/exterior/Asteroid_Large.glb", -9, 14, 0, null, 7.5], ["export/exterior/Asteroid_Small.glb", -5, 10, 0, null, 9],
+      ["export/Astronaut_Pilot.glb", 3.2, 0.2, 60, "Carry"], ["export/items/Item_Battery.glb", 3.48, 0.36, 60, null, 0.46],
+      ["export/Astronaut_Nav.glb", 2.6, -1.2, 70, "Walk"], ["export/Astronaut_Sys.glb", 4.6, 1.5, -110, "Idle"],
+  ] },
+};
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1e2235);
+const cam = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.05, 300);
+const controls = new OrbitControls(cam, renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x303848, 2.0));
+const sun = new THREE.DirectionalLight(0xffffff, 2.4); sun.position.set(-4, 8, 5); scene.add(sun);
+const world = new THREE.Group(); scene.add(world);
+const loader = new GLTFLoader();
+const cache = new Map();
+const load = (url) => cache.get(url) ?? cache.set(url, loader.loadAsync(url)).get(url);
+let mixers = [], crewActions = [], currentClip = "Walk", token = 0;
+const statusEl = document.createElement("span"); statusEl.id = "status";
+
+function clone(gltf) {
+  // the crew GLBs carry a skin, so a plain clone would keep pointing at the cached skeleton
+  return skClone(gltf.scene);
+}
+
+async function show(name) {
+  const my = ++token, p = PRESETS[name];
+  world.clear(); mixers = []; crewActions = [];
+  scene.background = new THREE.Color(name === "月面" ? 0x04060d : 0x1e2235);
+  cam.position.set(...p.cam); controls.target.set(...p.target); controls.update();
+  let ok = 0, fail = [];
+  await Promise.all(p.items.map(async ([url, x, z, rot, clip, y = 0]) => {
+    try {
+      const g = await load(url);
+      if (my !== token) return;
+      const o = clone(g);
+      o.position.set(x, y, -z); o.rotation.y = THREE.MathUtils.degToRad(rot);
+      world.add(o); ok++;
+      if (g.animations.length) {
+        const m = new THREE.AnimationMixer(o); mixers.push(m);
+        const fixed = clip !== undefined && clip !== null;
+        const pick = (c) => g.animations.find((a) => a.name === c) ?? g.animations[0];
+        const act = m.clipAction(pick(fixed ? clip : currentClip)); act.play();
+        if (!fixed) crewActions.push({ m, g, act });
+      }
+    } catch (e) { fail.push(url.split("/").pop()); }
+  }));
+  if (my !== token) return;
+  if (name !== "月面") fitWidth();
+  statusEl.textContent = `${ok}/${p.items.length} loaded` + (fail.length ? ` — 失敗: ${fail.join(", ")}` : "");
+  window.__viewer = { preset: name, ok, total: p.items.length, fail };
+}
+
+// Pull the camera back along its current direction until the whole row fits a narrow (portrait) window.
+function fitWidth() {
+  const size = new THREE.Box3().setFromObject(world).getSize(new THREE.Vector3());
+  const half = THREE.MathUtils.degToRad(cam.fov / 2);
+  const hHalf = Math.atan(Math.tan(half) * cam.aspect);
+  const need = (size.x / 2) / Math.tan(hHalf) * 1.08 + size.z / 2;
+  const dir = cam.position.clone().sub(controls.target);
+  if (dir.length() < need) cam.position.copy(controls.target).add(dir.setLength(need));
+  controls.update();
+}
+
+function setClip(c) {
+  currentClip = c;
+  for (const it of crewActions) {
+    const next = it.m.clipAction(it.g.animations.find((a) => a.name === c));
+    it.act.stop(); next.reset().play(); it.act = next;
+  }
+}
+
+const bar = document.getElementById("bar");
+const presetBtns = Object.keys(PRESETS).map((n) => {
+  const b = document.createElement("button"); b.textContent = n;
+  b.onclick = () => { presetBtns.forEach((x) => x.classList.toggle("on", x === b)); clipRow.style.display = n === "クルー" ? "contents" : "none"; show(n); };
+  bar.appendChild(b); return b;
+});
+bar.appendChild(Object.assign(document.createElement("span"), { className: "sep" }));
+const clipRow = document.createElement("span"); clipRow.style.display = "contents";
+const clipBtns = ["Idle", "Walk", "Carry", "Work"].map((c) => {
+  const b = document.createElement("button"); b.textContent = c; b.classList.toggle("on", c === currentClip);
+  b.onclick = () => { clipBtns.forEach((x) => x.classList.toggle("on", x === b)); setClip(c); };
+  clipRow.appendChild(b); return b;
+});
+bar.appendChild(clipRow); bar.appendChild(statusEl);
+presetBtns[0].click();
+window.__show = (n) => presetBtns[Object.keys(PRESETS).indexOf(n)].click();
+
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = clock.getDelta();
+  mixers.forEach((m) => m.update(dt));
+  controls.update();
+  renderer.render(scene, cam);
+});
+addEventListener("resize", () => {
+  cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
