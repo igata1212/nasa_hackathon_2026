@@ -1,0 +1,109 @@
+{
+ "name": "Fx_Parachute",
+ "tris": 1232,
+ "min": [
+  -7.4392,
+  -6.04891,
+  0.0
+ ],
+ "max": [
+  7.4392,
+  7.95161,
+  12.53389
+ ],
+ "size": [
+  14.8784,
+  14.00052,
+  12.53389
+ ],
+ "objects": {
+  "Fx_Parachute": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Fx_Parachute.Canopy_1": {
+   "origin": [
+    0.0,
+    4.27073,
+    9.59223
+   ],
+   "tris": 144
+  },
+  "Fx_Parachute.Canopy_2": {
+   "origin": [
+    -3.69856,
+    -2.13537,
+    9.59223
+   ],
+   "tris": 144
+  },
+  "Fx_Parachute.Canopy_3": {
+   "origin": [
+    3.69856,
+    -2.13537,
+    9.59223
+   ],
+   "tris": 144
+  },
+  "Fx_Parachute.Lines_1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 80
+  },
+  "Fx_Parachute.Lines_2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 80
+  },
+  "Fx_Parachute.Lines_3": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 80
+  },
+  "Fx_Parachute.Riser": {
+   "origin": [
+    0.0,
+    0.0,
+    0.6
+   ],
+   "tris": 140
+  },
+  "Fx_Parachute.Vent_1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  },
+  "Fx_Parachute.Vent_2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  },
+  "Fx_Parachute.Vent_3": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 140
+  }
+ }
+}

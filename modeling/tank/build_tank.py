@@ -1,6 +1,7 @@
 """Tank_*：酸素タンク。通常2つ（Tank_Oxygen1・Tank_Oxygen2）と、漏れる Tank 2 の破れ版（Tank_Oxygen2_Broken）。
 
 書いた人：iizuka（作成：Opus 5.5「Opus-3」）／ 最終更新：2026-11-14
+更新：Taiga（2026-11-14、Fable 5.2）#46 build() に spare を足した（予備のタンクは build_tank_spare.py が作る）
 
   modeling/core/run.sh modeling/tank/build_tank.py
 出力：unity/Assets/Models/Tank/Tank_*.fbx、modeling/tank/export/、modeling/tank/renders/（各3枚＋320px 版、
@@ -125,7 +126,9 @@ def petals(d, alpha):
     return ck.join(out, "Petals")
 
 
-def build(name, number, broken):
+def build(name, number, broken, spare=False):
+    """spare=True は予備のタンク（#46）：帯と札が orange、帯は上下2本。メインは teal の帯1本。"""
+    mark = "orange" if spare else "teal"
     root = ck.asset(name)
     ck.box("Plinth", (0, 0, 0.04), (0.46, 0.46, 0.08), "gray_dark", bevel=0.02)
     ck.cyl("Cradle", (0, 0, 0.12), 0.15, 0.08, "gray", r2=0.19, bevel=0.012)
@@ -136,14 +139,21 @@ def build(name, number, broken):
         petals(hole, HOLE_A)
     else:
         ck.sph("Shell", tuple(C), R, "white")
-    ck.cyl("Band", tuple(C), R + 0.012, 0.06, "teal", bevel=0.012)
+    if spare:
+        # 赤道をはさんで上下に2本（色が見分けにくくても、本数でメインと区別できる）。球の丸みに合わせて半径を少し縮める
+        bz = 0.06
+        br = math.sqrt(R * R - bz * bz) + 0.012
+        ck.join([ck.cyl("BandA", (0, 0, C.z + bz), br, 0.045, mark, bevel=0.01),
+                 ck.cyl("BandB", (0, 0, C.z - bz), br, 0.045, mark, bevel=0.01)], "Band")
+    else:
+        ck.cyl("Band", tuple(C), R + 0.012, 0.06, mark, bevel=0.012)
     ck.cyl("Neck", (0, 0, C.z + R - 0.01), 0.08, 0.09, "gray", bevel=0.012)
     ck.box("Pad", (0, 0, TOP - 0.02), (0.22, 0.22, 0.04), "gray_light", bevel=0.01)
     # 番号の札：球に接する平らな板（角が球にもぐる深さにする）と、さいころの目
     dl = direction(LABEL_AZ, LABEL_EL)
     rq = frame(dl)
     tangent = C + dl * R
-    lab = ck.box("Label", (0, 0, 0), (LABEL_W, LABEL_W, 0.05), "teal", bevel=0.012)       # 表は球の面から 13mm 浮く
+    lab = ck.box("Label", (0, 0, 0), (LABEL_W, LABEL_W, 0.05), mark, bevel=0.012)       # 表は球の面から 13mm 浮く
     lab.data.transform(Matrix.Translation(tangent) @ rq.to_4x4() @ Matrix.Translation((0, 0, -0.012)))
     pips = [(0, 0)] if number == 1 else [(-PIP, -PIP), (PIP, PIP)]
     for i, (px, py) in enumerate(pips):
