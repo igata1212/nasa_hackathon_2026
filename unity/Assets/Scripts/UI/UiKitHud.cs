@@ -377,6 +377,7 @@ public class UiSeatTabs
 public class UiDualPress
 {
     public enum Phase { Idle, Waiting, Together, Failed }
+    public const string TitleIdle = "HOLD TOGETHER", TitleTogether = "TOGETHER!", TitleFailed = "MISSED. TRY AGAIN";
 
     public RectTransform Root, Row;
     public Image CmdIcon, StateIcon;
@@ -424,7 +425,7 @@ public class UiDualPress
     {
         State = Phase.Idle;
         foreach (var s in slots) { s.pressing = false; Paint(s, 0f, T.Go, false); }
-        SetTitle("HOLD TOGETHER", null, T.Ink);
+        SetTitle(TitleIdle, null, T.Ink);
     }
 
     /// <summary>pressed の席が押した。輪が windowSec で一周する（0 なら最初から一周）</summary>
@@ -441,7 +442,7 @@ public class UiDualPress
     {
         State = Phase.Together;
         foreach (var s in slots) { s.pressing = false; Paint(s, 1f, T.Go, true); }
-        SetTitle("TOGETHER!", "check", T.Go);
+        SetTitle(TitleTogether, "check", T.Go);
         bounce = 0f;
     }
 
@@ -456,7 +457,7 @@ public class UiDualPress
             s.pressing = false;
             Paint(s, hit ? 1f : 0f, T.Danger, false);
         }
-        SetTitle("MISSED. TRY AGAIN", "cross", T.Danger);
+        SetTitle(TitleFailed, "cross", T.Danger);
     }
 
     /// <summary>サーバーの press イベント（waiting／together／failed）を出す。press でなければ false</summary>
@@ -861,6 +862,9 @@ public static class HudKit
         var head = UiKit.Row(u.Root, T.S2, TextAnchor.MiddleCenter);
         u.CmdIcon = UiKit.Icon(head, cmdIcon, T.IconM, T.Ink);
         u.Title = UiKit.Text(head, "", TextStyle.Sub, T.Ink);
+        float tw = 0f;   // 見出しが変わってもパネルの幅が動かないように、一番長い見出しの幅にそろえる
+        foreach (var s in new[] { UiDualPress.TitleIdle, UiDualPress.TitleTogether, UiDualPress.TitleFailed }) tw = Mathf.Max(tw, u.Title.GetPreferredValues(s).x);
+        UiKit.Fixed(u.Title, tw, T.TextSub * T.HeadingLineHeight);
         u.StateIcon = UiKit.Icon(head, null, T.IconM, T.Go);   // 消しても場所は空ける（見出しが左右に動かない）
         u.Row = UiKit.Row(u.Root, T.S4, TextAnchor.UpperCenter);
         u.SetSeats(seats);
