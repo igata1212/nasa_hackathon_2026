@@ -1,0 +1,41 @@
+# 誰が作業しているか（各自のローカル。Claude が参照する）
+.me
+
+# Unity（プロジェクトは unity/ に置く）
+unity/[Ll]ibrary/
+unity/[Tt]emp/
+unity/[Oo]bj/
+unity/[Bb]uild/
+unity/[Bb]uilds/
+unity/[Ll]ogs/
+unity/[Uu]ser[Ss]ettings/
+unity/[Mm]emoryCaptures/
+unity/[Rr]ecordings/
+unity/*.csproj
+unity/*.sln
+unity/*.slnx
+unity/*.user
+unity/*.pidb
+unity/*.booproj
+unity/*.svd
+unity/*.pdb
+unity/*.mdb
+unity/*.opendb
+unity/*.VC.db
+unity/.vs/
+unity/.vscode/
+unity/.idea/
+unity/.utmp/
+unity/sysinfo.txt
+unity/crashlytics-build.properties
+unity/*.apk
+unity/*.aab
+unity/*.unitypackage
+
+# Blender の自動バックアップ
+*.blend[0-9]
+
+# OS / Python
+.DS_Store
+Thumbs.db
+__pycache__/
