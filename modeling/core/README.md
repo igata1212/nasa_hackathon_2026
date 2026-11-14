@@ -167,3 +167,15 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 | かき混ぜスイッチ | `Ctrl_Stir` は「ひねると戻るつまみ」で作った。SPEC の M04 は「押す」なので未決定（押す形にするなら作り直す） |
 | 送信ボタン | `Ctrl_Transmit` は ON の間は押し込まれたまま（−0.02m） |
 | ルート切替レバー | `Ctrl_RouteLever` の初期値は −30（A 側） |
+
+## 9. 船室（#40、追記：Fable 5.2、2026-11-14）
+
+船室 `Ship_Interior` は、元データが `modeling/interior/`、FBX が外観と同じ `unity/Assets/Models/Ship/`。設計と Slot の一覧は `modeling/interior/layout.md`。core を次のように直した。
+
+| ファイル | 直したこと |
+|---|---|
+| `export.py` | `KINDS` に `"interior": "Ship"` を足した（`ck.export_all(root, "interior")` で FBX は `Ship/`、glb と `stats.json` は `modeling/interior/export/` に出る） |
+| `check.py` | 三角数の上限：`Ship_` で名前に `Interior` を含む物は 10,000（art-direction.md の「船室 10,000 以下」）。ほかの `Ship_` は 6,000 のまま |
+| `check.py` | `Ship/` に外観と船室の FBX が同居するので、フォルダを渡したとき（`check.py modeling/interior`・`check.py modeling/ship`）は、そのフォルダの `export/<名前>.stats.json` がある FBX だけを見る。`parts.json` と `stats.json` も、その FBX を書き出したフォルダの物を使う |
+
+船室の原点は船底の中心（底が z=0）。床の上面は z=0.30 で、置き場所は `.Slot_〜` が持っている。

@@ -1,0 +1,245 @@
+{
+ "name": "Ship_Interior",
+ "tris": 9048,
+ "min": [
+  -3.0,
+  -3.1,
+  0.0
+ ],
+ "max": [
+  3.0,
+  3.0,
+  4.37
+ ],
+ "size": [
+  6.0,
+  6.1,
+  4.37
+ ],
+ "objects": {
+  "Ship_Interior": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Floor": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 1892
+  },
+  "Ship_Interior.Pipe_Intact": {
+   "origin": [
+    0.0,
+    2.585,
+    1.56
+   ],
+   "tris": 556
+  },
+  "Ship_Interior.Roof_Back": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 1316
+  },
+  "Ship_Interior.Lamp_Cabin": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 324
+  },
+  "Ship_Interior.Move_Hatch": {
+   "origin": [
+    0.0,
+    0.8,
+    4.24
+   ],
+   "tris": 544
+  },
+  "Ship_Interior.Roof_Front": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 884
+  },
+  "Ship_Interior.Slot_Alarm_1": {
+   "origin": [
+    -1.01794,
+    2.45752,
+    1.78
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Alarm_2": {
+   "origin": [
+    1.01794,
+    2.45752,
+    1.78
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Cam_Cutaway": {
+   "origin": [
+    -0.0,
+    -11.27732,
+    4.5757
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Cam_Topdown": {
+   "origin": [
+    -0.0,
+    -8.18228,
+    10.59416
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Cam_Topdown_Close": {
+   "origin": [
+    -0.0,
+    -5.39116,
+    8.56136
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Center": {
+   "origin": [
+    0.0,
+    0.0,
+    0.3
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Console_CommsPower": {
+   "origin": [
+    1.21881,
+    1.95051,
+    0.3
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Console_LifeSupport": {
+   "origin": [
+    -1.21881,
+    1.95051,
+    0.3
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Console_MissionPlanner": {
+   "origin": [
+    2.18743,
+    0.71074,
+    0.3
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Console_Pilot": {
+   "origin": [
+    -2.18743,
+    0.71074,
+    0.3
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Crew_CommsPower": {
+   "origin": [
+    0.92736,
+    1.48408,
+    0.42
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Crew_Dual_CommsPlanner": {
+   "origin": [
+    1.26082,
+    0.98506,
+    0.42
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Crew_LifeSupport": {
+   "origin": [
+    -0.92736,
+    1.48408,
+    0.42
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Crew_MissionPlanner": {
+   "origin": [
+    1.66435,
+    0.54078,
+    0.42
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Crew_Pilot": {
+   "origin": [
+    -1.66435,
+    0.54078,
+    0.42
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Pipe": {
+   "origin": [
+    0.0,
+    2.585,
+    1.445
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Tank_1": {
+   "origin": [
+    0.37,
+    2.38,
+    0.37
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Tank_2": {
+   "origin": [
+    -0.37,
+    2.38,
+    0.37
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Slot_Window": {
+   "origin": [
+    0.0,
+    3.0,
+    2.03
+   ],
+   "tris": 0
+  },
+  "Ship_Interior.Wall_Back": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 2444
+  },
+  "Ship_Interior.Wall_Front": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 1088
+  }
+ }
+}
