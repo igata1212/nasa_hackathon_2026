@@ -1,0 +1,55 @@
+{
+ "Scene_LaunchPad": [
+  {
+   "name": "Scene_LaunchPad.Move_Arm_1",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -90,
+   "max": 0,
+   "default": 0,
+   "note": "0＝ロケットに付いた姿、−90＝奥（+Y）へ逃がした姿。打ち上げの直前に逃がす",
+   "origin": [
+    18.5,
+    0.0,
+    44.0
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Scene_LaunchPad.Move_Arm_2",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -90,
+   "max": 0,
+   "default": 0,
+   "note": "0＝ロケットに付いた姿、−90＝奥（+Y）へ逃がした姿。打ち上げの直前に逃がす",
+   "origin": [
+    18.5,
+    0.0,
+    76.0
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  },
+  {
+   "name": "Scene_LaunchPad.Move_Arm_3",
+   "type": "rotate",
+   "axis": "Z",
+   "min": -90,
+   "max": 0,
+   "default": 0,
+   "note": "0＝ロケットに付いた姿、−90＝奥（+Y）へ逃がした姿。打ち上げの直前に逃がす。先の白い箱がクルーの乗る部屋",
+   "origin": [
+    18.5,
+    0.0,
+    112.5
+   ],
+   "unity_axis": "Y",
+   "unity_sign": -1,
+   "unit": "deg"
+  }
+ ]
+}

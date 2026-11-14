@@ -18,6 +18,7 @@ UNITY_MODELS = os.path.join(REPO, "unity", "Assets", "Models")
 KINDS = {"controls": "Controls", "console": "Console", "crew": "Crew", "tank": "Tank",
          "ship": "Ship", "bodies": "Bodies", "fx": "Fx", "props": "Props",
          "interior": "Ship",
+         "scene": "Scene",    # 場面の背景と、その場面にだけ出る人（発射台・地面 #52、管制室・先生 #53）
          "part": "Part"}      # 船室（Ship_Interior）。FBX は外観と同じ Ship/ に、元データは modeling/interior/ に置く（#40）。part は設計画面の部品（#48）。props は浮く小物（#64）
 
 # Unity で確かめた設定。変えるときは build_axis_check.py のモデルを入れ直して ModelImportReport の出力を見ること。

@@ -1,0 +1,109 @@
+{
+ "name": "Scene_LaunchPad",
+ "tris": 4076,
+ "min": [
+  -18.3,
+  -17.3,
+  0.0
+ ],
+ "max": [
+  30.3,
+  17.3,
+  127.5
+ ],
+ "size": [
+  48.6,
+  34.6,
+  127.5
+ ],
+ "objects": {
+  "Scene_LaunchPad": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Scene_LaunchPad.Crane": {
+   "origin": [
+    23.0,
+    0.0,
+    120.5
+   ],
+   "tris": 324
+  },
+  "Scene_LaunchPad.HoldDowns": {
+   "origin": [
+    5.37401,
+    5.37401,
+    15.5
+   ],
+   "tris": 432
+  },
+  "Scene_LaunchPad.Lamp_Beacon": {
+   "origin": [
+    23.0,
+    0.0,
+    126.6
+   ],
+   "tris": 188
+  },
+  "Scene_LaunchPad.Legs": {
+   "origin": [
+    -14.0,
+    -13.0,
+    3.2
+   ],
+   "tris": 648
+  },
+  "Scene_LaunchPad.Move_Arm_1": {
+   "origin": [
+    18.5,
+    0.0,
+    44.0
+   ],
+   "tris": 216
+  },
+  "Scene_LaunchPad.Move_Arm_2": {
+   "origin": [
+    18.5,
+    0.0,
+    76.0
+   ],
+   "tris": 216
+  },
+  "Scene_LaunchPad.Move_Arm_3": {
+   "origin": [
+    18.5,
+    0.0,
+    112.5
+   ],
+   "tris": 216
+  },
+  "Scene_LaunchPad.Platform": {
+   "origin": [
+    6.0,
+    0.0,
+    10.0
+   ],
+   "tris": 324
+  },
+  "Scene_LaunchPad.Slot_Rocket": {
+   "origin": [
+    0.0,
+    0.0,
+    14.0
+   ],
+   "tris": 0
+  },
+  "Scene_LaunchPad.Tower": {
+   "origin": [
+    19.4,
+    -3.6,
+    66.0
+   ],
+   "tris": 1512
+  }
+ }
+}
