@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 でイベントを CabinHud に配るだけにした・GameParams を読む）／ 更新：iizuka（Opus 5.5、2026-11-14、#132 Toast を GameToast に）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 でイベントを CabinHud に配るだけにした・GameParams を読む）／ 更新：iizuka（Opus 5.5、2026-11-14、#132 Toast を GameToast に・#94 接続の表示 ConnectionUi を Toast の隣に）
 // ゲームの流れ。段階（title → lobby → design → practice/stir/flight(=Cabin) → ending → report）を IGameClient の OnPhase で切り替える。
 // シーンは分けず、1シーン（Game.unity。船内の 3D は常に置く）の中で UGUI の画面を切り替える。
 // 理由：船内のロードが1回で済む／サーバーの段階が途中で変わっても（再接続・again）画面の出し入れだけで追従できる／軽い。
@@ -51,6 +51,7 @@ public class GameFlow : MonoBehaviour
     TitleScreen title; LobbyScreen lobby; DesignScreen design; CabinHud cabin; EndingScreen ending; ReportScreen report;
     HoustonBox houston;
     GameToast toast;   // #132 短いお知らせ（UI/GameToast.cs）
+    ConnectionUi conn; // #94 切れたら自動でつなぎ直す・RECONNECTING・ほかの人の切断の印（UI/ConnectionUi.cs）
     GameObject debugBar; Text speedLabel;
 
     void Awake()
@@ -79,6 +80,7 @@ public class GameFlow : MonoBehaviour
         houston = new HoustonBox(root);
         BuildDebugBar(root);
         toast = new GameToast(root, this);
+        conn = new ConnectionUi(root, this, toast);
         ShowPhase("title");
     }
 
@@ -232,6 +234,7 @@ public class GameFlow : MonoBehaviour
         Client?.Update(Time.unscaledDeltaTime);
         houston.Tick(Time.unscaledTime);
         toast.Tick(Time.unscaledTime);
+        conn.Tick(Time.unscaledTime);
         cabin.Tick(Time.unscaledTime);   // 同時押しの文字を消すなど（HUD の部品の毎フレーム）
         if (Client is OfflineClient oc && speedLabel != null) speedLabel.text = (oc.Paused ? "PAUSED" : "x" + oc.Speed) + "  T=" + Mathf.RoundToInt(oc.Clock);
     }
