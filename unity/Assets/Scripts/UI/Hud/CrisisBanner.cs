@@ -8,7 +8,7 @@
 //   ・ほかの危機は帯の右に小さなアイコンで待機表示（state とサーバーの閾値 thresholds を見るだけ。どれを前に出すかは UrgencyFx が決める）
 //   ・ヒューストンが話している間（houston イベントから少しの間）は帯を小さく（#75 と二重に大きく出さない）。通信途絶・通信 OFF のときは小さくしない（帯が主役）
 //   ・照明 OFF でも暗くしない（Detail を持たない。#87）
-//   ・声なしの警告（event kind=warning：通信途絶・通信 OFF の間のヒューストンの台詞）も、この帯の1行に Look.WarnSec 秒出す（2行まで）。
+//   ・声なしの警告（event kind=warning：通信途絶・通信 OFF の間のヒューストンの台詞）も、この帯の1行に Look.WarnSec 秒出す（長ければ 22 で2行。帯の高さは 72 のまま）。
 //     前は HoustonBox の上に別の赤い帯を出していて、危機の帯と2本並んだ（#146。ui-guidelines 7章：帯は1本）。危機が無いときは NO RADIO の帯で出す
 //   ・画面の縁の赤（UrgencyFx の枠）と溶けないように、帯の外側に panel の輪と影を付ける。帯そのものは脈打たせない（脈は縁だけ）
 // 文言・アイコン・席は下の Crises の表の1か所（文言は Taiga が決める。今は houston_lines.json の H07・H11・H14・H16・H18・H26 に合わせた仮）
@@ -53,7 +53,6 @@ public class CrisisBanner : HudPart
     {
         public const float BandH = 72, BandPadX = 40;   // ui-guidelines 3章「警告の帯」（#71 の T.BannerH・T.BannerPadX と同じ値）
         public const float MaxW = 880;                  // 帯の最大の幅。CabinHud.Layout の CenterTop（0.22〜0.78 ＝ 896）に収める（#146）
-        public const float WarnH = 96;                  // 声なしの警告を出している間の帯の高さ（1行を2行まで折り返す）
         public const float WarnSec = HoustonStyle.WarnS; // 声なしの警告を出しておく秒（前の HoustonBox の帯と同じ）
         public const float BadgeD = T.BadgeS;           // 直す席のバッジ
         public const float StandbyD = T.TagH;           // 待機のアイコンの円
@@ -195,8 +194,7 @@ public class CrisisBanner : HudPart
         band.Title.text = c.title; band.Title.color = fg;
         band.Title.gameObject.SetActive(!warn);   // 警告の台詞を出す間は短い言葉を隠して、台詞に幅をあげる（2行で 110 字ほど入る）
         band.Line.text = warn ? warnText : c.line; band.Line.color = fg;
-        band.Line.textWrappingMode = warn ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;   // 警告の台詞は長いので2行まで
-        band.Root.sizeDelta = new Vector2(band.Root.sizeDelta.x, warn ? Look.WarnH : Look.BandH);
+        band.Line.textWrappingMode = warn ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;   // 警告の台詞は長いので折り返す（22 の2行で高さ 72 に入る）
         string seat = c.seat;
         if (seat == null && warn) { var seats = HoustonStyle.SeatsIn(warnText); if (seats.Count > 0) seat = seats[0]; }
         band.Badge.Root.gameObject.SetActive(seat != null);
