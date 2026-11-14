@@ -2,7 +2,7 @@
 
 # modeling/source — 外から取ってきた元データ
 
-3D モデル制作（#34）の下敷きと画像。計画は `docs/design/modeling-plan.md` の B 章。
+3D モデル制作（#34）の下敷きと画像。計画は `docs/reference/modeling-plan.md` の B 章。
 ここのファイルは**取ってきたまま**置く（加工しない）。加工した物は各モデルのフォルダに出す。
 
 - 取得日：2026-11-14
