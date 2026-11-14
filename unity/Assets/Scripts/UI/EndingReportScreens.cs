@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）
 // Ending（結末 ED-A/B/C・要件4つ）と Report（スコアの内訳）。見た目は仮
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,7 +33,7 @@ public class EndingScreen
         string e = J.Str(r, "ending");
         title.text = e == "ED-A" ? "MISSION SUCCESS" : e == "ED-B" ? "CREW SURVIVED" : "CREW LOST";
         title.color = e == "ED-A" ? Ui.Green : e == "ED-B" ? Ui.Yellow : Ui.Red;
-        subtitle.text = e + "   splashdown at T+" + Ui.Mmss(J.Num(r, "t_end"));
+        subtitle.text = e == "ED-C" ? e : e + "   splashdown at T+" + Ui.Mmss(J.Num(r, "t_end"));   // ED-C は着水していない（#130）
         reqs.text = ReqText(r);
         score.text = "SCORE  " + J.Num(r, "score").ToString("0.0");
     }
