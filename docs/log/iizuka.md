@@ -29,3 +29,4 @@
 - 17:13 #115 Unity（WsClient）と Python サーバーをつないで最後まで通しで遊べた（ED-A 1260.6、reference_sim と一致）。オフライン再生をサーバーの記録の形に、軌道の小窓、パネル警告、遊び方 how-to-play-local.md
 - 17:40 #123 1人で両方の席を持つときの「両方押す」ボタン（点火・フィルター交換）、ヒューストンの字幕を優先度で入れ替え。#51・#52・#53 の FBX の .meta を追加
 - 17:59 #124 スケッチの演出を Unity に入れた（打ち上げ、管制室の先生の小窓（口が動く）、帰還と着水、ED-C の静かな終わり）。StoryDirector、storyboard.md に実装の有無、lookdev/story_1〜8.png
+- 18:42 #72 タイトルと部屋の画面を UI ガイドラインで作り直した（UiTokens・UiKit、TMP の Baloo 2・Nunito、部屋は 3D のクルー4人が並ぶ LobbyStage）。ui-guidelines.md を docs に、素材は Art/UI

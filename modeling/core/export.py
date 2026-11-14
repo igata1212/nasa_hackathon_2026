@@ -3,6 +3,7 @@
 書いた人：iizuka（作成：Fable 5.2、FBX の画像パスをファイル名だけに：Opus-5、Unity の差し替えの注記：Opus 5.5）／ 最終更新：2026-11-14
 更新：Taiga（2026-11-14、Fable 5.2）#48 KINDS に part（設計画面の部品）を足した
 更新：Taiga（2026-11-14、Fable 5.2）#53 シェイプキー（口・目の動き）も一緒に Y-up に直すようにした（shape_keys=True）
+更新：Taiga（2026-11-14、Fable 5.2）#120 アニメーションも FBX に入れられるようにした（export_fbx・export_all の anim）
 
 ふつうは build_*.py から `ck.export_all(root, "fx")` で呼ぶ（corekit がここを使う）。
 FBX の設定は FBX_SETTINGS の1か所だけ。Unity 6000.6.9f1 に見本（Fx_Alarm）を入れて確かめた値（README「Unity での向き」）。
@@ -152,18 +153,29 @@ def _no_abs_image_paths(fbx_path):
     return restore
 
 
-def export_fbx(root, path):
+def export_fbx(root, path, anim=None):
     """FBX を書く。Unity で、ルートも子も孫も回転 0・スケール 1、位置は Blender (x, y, z) → Unity (−x, z, −y) で入る。
-    画像のパスは FBX からの相対パス（../Core/palette.png など）。マシンの絶対パスは入らない。"""
+    画像のパスは FBX からの相対パス（../Core/palette.png など）。マシンの絶対パスは入らない。
+    anim（#120）：アニメーションも入れるときに渡す関数。Y-up に組み替えた後で呼ばれ、キーフレームを打って、片づけの関数を返す。
+      そのとき部品の回転は Y-up の軸で打つ（Blender の X まわり → X のまま、Z まわり → Y まわり）。シェイプキーの値はそのまま。
+      クリップ名は、書き出すときのシーンの名前（bpy.context.scene.name）、長さはシーンの開始〜終了フレーム。"""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     G = _axis_matrix()
     keep = [(o, o.matrix_basis.copy()) for o in tree(root)]
     _to_fbx_space(root, G)
     restore_paths = _no_abs_image_paths(path)
+    settings, undo = dict(FBX_SETTINGS), None
     try:
+        if anim:
+            undo = anim()
+            settings.update(bake_anim=True, bake_anim_use_all_bones=False, bake_anim_use_nla_strips=False,
+                            bake_anim_use_all_actions=False, bake_anim_force_startend_keying=True,
+                            bake_anim_step=1.0, bake_anim_simplify_factor=0.0)
         _select(root)
-        bpy.ops.export_scene.fbx(filepath=path, **FBX_SETTINGS)
-    finally:                      # 元の Z-up に戻す
+        bpy.ops.export_scene.fbx(filepath=path, **settings)
+    finally:                      # アニメーションを片づけてから、元の Z-up に戻す
+        if undo:
+            undo()
         restore_paths()
         Gi = G.inverted()
         done = set()
@@ -183,13 +195,14 @@ def export_glb(root, path):
     return path
 
 
-def export_all(root, kind):
-    """FBX → unity/Assets/Models/<種類>/、glb と stats.json → modeling/<種類>/export/。ルートは原点に戻してから出す。"""
+def export_all(root, kind, anim=None):
+    """FBX → unity/Assets/Models/<種類>/、glb と stats.json → modeling/<種類>/export/。ルートは原点に戻してから出す。
+    anim を渡すと FBX にアニメーションも入る（export_fbx を参照。glb には入らない）。"""
     assert kind in KINDS, f"種類は {sorted(KINDS)} のどれか: {kind}"
     root.location = (0, 0, 0); root.rotation_euler = (0, 0, 0); root.scale = (1, 1, 1)
     bpy.context.view_layer.update()
     exp = os.path.join(MODELING, kind, "export")
-    fbx = export_fbx(root, os.path.join(UNITY_MODELS, KINDS[kind], root.name + ".fbx"))
+    fbx = export_fbx(root, os.path.join(UNITY_MODELS, KINDS[kind], root.name + ".fbx"), anim=anim)
     glb = export_glb(root, os.path.join(exp, root.name + ".glb"))
     st = stats(root)
     with open(os.path.join(exp, root.name + ".stats.json"), "w", encoding="utf-8") as f:
