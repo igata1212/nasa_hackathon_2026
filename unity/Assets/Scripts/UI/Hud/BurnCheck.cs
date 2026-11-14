@@ -127,6 +127,7 @@ public class BurnCheck : HudPart
         readyRow = UiKit.Row(panel, T.S2, TextAnchor.MiddleCenter);
         readyBadges = new TimelineKit.BadgeRow(readyRow, T.TagH);
         ready = UiKit.Text(readyRow, Words.AllSet, TextStyle.Body, T.Ink);
+        ready.textWrappingMode = TextWrappingModes.Normal; Ui.Size(ready, flexW: 1);
 
         signalRow = UiKit.Row(panel, T.S4, TextAnchor.MiddleCenter);
         left = TimelineKit.DualBadge.Make(signalRow);
@@ -136,6 +137,7 @@ public class BurnCheck : HudPart
         right = TimelineKit.DualBadge.Make(signalRow);
 
         result = UiKit.Text(panel, "", TextStyle.Body, T.Go);
+        result.textWrappingMode = TextWrappingModes.Normal;
 
         Rebuild();
     }
