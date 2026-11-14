@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（作成：Claude、#72 UI ガイドラインの見た目にした。2026-11-14）／ 更新：iizuka（Opus 5.5、2026-11-14、#153）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（作成：Claude、#72 UI ガイドラインの見た目にした。2026-11-14）／ 更新：iizuka（Opus 5.5、2026-11-14、#153） ／ 更新：iizuka（Opus 5.5、2026-11-14、#141 DEV パネルに音のミュート）
 // Title（名前・合言葉・部屋を作る／入る）と Lobby（合言葉・4人のクルー・開始）。docs/design/ui-guidelines.md の 6章のワイヤーフレーム。
 // 部屋の画面は、席カードの代わりに 4人のクルーの 3D を手前に並べ、頭の上に名前のタグを出す（iizuka の指示、2026-11-14。LobbyStage）。
 // 色と大きさは UiTokens、部品は UiKit。開発用（Server URL・記録の再生）は右上の歯車で開くパネルに入れた
@@ -127,7 +127,28 @@ public class TitleScreen
         UiKit.Text(panel, "Replay a recorded game (no server)", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
         UiKit.SecondaryButton(panel, "REPLAY: SUCCESS (T1)", "check", () => f.StartOffline(false));
         UiKit.SecondaryButton(panel, "REPLAY: FAILURE (T4)", "cross", () => f.StartOffline(true));
+
+        // 音のミュート（#141。SoundPrefs に残る。チェック＝鳴る、バツ＝ミュート）
+        UiKit.Text(panel, "Sound (tap to mute)", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+        var snd = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft);
+        MuteButton(snd, SoundBus.Music, "MUSIC");
+        MuteButton(snd, SoundBus.Sfx, "SFX");
+        MuteButton(snd, SoundBus.Voice, "VOICE");
         return scrim.gameObject;
+    }
+
+    static void MuteButton(Transform parent, SoundBus bus, string label)
+    {
+        UiButton b = null;
+        void Draw()
+        {
+            var sp = T.Icon(SoundPrefs.Muted(bus) ? "cross" : "check");
+            b.Icon.sprite = sp; b.iconOn = sp;
+            b.Icon.gameObject.SetActive(sp != null);
+            UiKit.FitWidth(b);
+        }
+        b = UiKit.SecondaryButton(parent, label, "check", () => { SoundPrefs.SetMuted(bus, !SoundPrefs.Muted(bus)); Draw(); });
+        Draw();
     }
 }
 

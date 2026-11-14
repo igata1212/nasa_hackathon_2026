@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130・#141）
 // 演出3：帰還（#124。storyboard.md の場面6〜7。ED-A・ED-B のとき）。約 6.7 秒。#130 で Fable の採点をもとに作り直した。
 //   0.0〜2.0  再突入（RE-ENTRY）：熱シールドを前に、燃えながら斜めに落ちる。光る熱シールド・炎の尾・流れる筋・カメラの遅れと揺れ。海は隠す
 //            カメラは真横から（Unity で見て直した：正面寄りだと熱シールドが「黄色い円盤」に見える。包む光の層も板に見えたので作らない）
@@ -8,6 +8,7 @@
 // ヒューストンの帯は自動では出さない（結果を先に言わないため）。ED-A は傘が開くと同時に「We see parachutes!」、ED-B は着水のあと。
 // サーバーの ending は ENDING_HOLD_S（16 秒）で report に進む。実寸（司令船 直径 3.9m）。海は原点の高さ（transform.position.y）。
 // 揺れは Random ではなく Mathf.Sin で作る（同じ t なら同じ絵）。
+// 音（#141）：Sound(t)。Fable の採点 5章の表どおり。素材の無い「傘のボフッ」と「風」はガスのシューのピッチ違いで代用。
 using UnityEngine;
 
 public class ReturnStage : StoryStage
@@ -183,5 +184,25 @@ public class ReturnStage : StoryStage
         d.HoustonBar(t >= (edA ? TChute + 0.5f : TText + 0.3f) ? d.Line(edA ? "ED-A" : "ED-B") : "");
         if (t >= TText) d.Caption("SPLASHDOWN!", edA ? "WELCOME HOME, CREW!" : "WELCOME HOME  -  THAT WAS CLOSE!", Ui.Yellow, EaseOutBack(Win(t, TText, TText + 0.35f)));
         else d.Caption("", "");
+        Sound(t, edA, heat);
+    }
+
+    // ------------------------------------------------------------------ 音（#141。Fable の採点 5章の表。大きさは効果音の音量に掛ける）
+    void Sound(float t, bool edA, float heat)
+    {
+        StoryAudio.Loop("rumble", "reentry_rumble_loop", 0.9f * Win(t, 0f, 0.3f) * heat);            // 熱に合わせて、2.1 までに消える
+        StoryAudio.Loop("static", "radio_static_loop", t < TChute ? 0.13f * Win(t, 0f, 0.3f) : 0f);  // 小さく（-18 dB くらい）。M12「熱で通信が切れる」
+        StoryAudio.At(TChute, "quindar_in", 0.5f);                                                   // 雑音を切ってすぐ：通信が戻った合図
+        // 傘が開く「ボフッ」：素材が無いので、ガスのシューを低く・短く鳴らし、再突入のゴーッを低くして重ねる（代用）
+        float boof = t >= TChute ? Mathf.Exp(-(t - TChute) * 8f) : 0f;
+        StoryAudio.Loop("boof", "gas_hiss_loop", 0.8f * boof, 0.35f);
+        StoryAudio.Loop("boofLow", "reentry_rumble_loop", 0.9f * boof, 0.6f);
+        // 風：素材が無いので、ガスのシューをピッチ 0.5・小さめで代用。着水で消える
+        StoryAudio.Loop("wind", "gas_hiss_loop", 0.15f * Win(t, TChute, TChute + 0.4f) * (1f - Win(t, TSplash - 0.2f, TSplash)), 0.5f);
+        StoryAudio.At(TSplash, "splash");                                                            // カメラの揺れと同じフレーム
+        StoryAudio.At(TText, "ui_confirm", 0.6f);                                                    // SPLASHDOWN! の「ぽん」
+        if (edA) StoryAudio.At(TText + 0.15f, "ui_confirm", 0.6f, 1.26f);
+        if (StoryAudio.Crossed(TText + 0.2f)) StoryAudio.EndingJingle();                            // 生還（ED-A）／ぎりぎりの生還（ED-B）
+        StoryAudio.At(TEnd - 0.4f, "quindar_out", 0.4f);                                             // 黒になる所で交信を閉じる
     }
 }

@@ -1,4 +1,4 @@
-書いた人：iizuka（下書き：Fable 5.2）／ 最終更新：2026-11-14
+書いた人：iizuka（下書き：Fable 5.2）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#141 音）
 
 # CREDITS（下書き）
 
@@ -20,6 +20,19 @@ NASA の素材は [NASA Images and Media Usage Guidelines](https://www.nasa.gov/
 | Nunito（wght 400・700 に固定。`Nunito-Regular.ttf`・`Nunito-Bold.ttf`） | The Nunito Project Authors（https://github.com/googlefonts/nunito ） | https://github.com/google/fonts/tree/main/ofl/nunito | SIL Open Font License 1.1（`unity/Assets/Art/UI/Fonts/OFL-Nunito.txt`） | 本文・吹き出しの台詞・補助ラベル |
 | Zen Maru Gothic（Black・Regular・Bold。そのまま。`ZenMaruGothic-*.ttf`） | The Zen Maru Gothic Project Authors（https://github.com/googlefonts/zen-marugothic ） | https://github.com/google/fonts/tree/main/ofl/zenmarugothic | SIL Open Font License 1.1（`unity/Assets/Art/UI/Fonts/OFL-ZenMaruGothic.txt`） | 日本語の開発用の表示だけ（提出の画面は英語） |
 
+## 音（#141）
+
+置き場所は `unity/Assets/Audio/`（効果音 `Sfx/`・BGM とジングル `Music/`）。1つずつの用途・切り出し・加工は各フォルダの `SOURCES.md`。
+
+| 名前 | 作者 | URL | ライセンス | 何に使ったか |
+|---|---|---|---|---|
+| Spacedman | Shane Ivers（Silverman Sound） | https://www.silvermansound.com/free-music/spacedman （ファイル：https://www.silvermansound.com/wp-content/uploads/spacedman.mp3 ） | CC BY 4.0（**表記が必要**。表記文：`Music: Spacedman by Shane Ivers - https://www.silvermansound.com`） | BGM（設計・練習・飛行）。`Music/space_calm_01.mp3`。そのまま |
+| Music Jingles（`STEEL02`・`STEEL04`・`STEEL07`・`STEEL10`・`PIZZI08`・`PIZZI13`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/music-jingles | CC0 1.0 | ジングル（生還・ぎりぎりの生還・失敗・打ち上げ・部屋に人が入った・危機）。`Music/jingle_*.wav`。音量をそろえて WAV にした |
+| Interface Sounds（`click_001`・`switch_004`・`switch_007`・`confirmation_003`・`error_005`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/interface-sounds （取得元：https://github.com/Calinou/kenney-interface-sounds ） | CC0 1.0 | ボタン・スイッチ・成功・エラーの音（`Sfx/ui_*.wav`）。スイッチはモノラルにした |
+| Sci-Fi Sounds（`space_engine_low_000`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/sci-fi-sounds （取得元：https://github.com/Boyquotes/kenney-sci-fi-sounds-for-godot ） | CC0 1.0 | 噴射の音（`Sfx/thruster_burn_loop.wav`）。ループにして音量を下げた |
+| Apollo 13 の交信「Houston, we've had a problem」 | NASA | https://commons.wikimedia.org/wiki/File:Apollo13-wehaveaproblem.ogg | パブリックドメイン（Commons の表記 "NASA public domain"。NASA 本体での確認は未了）。NASA Media Usage Guidelines | 事故の瞬間の本物の声（`Sfx/voice_problem.wav`）。7.21〜8.29 秒を切り出し、音量をそろえて低音を切った |
+| 合成の効果音（警報・ガス漏れ・Quindar トーン・無線の雑音・再突入・着水・バルブ） | このチーム（iizuka。Claude が合成） | リポジトリ内 `art/audio/synth_sfx.py`・`art/audio/synth_valve.py` | 自作 | `Sfx/` の `alarm_*`・`gas_hiss_loop`・`quindar_*`・`radio_static_loop`・`reentry_rumble_loop`・`splash`・`valve_turn` |
+
 ## 寸法取りだけに使った素材（ゲームには入らない）
 
 | 名前 | 作者 | URL | ライセンス | 何に使ったか |
@@ -37,5 +50,6 @@ NASA の素材は [NASA Images and Media Usage Guidelines](https://www.nasa.gov/
 ## まだ決まっていないこと
 
 - midori のスクリプトのライセンス（チーム内の成果物として使ってよいか、表記のしかた）
+- ゲーム内のクレジット画面（または提出ページ）に **Spacedman の表記文**（CC BY 4.0 で必須）を出す場所。今はゲームのどこにも出ていない
 - ゲーム内のクレジット画面に出す文面。案：「Earth and Moon imagery: NASA Earth Observatory / NASA's Scientific Visualization Studio」「Spacecraft reference models: NASA 3D Resources」
 - 取ってきた元ファイルの置き場所と sha256 は `modeling/source/README.md`

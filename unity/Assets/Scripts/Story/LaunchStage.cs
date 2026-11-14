@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129・#141）
 // 演出1：打ち上げ（#124。storyboard.md の場面1〜3）。約 8.2 秒。#129 で Fable の採点（上位6つ）を入れた。
 //   0.2  カウントダウン 3・2・1（左上の空に、数字が弾む）。クルー4人がカメラに手を振る。カメラが低い位置へ寄る
 //   0.8  クルーが1人ずつ（Pilot から 0.2 秒ずつ）ロケットの根元へ跳んで乗り込む（1.85 で4人とも消える）
@@ -7,6 +7,7 @@
 //   5.0  直接カット（暗転なし）→ 月へ向かう宇宙船。5.3 から字幕「TO THE MOON」とヒューストンの台詞（M03）
 //   8.2  黒 → 船内へ
 // 地上の物（地面・発射台・ロケット）は実寸（ロケット 70〜110m）なので、ground ごと 0.05 倍に縮めてクルー（1.2m）と並べる。
+// 音（#141）：Sound(t)。Fable の採点の「音を入れる瞬間」の表どおり（秒読み・乗り込み・腕・点火・LIFTOFF!・宇宙へのカットで噴射をぴたりと止める）。
 // 組み立ては Editor/Story/StoryScene.cs。向き：舞台は 180° 回してあり、カメラは −Z 側から +Z を見る（主光源が前から当たる）。
 // 炎（円錐3枚）・地面の煙の輪・船と月の大きさ・後ろの煙の量は、シーンを作り直さなくて済むよう Begin で作る／変える（#129）。
 // 炎の3枚は全部「裏の面だけ描く」（Cull Front）。視線が最初に当たる裏の面＝いちばん内側の円錐になるので、
@@ -145,6 +146,29 @@ public class LaunchStage : StoryStage
         space.gameObject.SetActive(inSpace);
         d.SetFade(Mathf.Max(1f - Win(t, 0f, 0.35f), Win(t, TEnd - 0.3f, TEnd)));   // 地上 → 宇宙は暗転なしで直接切り替える
         if (inSpace) PoseSpace(d, t); else PoseGround(d, t);
+        Sound(t);
+    }
+
+    // ------------------------------------------------------------------ 音（#141。Fable の採点「音を入れる瞬間」の表。大きさは効果音の音量に掛ける）
+    void Sound(float t)
+    {
+        StoryAudio.At(0.2f, "alarm_soft", 0.5f);                                     // 秒読み 3・2・1（「1」だけ高く）
+        StoryAudio.At(0.9f, "alarm_soft", 0.5f);
+        StoryAudio.At(1.6f, "alarm_soft", 0.5f, 1.2f);
+        for (int i = 0; i < crew.Length; i++)                                        // クルーが1人ずつ乗り込む（消える瞬間）
+            StoryAudio.At(boardStart + i * boardStagger + boardTime, "ui_switch_on", 0.4f, 1f + 0.1f * i);
+        StoryAudio.At(armOpenFrom, "valve_turn", 0.5f, 0.7f);                        // 腕が離れる（重い機械に聞こえるかは要試聴）
+        if (StoryAudio.Crossed(TIgnite - 0.1f)) StoryAudio.Hush();                  // 点火の直前の 0.1 秒は無音（溜め）
+        bool burning = t >= TIgnite && t < TSpace;                                   // 宇宙へのカットでぴたりと止める（真空は無音。落差が効く）
+        float down = Win(t, TSpace - 0.6f, TSpace);                                  // 機体が画面の上へ抜ける間に 0.3 まで下げる
+        float burn = Mathf.Lerp(Mathf.Lerp(0.6f, 1f, Win(t, TIgnite, TLift)), 0.3f, down);
+        StoryAudio.Loop("burn", "thruster_burn_loop", burning ? burn : 0f, Mathf.Lerp(1f, 1.15f, Win(t, TLift, TSpace - 0.2f)));
+        StoryAudio.Loop("rumble", "reentry_rumble_loop", burning ? Mathf.Lerp(0.8f, 0.3f, down) : 0f);
+        StoryAudio.At(TLift, "ui_confirm", 0.6f);                                    // LIFTOFF!
+        StoryAudio.At(TLift + 0.3f, "jingle_liftoff", 0.8f);                         // LIFTOFF! の字が弾んだあと
+        StoryAudio.At(TSpace, "quindar_in", 0.5f);                                   // 宇宙へのカット：ヒューストンの交信が始まる
+        if (StoryAudio.Crossed(TSpace + 0.3f)) StoryAudio.Music("flight", 0.5f);     // M03 の字幕と一緒に BGM（船内へそのまま続ける）
+        StoryAudio.At(TEnd - 0.25f, "quindar_out", 0.5f);                            // 字幕が消える
     }
 
     void PoseGround(StoryDirector d, float t)

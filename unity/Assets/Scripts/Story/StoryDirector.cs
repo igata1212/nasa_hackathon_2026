@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129・#130）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129・#130・#141）
 // iizuka の手描きスケッチ（docs/design/storyboard.md）の場面を、段階の変わり目に短い演出として流す（#124）。
 //   design → practice（打ち上げが通った）  … LaunchStage：地上のクルーとロケット → 打ち上げ → 月へ向かう船（約 8 秒）
 //   flight → ending（ED-A・ED-B）          … ReturnStage：再突入 → パラシュート → 着水「SPLASHDOWN!」（約 6.7 秒。#130）
@@ -6,6 +6,7 @@
 // サーバーの時間は止まらないので、演出は短くし、SKIP で飛ばせる。演出の間は全画面の絵を GameFlow の UI の上に重ねる
 // （UI は消さない。重ねた絵がクリックも受け止める）。その間に来たヒューストンの台詞は、絵の下に字幕で出す。
 // GameFlow は変えない：シーンに置いて flow を指すだけ。GameFlow.Client が差し替わったら付け直す。
+// 音（#141）：舞台が Pose の中で StoryAudio を時刻で呼ぶ。ここは StoryAudio の始め・毎フレームの t・片づけだけ。
 // 船内の場面はそのまま。舞台は船内から遠く（Editor/Story/StoryScene.cs が組む）に置き、専用のカメラで RenderTexture に描く。
 using System.Collections;
 using System.Collections.Generic;
@@ -150,8 +151,10 @@ public class StoryDirector : MonoBehaviour
         houstonBar.SetActive(false);
         pendingHouston = Time.unscaledTime - lastHoustonAt < 1.5f ? lastHouston : null;   // 直前の台詞も拾う（打ち上げの M03 など）
         storyCamera.enabled = true;
+        StoryAudio.Begin();
         s.Begin(this);
         t = 0f;
+        StoryAudio.Frame(0f);
         s.Pose(this, 0f);
         running = StartCoroutine(Run(s));
     }
@@ -164,6 +167,7 @@ public class StoryDirector : MonoBehaviour
             yield return null;
             t += Time.unscaledDeltaTime;
             if (debugFreezeAt >= 0f && t > debugFreezeAt) t = debugFreezeAt;
+            StoryAudio.Frame(Mathf.Min(t, s.Length));
             s.Pose(this, Mathf.Min(t, s.Length));
             if (pendingHouston != null && s.AllowHouston(t)) { ShowHouston(pendingHouston); pendingHouston = null; }
         }
@@ -175,6 +179,7 @@ public class StoryDirector : MonoBehaviour
     {
         closing = true;
         skipBtn.SetActive(false);
+        StoryAudio.FadeOut(0.2f);
         yield return FadeTo(1f, 0.2f);
         Cleanup();
         yield return FadeTo(0f, 0.35f);
@@ -201,7 +206,7 @@ public class StoryDirector : MonoBehaviour
 
     void Cleanup()
     {
-        if (current != null) { current.End(this); current = null; }
+        if (current != null) { current.End(this); current = null; StoryAudio.End(); }
         if (storyCamera != null) storyCamera.enabled = false;
         if (view != null) view.enabled = false;
         Caption("", "");
