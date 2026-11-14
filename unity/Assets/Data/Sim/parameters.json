@@ -1,0 +1,698 @@
+{
+  "_generated_by": "tools/xlsx_to_json.py（元：ミッション・リターン イベント表.xlsx）",
+  "params": [
+    {
+      "key": "time_p1_cruise_min",
+      "value": 2,
+      "unit": "min",
+      "group": "Time",
+      "item": "P1 Launch & cruise",
+      "item_ja": "P1 出発・巡航",
+      "row": 2
+    },
+    {
+      "key": "time_p2_accident_min",
+      "value": 2,
+      "unit": "min",
+      "group": "Time",
+      "item": "P2 Accident (until the far side)",
+      "item_ja": "P2 事故（月の裏側に入るまで）",
+      "row": 3
+    },
+    {
+      "key": "time_p3_farside_min",
+      "value": 3,
+      "unit": "min",
+      "group": "Time",
+      "item": "P3 Far side of the Moon",
+      "item_ja": "P3 月の裏側",
+      "row": 4
+    },
+    {
+      "key": "time_p4_return_a_min",
+      "value": 2,
+      "unit": "min",
+      "group": "Time",
+      "item": "P4 Return (route A)",
+      "item_ja": "P4 帰還（ルートA）",
+      "row": 5
+    },
+    {
+      "key": "time_p4_return_b_min",
+      "value": 3.5,
+      "unit": "min",
+      "group": "Time",
+      "item": "P4 Return (route B)",
+      "item_ja": "P4 帰還（ルートB）",
+      "row": 6
+    },
+    {
+      "key": "time_p5_reentry_min",
+      "value": 1,
+      "unit": "min",
+      "group": "Time",
+      "item": "P5 Re-entry",
+      "item_ja": "P5 再突入",
+      "row": 7
+    },
+    {
+      "key": "power_per_battery",
+      "value": 50,
+      "unit": "%",
+      "group": "Power",
+      "item": "Capacity per battery module",
+      "item_ja": "バッテリー1個あたりの容量",
+      "row": 8
+    },
+    {
+      "key": "power_accident_loss",
+      "value": 20,
+      "unit": "%",
+      "group": "Power",
+      "item": "Loss in the accident",
+      "item_ja": "事故での減少",
+      "row": 9
+    },
+    {
+      "key": "power_life_support",
+      "value": 3,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Life support (cannot be shut down)",
+      "item_ja": "生命維持（切れない）",
+      "row": 10
+    },
+    {
+      "key": "power_heater",
+      "value": 3,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Heater",
+      "item_ja": "暖房",
+      "row": 11
+    },
+    {
+      "key": "power_lights",
+      "value": 1,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Lights",
+      "item_ja": "照明",
+      "row": 12
+    },
+    {
+      "key": "power_nav",
+      "value": 3,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Navigation computer",
+      "item_ja": "航法コンピュータ",
+      "row": 13
+    },
+    {
+      "key": "power_comms",
+      "value": 2,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Comms",
+      "item_ja": "通信",
+      "row": 14
+    },
+    {
+      "key": "power_nav_restart",
+      "value": 8,
+      "unit": "%",
+      "group": "Power",
+      "item": "Navigation restart",
+      "item_ja": "航法の再起動",
+      "row": 15
+    },
+    {
+      "key": "power_camera",
+      "value": 2,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Camera while observing",
+      "item_ja": "カメラ（観測中）",
+      "row": 16
+    },
+    {
+      "key": "power_spectrometer",
+      "value": 4,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Spectrometer while observing",
+      "item_ja": "分光計（観測中）",
+      "row": 17
+    },
+    {
+      "key": "power_radar",
+      "value": 3,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Radar sounder while observing",
+      "item_ja": "レーダーサウンダー（観測中）",
+      "row": 18
+    },
+    {
+      "key": "solar_sun",
+      "value": 3,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Solar panel output, Sun-pointing",
+      "item_ja": "ソーラーパネルの出力（太陽向き）",
+      "row": 19
+    },
+    {
+      "key": "solar_other",
+      "value": 1,
+      "unit": "%/min",
+      "group": "Power",
+      "item": "Solar panel output, other attitudes",
+      "item_ja": "ソーラーパネルの出力（他の姿勢）",
+      "row": 20
+    },
+    {
+      "key": "oxygen_start",
+      "value": 100,
+      "unit": "%",
+      "group": "Oxygen",
+      "item": "Starting value",
+      "item_ja": "初期値",
+      "row": 21
+    },
+    {
+      "key": "oxygen_per_spare_tank",
+      "value": 20,
+      "unit": "%",
+      "group": "Oxygen",
+      "item": "Per spare oxygen tank",
+      "item_ja": "予備タンク1本あたり",
+      "row": 22
+    },
+    {
+      "key": "oxygen_leak_per_s",
+      "value": 2,
+      "unit": "%/s",
+      "group": "Oxygen",
+      "item": "Leak rate until the valve is closed",
+      "item_ja": "バルブを閉じるまでの漏れの速さ",
+      "row": 23
+    },
+    {
+      "key": "oxygen_leak_max",
+      "value": 40,
+      "unit": "%",
+      "group": "Oxygen",
+      "item": "Maximum loss from the leak",
+      "item_ja": "漏れで失う量の上限",
+      "row": 24
+    },
+    {
+      "key": "oxygen_breathing",
+      "value": 6,
+      "unit": "%/min",
+      "group": "Oxygen",
+      "item": "Breathing",
+      "item_ja": "呼吸による消費",
+      "row": 25
+    },
+    {
+      "key": "oxygen_co2_extra",
+      "value": 2,
+      "unit": "%/min",
+      "group": "Oxygen",
+      "item": "Extra use while CO2 is high",
+      "item_ja": "CO2が高い間の追加消費",
+      "row": 26
+    },
+    {
+      "key": "fuel_start",
+      "value": 100,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Starting value",
+      "item_ja": "初期値",
+      "row": 27
+    },
+    {
+      "key": "fuel_per_extra_tank",
+      "value": 25,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Per extra fuel tank",
+      "item_ja": "追加タンク1本あたり",
+      "row": 28
+    },
+    {
+      "key": "fuel_attitude_change",
+      "value": 1,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Each attitude change",
+      "item_ja": "姿勢変更1回",
+      "row": 29
+    },
+    {
+      "key": "fuel_correction_burn",
+      "value": 15,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Correction burn (science trajectory)",
+      "item_ja": "軌道修正の噴射（観測向き軌道）",
+      "row": 30
+    },
+    {
+      "key": "fuel_burn_a",
+      "value": 50,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Return burn (route A)",
+      "item_ja": "帰還噴射（ルートA）",
+      "row": 31
+    },
+    {
+      "key": "fuel_burn_b",
+      "value": 25,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Return burn (route B)",
+      "item_ja": "帰還噴射（ルートB）",
+      "row": 32
+    },
+    {
+      "key": "fuel_burn_retry",
+      "value": 10,
+      "unit": "%",
+      "group": "Fuel",
+      "item": "Burn retry",
+      "item_ja": "噴射のやり直し",
+      "row": 33
+    },
+    {
+      "key": "temp_start",
+      "value": 22,
+      "unit": "°C",
+      "group": "Temperature",
+      "item": "Starting value",
+      "item_ja": "初期値",
+      "row": 34
+    },
+    {
+      "key": "temp_drop",
+      "value": 1.5,
+      "unit": "°C/min",
+      "group": "Temperature",
+      "item": "Drop with the heater off",
+      "item_ja": "暖房OFFでの低下",
+      "row": 35
+    },
+    {
+      "key": "temp_rise",
+      "value": 3,
+      "unit": "°C/min",
+      "group": "Temperature",
+      "item": "Rise with the heater on",
+      "item_ja": "暖房ONでの上昇",
+      "row": 36
+    },
+    {
+      "key": "temp_slow_c",
+      "value": 10,
+      "unit": "°C",
+      "group": "Temperature",
+      "item": "Actions slow below",
+      "item_ja": "動作が遅くなる温度",
+      "row": 37
+    },
+    {
+      "key": "temp_slower_c",
+      "value": 5,
+      "unit": "°C",
+      "group": "Temperature",
+      "item": "Actions slow further below",
+      "item_ja": "動作がさらに遅くなる温度",
+      "row": 38
+    },
+    {
+      "key": "co2_start",
+      "value": 10,
+      "unit": "",
+      "group": "CO2",
+      "item": "Level right after the accident",
+      "item_ja": "事故直後の値",
+      "row": 39
+    },
+    {
+      "key": "co2_rise",
+      "value": 12,
+      "unit": "/min",
+      "group": "CO2",
+      "item": "Rise rate after the accident",
+      "item_ja": "事故後の上昇の速さ",
+      "row": 40
+    },
+    {
+      "key": "co2_warn",
+      "value": 60,
+      "unit": "",
+      "group": "CO2",
+      "item": "Warning level",
+      "item_ja": "警告を出す値",
+      "row": 41
+    },
+    {
+      "key": "co2_slow",
+      "value": 80,
+      "unit": "",
+      "group": "CO2",
+      "item": "Level where actions slow",
+      "item_ja": "動作が遅くなる値",
+      "row": 42
+    },
+    {
+      "key": "co2_filters",
+      "value": 2,
+      "unit": "swaps",
+      "group": "CO2",
+      "item": "Filter swaps available",
+      "item_ja": "フィルター交換ができる回数",
+      "row": 43
+    },
+    {
+      "key": "sci_camera",
+      "value": 1,
+      "unit": "",
+      "group": "Science",
+      "item": "Camera science value",
+      "item_ja": "カメラの科学価値",
+      "row": 44
+    },
+    {
+      "key": "sci_spectrometer",
+      "value": 2,
+      "unit": "",
+      "group": "Science",
+      "item": "Spectrometer science value",
+      "item_ja": "分光計の科学価値",
+      "row": 45
+    },
+    {
+      "key": "sci_radar",
+      "value": 1.5,
+      "unit": "",
+      "group": "Science",
+      "item": "Radar sounder science value",
+      "item_ja": "レーダーサウンダーの科学価値",
+      "row": 46
+    },
+    {
+      "key": "data_camera",
+      "value": 10,
+      "unit": "data/min",
+      "group": "Data",
+      "item": "Camera data",
+      "item_ja": "カメラのデータ量",
+      "row": 47
+    },
+    {
+      "key": "data_spectrometer",
+      "value": 20,
+      "unit": "data/min",
+      "group": "Data",
+      "item": "Spectrometer data",
+      "item_ja": "分光計のデータ量",
+      "row": 48
+    },
+    {
+      "key": "data_radar",
+      "value": 15,
+      "unit": "data/min",
+      "group": "Data",
+      "item": "Radar sounder data",
+      "item_ja": "レーダーサウンダーのデータ量",
+      "row": 49
+    },
+    {
+      "key": "tx_standard",
+      "value": 30,
+      "unit": "data/min",
+      "group": "Data",
+      "item": "Transmit rate, standard antenna",
+      "item_ja": "送信速度（標準アンテナ）",
+      "row": 50
+    },
+    {
+      "key": "tx_high_gain",
+      "value": 60,
+      "unit": "data/min",
+      "group": "Data",
+      "item": "Transmit rate, high-gain antenna",
+      "item_ja": "送信速度（高利得アンテナ）",
+      "row": 51
+    },
+    {
+      "key": "sci_trajectory_mult",
+      "value": 1.5,
+      "unit": "x",
+      "group": "Science",
+      "item": "Science multiplier on the science trajectory",
+      "item_ja": "観測向き軌道の科学価値の倍率",
+      "row": 52
+    },
+    {
+      "key": "sci_carried_home",
+      "value": 0.5,
+      "unit": "x",
+      "group": "Science",
+      "item": "Value of data carried home without sending",
+      "item_ja": "送らずに持ち帰ったデータの価値",
+      "row": 53
+    },
+    {
+      "key": "burn_window_s",
+      "value": 60,
+      "unit": "s",
+      "group": "Burn",
+      "item": "Burn window length",
+      "item_ja": "噴射窓の長さ",
+      "row": 54
+    },
+    {
+      "key": "press_window_s",
+      "value": 0.5,
+      "unit": "s",
+      "group": "Burn",
+      "item": "Simultaneous-press window",
+      "item_ja": "同時押しの受付幅",
+      "row": 55
+    },
+    {
+      "key": "end_oxygen_min",
+      "value": 20,
+      "unit": "% or more",
+      "group": "Ending",
+      "item": "All-safe threshold: oxygen",
+      "item_ja": "全員生還の基準：酸素",
+      "row": 56
+    },
+    {
+      "key": "end_power_min",
+      "value": 15,
+      "unit": "% or more",
+      "group": "Ending",
+      "item": "All-safe threshold: power",
+      "item_ja": "全員生還の基準：電力",
+      "row": 57
+    },
+    {
+      "key": "end_temp_min",
+      "value": 10,
+      "unit": "°C or more",
+      "group": "Ending",
+      "item": "All-safe threshold: temperature",
+      "item_ja": "全員生還の基準：温度",
+      "row": 58
+    },
+    {
+      "key": "req_science_min",
+      "value": 1.5,
+      "unit": "science value",
+      "group": "Requirement",
+      "item": "Minimum science delivered (Req 2)",
+      "item_ja": "届ける科学価値の最小値（Req 2）",
+      "row": 59
+    },
+    {
+      "key": "score_ed_a",
+      "value": 500,
+      "unit": "pts",
+      "group": "Score",
+      "item": "Everyone home safe (ED-A)",
+      "item_ja": "全員生還（ED-A）",
+      "row": 60
+    },
+    {
+      "key": "score_ed_b",
+      "value": 300,
+      "unit": "pts",
+      "group": "Score",
+      "item": "Home with equipment lost (ED-B)",
+      "item_ja": "設備を失って生還（ED-B）",
+      "row": 61
+    },
+    {
+      "key": "score_per_science",
+      "value": 100,
+      "unit": "pts",
+      "group": "Score",
+      "item": "Per 1 science value delivered",
+      "item_ja": "届けた科学価値1あたり",
+      "row": 62
+    },
+    {
+      "key": "score_per_resource",
+      "value": 1,
+      "unit": "pts/%",
+      "group": "Score",
+      "item": "Remaining resources",
+      "item_ja": "残りリソース",
+      "row": 63
+    },
+    {
+      "key": "score_per_budget",
+      "value": 2,
+      "unit": "pts/unit",
+      "group": "Score",
+      "item": "Leftover budget",
+      "item_ja": "予算の余り",
+      "row": 64
+    },
+    {
+      "key": "score_teamwork",
+      "value": 50,
+      "unit": "pts",
+      "group": "Score",
+      "item": "Teamwork bonus (per two-person action)",
+      "item_ja": "協力ボーナス（2人操作1回あたり）",
+      "row": 65
+    },
+    {
+      "key": "score_all_requirements",
+      "value": 200,
+      "unit": "pts",
+      "group": "Score",
+      "item": "All four requirements met",
+      "item_ja": "4つの要件をすべて達成",
+      "row": 66
+    },
+    {
+      "key": "difficulty_1",
+      "value": 1,
+      "unit": "x",
+      "group": "Difficulty",
+      "item": "Consumption multiplier (level 1)",
+      "item_ja": "消費の倍率（レベル1）",
+      "row": 67
+    },
+    {
+      "key": "difficulty_2",
+      "value": 1.15,
+      "unit": "x",
+      "group": "Difficulty",
+      "item": "Consumption multiplier (level 2)",
+      "item_ja": "消費の倍率（レベル2）",
+      "row": 68
+    },
+    {
+      "key": "difficulty_3",
+      "value": 1.3,
+      "unit": "x",
+      "group": "Difficulty",
+      "item": "Consumption multiplier (level 3)",
+      "item_ja": "消費の倍率（レベル3）",
+      "row": 69
+    },
+    {
+      "key": "burn_window_open_after_aos_s",
+      "value": 30,
+      "unit": "s",
+      "group": "Time",
+      "item": "Burn window opens after signal returns",
+      "item_ja": "通信回復から噴射窓が開くまで",
+      "row": 70
+    },
+    {
+      "key": "reentry_ready_s",
+      "value": 20,
+      "unit": "s",
+      "group": "Time",
+      "item": "Re-entry check: time allowed to get ready",
+      "item_ja": "再突入の準備に使える時間",
+      "row": 71
+    },
+    {
+      "key": "slow_cold_pct",
+      "value": 30,
+      "unit": "%",
+      "group": "Speed",
+      "item": "Control slow-down below 10 °C",
+      "item_ja": "10℃未満での操作の遅れ",
+      "row": 72
+    },
+    {
+      "key": "slow_colder_pct",
+      "value": 50,
+      "unit": "%",
+      "group": "Speed",
+      "item": "Control slow-down below 5 °C",
+      "item_ja": "5℃未満での操作の遅れ",
+      "row": 73
+    },
+    {
+      "key": "slow_co2_pct",
+      "value": 30,
+      "unit": "%",
+      "group": "Speed",
+      "item": "Control slow-down while CO2 is high",
+      "item_ja": "CO2が高い間の操作の遅れ",
+      "row": 74
+    },
+    {
+      "key": "end_strict_margin",
+      "value": 5,
+      "unit": "% points",
+      "group": "Ending",
+      "item": "Stricter thresholds after a missed burn window or a bad re-entry",
+      "item_ja": "噴射窓を逃した・再突入の準備不足のときに厳しくする幅",
+      "row": 75
+    },
+    {
+      "key": "houston_cooldown_s",
+      "value": 30,
+      "unit": "s",
+      "group": "Houston",
+      "item": "Same line not repeated within",
+      "item_ja": "同じ台詞を繰り返さない時間",
+      "row": 76
+    },
+    {
+      "key": "houston_leak_repeat_s",
+      "value": 8,
+      "unit": "s",
+      "group": "Houston",
+      "item": "Leak warning repeats every",
+      "item_ja": "漏れの警告を繰り返す間隔",
+      "row": 77
+    },
+    {
+      "key": "m06_delay_s",
+      "value": 20,
+      "unit": "s",
+      "group": "Time",
+      "item": "M06 line after the accident",
+      "item_ja": "事故からM06の台詞まで",
+      "row": 78
+    }
+  ]
+}
