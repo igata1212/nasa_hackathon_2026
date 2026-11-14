@@ -36,7 +36,7 @@
 - 出うる反応：練習中（事故前）なら H08・H21・H23・H27・H28。M05 の直後なら H07（8 秒後）・H09（30 秒後）
 
 ## 場面4　管制室（the earth）
-- 時刻：t=20（M06）〜 t=120（M09）。SPEC 4章。場面としての時刻は材料になし
+- 時刻：t=20（M06）〜 t=90（M09）。SPEC 4章。場面としての時刻は材料になし
 - 何が起きる（storyboard）：「部屋の中に机とコンピュータと人。「ここが先生」と注記がある。」（SPEC になし。art-direction.md は「作っていないもの」に管制室を挙げる）
 - 流れる台詞（ヒューストンの声。M10 は場面6）：
   - **M06**
@@ -51,7 +51,7 @@
   - **M09**（食い違いあり）
     - EN: You're about to go behind the Moon. The Moon will block our signal, so you're on your own for a while. It's also your only chance to observe the far side. What you run back there is up to you. ...You'll be fine.
     - JA: もうすぐ月の裏側だ。月が電波をさえぎるから、しばらく君たちだけになる。裏側を観測できるのもこの時だけだ。何を動かすかは任せる。……君たちなら大丈夫だ。
-- 出うる反応：H07〜H28 のすべて（通信途絶 t=120〜300 の間は声なし。SPEC 9章）
+- 出うる反応：H07〜H28 のすべて（通信途絶 t=90〜210 の間は声なし。SPEC 9章）
 
 ## 場面5　素材の画面（部品を「使う」「使わない」）
 - 時刻：未確定。M01 なら事故前。修理の場面なら事故後（storyboard も「未確定」）
@@ -63,8 +63,8 @@
 - 出うる反応：設計画面なら H01〜H06。修理なら未定（下の食い違いを参照）
 
 ## 場面6　地球に向かう宇宙船
-- 時刻：t=300（M10 通信回復）→ 330（M11 噴射窓）→ 420 / 510（M12 再突入。ルートA / ルートB）。SPEC 4章
-- 何が起きる（storyboard）：「大きな地球（the earth）の弧に向かって宇宙船が飛ぶ。」（SPEC 4章：「通信回復、データを送れる」「噴射窓が開く（60秒）」「再突入開始（ルートA / ルートB）」）
+- 時刻：t=210（M10 通信回復）→ 240（M11 噴射窓）→ 300 / 360（M12 再突入。ルートA / ルートB）。SPEC 4章
+- 何が起きる（storyboard）：「大きな地球（the earth）の弧に向かって宇宙船が飛ぶ。」（SPEC 4章：「通信回復、データを送れる」「噴射窓が開く（40秒）」「再突入開始（ルートA / ルートB）」）
 - 流れる台詞：
   - **M10**
     - EN: ...Houston here! Do you read me? You made it through! I can take your data whenever you point the antenna at Earth.
@@ -75,10 +75,10 @@
   - **M12**
     - EN: There's Earth. One last hurdle: re-entry. The heat will cut our radio again. Heat shield forward, and make sure life support and navigation have power. See you on the other side.
     - JA: 地球が見えてきた。最後の山場、再突入だ。熱でまた通信が途切れる。熱シールドを前に向けて、生命維持と航法に電力が回っているか確かめてくれ。向こう側で会おう。
-- 出うる反応：H10〜H19（資源の閾値）、H21〜H28（H24・H25 は t=300 のみ）
+- 出うる反応：H10〜H19（資源の閾値）、H21〜H28（H24・H25 は t=210 のみ）
 
 ## 場面7　「成功」の画面
-- 時刻：着水。t=480 / 570（SPEC 4章）。判定は SPEC 8章（着水時）
+- 時刻：着水。t=360 / 420（SPEC 4章）。判定は SPEC 8章（着水時）
 - 何が起きる（storyboard）：「成功と書かれた画面。写真の下半分は裏写りで、描かれていない。」（storyboard：ED-A または ED-B にあたりそう。ED-C の場面はない）
 - 流れる台詞（判定で ED-A か ED-B のどちらか。その後 R01）：
   - **ED-A**

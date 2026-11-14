@@ -12,7 +12,7 @@
     },
     {
       "key": "time_p2_accident_min",
-      "value": 2,
+      "value": 1.5,
       "unit": "min",
       "group": "Time",
       "item": "P2 Accident (until the far side)",
@@ -21,7 +21,7 @@
     },
     {
       "key": "time_p3_farside_min",
-      "value": 3,
+      "value": 2,
       "unit": "min",
       "group": "Time",
       "item": "P3 Far side of the Moon",
@@ -30,7 +30,7 @@
     },
     {
       "key": "time_p4_return_a_min",
-      "value": 2,
+      "value": 1.5,
       "unit": "min",
       "group": "Time",
       "item": "P4 Return (route A)",
@@ -39,7 +39,7 @@
     },
     {
       "key": "time_p4_return_b_min",
-      "value": 3.5,
+      "value": 2.5,
       "unit": "min",
       "group": "Time",
       "item": "P4 Return (route B)",
@@ -75,7 +75,7 @@
     },
     {
       "key": "power_life_support",
-      "value": 3,
+      "value": 4,
       "unit": "%/min",
       "group": "Power",
       "item": "Life support (cannot be shut down)",
@@ -84,7 +84,7 @@
     },
     {
       "key": "power_heater",
-      "value": 3,
+      "value": 4,
       "unit": "%/min",
       "group": "Power",
       "item": "Heater",
@@ -93,7 +93,7 @@
     },
     {
       "key": "power_lights",
-      "value": 1,
+      "value": 1.5,
       "unit": "%/min",
       "group": "Power",
       "item": "Lights",
@@ -102,7 +102,7 @@
     },
     {
       "key": "power_nav",
-      "value": 3,
+      "value": 4,
       "unit": "%/min",
       "group": "Power",
       "item": "Navigation computer",
@@ -111,7 +111,7 @@
     },
     {
       "key": "power_comms",
-      "value": 2,
+      "value": 3,
       "unit": "%/min",
       "group": "Power",
       "item": "Comms",
@@ -129,7 +129,7 @@
     },
     {
       "key": "power_camera",
-      "value": 2,
+      "value": 3,
       "unit": "%/min",
       "group": "Power",
       "item": "Camera while observing",
@@ -138,7 +138,7 @@
     },
     {
       "key": "power_spectrometer",
-      "value": 4,
+      "value": 5,
       "unit": "%/min",
       "group": "Power",
       "item": "Spectrometer while observing",
@@ -147,7 +147,7 @@
     },
     {
       "key": "power_radar",
-      "value": 3,
+      "value": 4,
       "unit": "%/min",
       "group": "Power",
       "item": "Radar sounder while observing",
@@ -192,7 +192,7 @@
     },
     {
       "key": "oxygen_leak_per_s",
-      "value": 2,
+      "value": 1,
       "unit": "%/s",
       "group": "Oxygen",
       "item": "Leak rate until the valve is closed",
@@ -210,7 +210,7 @@
     },
     {
       "key": "oxygen_breathing",
-      "value": 6,
+      "value": 9,
       "unit": "%/min",
       "group": "Oxygen",
       "item": "Breathing",
@@ -219,7 +219,7 @@
     },
     {
       "key": "oxygen_co2_extra",
-      "value": 2,
+      "value": 3,
       "unit": "%/min",
       "group": "Oxygen",
       "item": "Extra use while CO2 is high",
@@ -300,7 +300,7 @@
     },
     {
       "key": "temp_drop",
-      "value": 1.5,
+      "value": 2.5,
       "unit": "°C/min",
       "group": "Temperature",
       "item": "Drop with the heater off",
@@ -309,7 +309,7 @@
     },
     {
       "key": "temp_rise",
-      "value": 3,
+      "value": 4,
       "unit": "°C/min",
       "group": "Temperature",
       "item": "Rise with the heater on",
@@ -345,7 +345,7 @@
     },
     {
       "key": "co2_rise",
-      "value": 12,
+      "value": 20,
       "unit": "/min",
       "group": "CO2",
       "item": "Rise rate after the accident",
@@ -408,7 +408,7 @@
     },
     {
       "key": "data_camera",
-      "value": 10,
+      "value": 15,
       "unit": "data/min",
       "group": "Data",
       "item": "Camera data",
@@ -417,7 +417,7 @@
     },
     {
       "key": "data_spectrometer",
-      "value": 20,
+      "value": 30,
       "unit": "data/min",
       "group": "Data",
       "item": "Spectrometer data",
@@ -426,7 +426,7 @@
     },
     {
       "key": "data_radar",
-      "value": 15,
+      "value": 22,
       "unit": "data/min",
       "group": "Data",
       "item": "Radar sounder data",
@@ -435,7 +435,7 @@
     },
     {
       "key": "tx_standard",
-      "value": 30,
+      "value": 45,
       "unit": "data/min",
       "group": "Data",
       "item": "Transmit rate, standard antenna",
@@ -444,7 +444,7 @@
     },
     {
       "key": "tx_high_gain",
-      "value": 60,
+      "value": 90,
       "unit": "data/min",
       "group": "Data",
       "item": "Transmit rate, high-gain antenna",
@@ -471,7 +471,7 @@
     },
     {
       "key": "burn_window_s",
-      "value": 60,
+      "value": 40,
       "unit": "s",
       "group": "Burn",
       "item": "Burn window length",

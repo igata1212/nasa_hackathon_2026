@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129・#130）
 // iizuka の手描きスケッチ（docs/design/storyboard.md）の場面を、段階の変わり目に短い演出として流す（#124）。
 //   design → practice（打ち上げが通った）  … LaunchStage：地上のクルーとロケット → 打ち上げ → 月へ向かう船（約 8 秒）
 //   flight → ending（ED-A・ED-B）          … ReturnStage：再突入 → パラシュート → 着水「SPLASHDOWN!」（約 6.7 秒。#130）
@@ -98,9 +98,10 @@ public class StoryDirector : MonoBehaviour
         if (e.kind != "houston" || string.IsNullOrEmpty(e.text)) return;
         lastHouston = e.text; lastHoustonAt = Time.unscaledTime;
         if (!string.IsNullOrEmpty(e.id)) lines[e.id] = e.text;   // 結末の台詞（ED-A/B/C）を舞台が時刻を決めて出すため（#130）
-        if (Playing && !closing) ShowHouston(e.text);
+        if (Playing && !closing) pendingHouston = e.text;   // 出すのは舞台が許したとき（Run、#129）
     }
     string lastHouston = ""; float lastHoustonAt = -99f, launchOkAt = -99f;
+    string pendingHouston;   // 演出中に来て、まだ出していない台詞（#129）
 
     /// <summary>結末（ED-A/B/C）は room の直後の result で届くので、少し待ってから選ぶ</summary>
     IEnumerator PlayReturnWhenKnown()
@@ -147,7 +148,7 @@ public class StoryDirector : MonoBehaviour
         bars.SetActive(true);
         Caption("", "");
         houstonBar.SetActive(false);
-        if (Time.unscaledTime - lastHoustonAt < 1.5f) ShowHouston(lastHouston);   // 直前の台詞も拾う（打ち上げの M03 など）
+        pendingHouston = Time.unscaledTime - lastHoustonAt < 1.5f ? lastHouston : null;   // 直前の台詞も拾う（打ち上げの M03 など）
         storyCamera.enabled = true;
         s.Begin(this);
         t = 0f;
@@ -164,6 +165,7 @@ public class StoryDirector : MonoBehaviour
             t += Time.unscaledDeltaTime;
             if (debugFreezeAt >= 0f && t > debugFreezeAt) t = debugFreezeAt;
             s.Pose(this, Mathf.Min(t, s.Length));
+            if (pendingHouston != null && s.AllowHouston(t)) { ShowHouston(pendingHouston); pendingHouston = null; }
         }
         yield return Close();
     }
@@ -227,6 +229,9 @@ public class StoryDirector : MonoBehaviour
 
     // ------------------------------------------------------------------ 舞台から使う
     public Camera Cam => storyCamera;
+    /// <summary>大きい字幕・小さい字幕の Text（#129。舞台が位置や縁取りを変えるとき。End で元に戻すこと）</summary>
+    public Text CaptionBig => caption;
+    public Text CaptionSmall => sub;
     public void SetFade(float a) { if (fade != null) fade.color = new Color(0f, 0f, 0f, Mathf.Clamp01(a)); }
     public void SetBackground(Color c) { storyCamera.clearFlags = CameraClearFlags.SolidColor; storyCamera.backgroundColor = c; }
     public void UseSkybox() { storyCamera.clearFlags = CameraClearFlags.Skybox; }

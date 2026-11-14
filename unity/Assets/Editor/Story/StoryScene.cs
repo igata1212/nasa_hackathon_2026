@@ -91,6 +91,7 @@ public static class StoryScene
         go.transform.SetParent(parent, false);
         go.transform.position = LaunchOrigin;
         var st = go.AddComponent<LaunchStage>();
+        st.captionFont = AssetDatabase.LoadAssetAtPath<Font>("Assets/Art/UI/Fonts/Baloo2-ExtraBold.ttf");   // 3・2・1、LIFTOFF!、TO THE MOON（#129）
 
         // 地上（0.05 倍・180° 回す）
         var ground = new GameObject("Ground").transform;
