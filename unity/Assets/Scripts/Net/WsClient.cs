@@ -1,5 +1,5 @@
 // 書いた人：Claude ／ 最終更新：2026-11-14
-// WebSocket でサーバー（Python、tmp/wt/server/server/README.md）につなぐクライアント。
+// WebSocket でサーバー（Python、server/README.md）につなぐクライアント。
 // .NET の System.Net.WebSockets.ClientWebSocket を使う（パッケージなし）。エディタ・iOS・デスクトップで動く。
 // WebGL のビルドでは動かない（今日はやらない。#if UNITY_WEBGL のとき未対応のログだけ）。WebGL は後で NativeWebSocket などに差し替える。
 // 受信は別スレッドで読み、ConcurrentQueue に積んで、Update（メインスレッド）でイベントを出す。
