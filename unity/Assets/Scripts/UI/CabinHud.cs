@@ -19,6 +19,7 @@ public class CabinHud
     readonly Dictionary<string, Button> toggles = new Dictionary<string, Button>();   // "sw:heater" など
     readonly Dictionary<string, Button> attBtns = new Dictionary<string, Button>();
     readonly Dictionary<string, Button> routeBtns = new Dictionary<string, Button>();
+    Button swapBtn; string swapLabel;   // フィルター交換。残り回数（state.filters）をラベルに足す
 
     static readonly string[] Attitudes = { "earth", "moon", "sun", "burn", "heatshield" };
 
@@ -175,7 +176,7 @@ public class CabinHud
     void BuildSeat()
     {
         Clear(tabRow); Clear(seatPanel);
-        toggles.Clear(); attBtns.Clear(); routeBtns.Clear();
+        toggles.Clear(); attBtns.Clear(); routeBtns.Clear(); swapBtn = null;
         foreach (var s in f.Model.MySeats)
         {
             string seat = s;
@@ -207,8 +208,9 @@ public class CabinHud
             case Seats.Life:
                 Ui.Size(Ui.Btn(row, "CLOSE VALVE 1", tint, () => f.Client.Send(Cmd.Valve(me, 1)), 26), flexW: 1);
                 Ui.Size(Ui.Btn(row, "CLOSE VALVE 2", tint, () => f.Client.Send(Cmd.Valve(me, 2)), 26), flexW: 1);
-                if (filterMate != null) { string mate = filterMate; Ui.Size(Ui.Btn(row, "SWAP FILTER (both seats)", tint, () => { f.Client.Send(Cmd.Simple("swap_filter", Seats.Life)); f.Client.Send(Cmd.Simple("swap_filter", mate)); }, 22), flexW: 1); }
-                else Ui.Size(Ui.Btn(row, "SWAP CO2 FILTER (with a partner)", tint, () => f.Client.Send(Cmd.Simple("swap_filter", me)), 22), flexW: 1);
+                if (filterMate != null) { string mate = filterMate; swapLabel = "SWAP FILTER (both seats)"; swapBtn = Ui.Btn(row, swapLabel, tint, () => { f.Client.Send(Cmd.Simple("swap_filter", Seats.Life)); f.Client.Send(Cmd.Simple("swap_filter", mate)); }, 22); }
+                else { swapLabel = "SWAP CO2 FILTER (with a partner)"; swapBtn = Ui.Btn(row, swapLabel, tint, () => f.Client.Send(Cmd.Simple("swap_filter", me)), 22); }
+                Ui.Size(swapBtn, flexW: 1);
                 break;
             case Seats.Comms:
                 var sw = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(sw, flexW: 3);
@@ -247,6 +249,11 @@ public class CabinHud
             else on = s.Switch(kv.Key.Substring(3));
             var (label, tint) = togglesState[kv.Key];
             Ui.SetBtn(kv.Value, label + (on ? "  ON" : "  OFF"), on ? tint : Ui.Gray, on ? Ui.Navy : Ui.Cream);
+        }
+        if (swapBtn != null)
+        {
+            bool left = s.filters > 0;
+            Ui.SetBtn(swapBtn, left ? swapLabel + "  x" + s.filters : "NO FILTERS LEFT", left ? Seats.Tint(Seats.Life) : Ui.Gray, left ? Ui.Navy : Ui.Cream);
         }
         foreach (var kv in attBtns) { bool on = s.attitude == kv.Key; Ui.SetBtn(kv.Value, kv.Key.ToUpper(), on ? Seats.Tint(Seats.Pilot) : Ui.Gray, on ? Ui.Navy : Ui.Cream); }
         foreach (var kv in routeBtns) { bool on = s.route == kv.Key; Ui.SetBtn(kv.Value, "ROUTE " + kv.Key.ToUpper(), on ? Seats.Tint(Seats.Planner) : Ui.Gray, on ? Ui.Navy : Ui.Cream); }
