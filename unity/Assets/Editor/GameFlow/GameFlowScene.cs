@@ -2,6 +2,7 @@
 // ゲームの流れのシーン Assets/Scenes/Game.unity を組み立てる（#96）。シーンは手で直さず、ここを直して作り直す。
 //   メニュー Tools/GameFlow/シーンを作り直す … LookDev.unity（船内・光・クルー）を開いて Game.unity として別名保存し、GameFlow と EventSystem を足す
 //   LookDev.unity 自体は変えない（別名保存。LookDev の組み立ては Tools/LookDev/シーンを作り直す）
+//   演出（打ち上げ・管制室の小窓・帰還）：最後に StoryScene.BuildInto を呼ぶ（Editor/Story/StoryScene.cs）
 //   軌道の小窓：軌道の地図（GmatOrbitMapScene.BuildRig）を船内から遠く（RigOrigin）に置き、専用のカメラで RenderTexture に描いて HUD の隅に出す
 using System.Linq;
 using UnityEditor;
@@ -60,6 +61,8 @@ public static class GameFlowScene
         camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>().renderPostProcessing = false;
         flow.trajectory = view;
         flow.trajectoryCamera = cam;
+
+        StoryScene.BuildInto(flow);   // 手描きスケッチの演出（#124）：打ち上げ・管制室の小窓・帰還
 
         EditorSceneManager.SaveScene(scene, ScenePath, false);   // 別名で保存（LookDev.unity は触らない）
         var list = EditorBuildSettings.scenes.ToList();
