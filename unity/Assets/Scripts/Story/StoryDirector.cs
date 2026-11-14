@@ -1,13 +1,14 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#129・#130）
 // iizuka の手描きスケッチ（docs/design/storyboard.md）の場面を、段階の変わり目に短い演出として流す（#124）。
 //   design → practice（打ち上げが通った）  … LaunchStage：地上のクルーとロケット → 打ち上げ → 月へ向かう船（約 8 秒）
-//   flight → ending（ED-A・ED-B）          … ReturnStage：再突入 → パラシュート → 着水「SPLASHDOWN!」（約 5.5 秒）
+//   flight → ending（ED-A・ED-B）          … ReturnStage：再突入 → パラシュート → 着水「SPLASHDOWN!」（約 6.7 秒。#130）
 //   flight → ending（ED-C）                … LostStage：静かに暗くなって「Mission lost」（約 4.5 秒）
 // サーバーの時間は止まらないので、演出は短くし、SKIP で飛ばせる。演出の間は全画面の絵を GameFlow の UI の上に重ねる
 // （UI は消さない。重ねた絵がクリックも受け止める）。その間に来たヒューストンの台詞は、絵の下に字幕で出す。
 // GameFlow は変えない：シーンに置いて flow を指すだけ。GameFlow.Client が差し替わったら付け直す。
 // 船内の場面はそのまま。舞台は船内から遠く（Editor/Story/StoryScene.cs が組む）に置き、専用のカメラで RenderTexture に描く。
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -96,7 +97,8 @@ public class StoryDirector : MonoBehaviour
         if (e.kind == "launch" && e.status == "ok") launchOkAt = Time.unscaledTime;
         if (e.kind != "houston" || string.IsNullOrEmpty(e.text)) return;
         lastHouston = e.text; lastHoustonAt = Time.unscaledTime;
-        if (Playing && !closing) pendingHouston = e.text;   // 出すのは舞台が許したとき（Run）
+        if (!string.IsNullOrEmpty(e.id)) lines[e.id] = e.text;   // 結末の台詞（ED-A/B/C）を舞台が時刻を決めて出すため（#130）
+        if (Playing && !closing) pendingHouston = e.text;   // 出すのは舞台が許したとき（Run、#129）
     }
     string lastHouston = ""; float lastHoustonAt = -99f, launchOkAt = -99f;
     string pendingHouston;   // 演出中に来て、まだ出していない台詞（#129）
@@ -203,6 +205,7 @@ public class StoryDirector : MonoBehaviour
         if (storyCamera != null) storyCamera.enabled = false;
         if (view != null) view.enabled = false;
         Caption("", "");
+        EndingLayout(false);
         if (houstonBar != null) houstonBar.SetActive(false);
         if (bars != null) bars.SetActive(false);
     }
@@ -244,7 +247,7 @@ public class StoryDirector : MonoBehaviour
 
     void ShowHouston(string text)
     {
-        houstonLine.text = text;
+        houstonLine.text = CleanLine(text);
         houstonBar.SetActive(true);
     }
 
@@ -283,7 +286,8 @@ public class StoryDirector : MonoBehaviour
         Ui.Anchor(who.rectTransform, 0, 0.7f, 1, 1, 14, 0, 8, 4);
         houstonLine = Ui.Label(hb.transform, "", 22, Ui.Cream, TextAnchor.UpperLeft);
         Ui.Anchor(houstonLine.rectTransform, 0, 0, 1, 0.74f, 14, 4, 14, 0);
-        houstonLine.resizeTextForBestFit = true; houstonLine.resizeTextMinSize = 14; houstonLine.resizeTextMaxSize = 22;
+        houstonLine.resizeTextForBestFit = true; houstonLine.resizeTextMinSize = 12; houstonLine.resizeTextMaxSize = 22;
+        houstonLine.verticalOverflow = VerticalWrapMode.Truncate;   // 長い台詞が帯の外にはみ出さない（#130）
         houstonBar.SetActive(false);
 
         var skip = Ui.Btn(root, "SKIP  >>", new Color(1f, 1f, 1f, 0.85f), Skip, 26, Ui.Navy);
@@ -294,4 +298,69 @@ public class StoryDirector : MonoBehaviour
         bars.SetActive(false);
         overlay.SetActive(false);
     }
+
+    // ------------------------------------------------------------------ 帰還・ED-C の字幕の並べ方（#130）
+    // 大きい字幕を上へ、小さい字幕をその下へ、ヒューストンの帯を下へ（下には海か暗い宇宙しか映らない）。見出しは Baloo 2、navy の縁。
+    // この間、ヒューストンの帯は舞台（ReturnStage・LostStage）が毎フレーム HoustonBar() で決める（結果を先に言わないため）。
+    // Cleanup で元に戻すので、打ち上げの演出の並べ方は変わらない。
+    [Header("帰還・ED-C の字幕（#130）")]
+    [Tooltip("見出しの書体（Baloo 2 ExtraBold の ttf）。StoryScene が入れる。空なら既定の書体")] public Font headingFont;
+    [Tooltip("大きい字幕の位置（anchor の x0, y0, x1, y1）")] public Vector4 endingBig = new Vector4(0f, 0.62f, 1f, 0.84f);
+    [Tooltip("小さい字幕の位置")] public Vector4 endingSmall = new Vector4(0f, 0.53f, 1f, 0.61f);
+    [Tooltip("下の短い字幕（RE-ENTRY など）の位置")] public Vector4 endingLow = new Vector4(0f, 0.11f, 1f, 0.19f);
+    [Tooltip("ヒューストンの帯の位置")] public Vector4 endingBar = new Vector4(0.20f, 0.10f, 0.80f, 0.19f);
+    public int endingSmallSize = 40, endingLowSize = 34;
+    public Vector2 endingOutline = new Vector2(3f, -3f);
+
+    readonly Dictionary<string, string> lines = new Dictionary<string, string>();
+    Text low;
+    Outline[] outlines;
+    Vector4 defBig, defSmall, defBar;
+    int defSmallSize;
+
+    /// <summary>帰還・ED-C の並べ方にする（on）／元に戻す（off）</summary>
+    public void EndingLayout(bool on)
+    {
+        if (caption == null || (!on && low == null)) return;
+        if (low == null)
+        {
+            defBig = AnchorOf(caption.rectTransform); defSmall = AnchorOf(sub.rectTransform); defBar = AnchorOf((RectTransform)houstonBar.transform);
+            defSmallSize = sub.fontSize;
+            low = Ui.Label(overlay.transform, "", endingLowSize, Ui.Cream, TextAnchor.MiddleCenter, FontStyle.Bold);
+            low.name = "LowCaption";
+            SetAnchor(low.rectTransform, endingLow);
+            outlines = new[] { caption.gameObject.AddComponent<Outline>(), sub.gameObject.AddComponent<Outline>(), low.gameObject.AddComponent<Outline>() };
+            foreach (var o in outlines) { o.effectColor = Ui.Navy; o.effectDistance = endingOutline; }
+        }
+        SetAnchor(caption.rectTransform, on ? endingBig : defBig);
+        SetAnchor(sub.rectTransform, on ? endingSmall : defSmall);
+        SetAnchor((RectTransform)houstonBar.transform, on ? endingBar : defBar);
+        sub.fontSize = on ? endingSmallSize : defSmallSize;
+        bool baloo = on && headingFont != null;
+        foreach (var x in new[] { caption, sub, low }) { x.font = baloo ? headingFont : Ui.Font; x.fontStyle = baloo ? FontStyle.Normal : FontStyle.Bold; }
+        foreach (var o in outlines) o.enabled = on;
+        low.text = "";
+        low.gameObject.SetActive(on);
+    }
+
+    /// <summary>下の短い字幕（EndingLayout の間だけ）。空文字で消す</summary>
+    public void LowCaption(string s) { if (low != null) low.text = s; }
+
+    /// <summary>ヒューストンの帯を出す（空文字なら隠す）。EndingLayout の間、舞台が毎フレーム呼ぶ</summary>
+    public void HoustonBar(string text)
+    {
+        if (houstonBar == null) return;
+        bool on = !string.IsNullOrEmpty(text);
+        if (on) houstonLine.text = CleanLine(text);
+        if (houstonBar.activeSelf != on) houstonBar.SetActive(on);
+    }
+
+    /// <summary>その id（ED-A など）の台詞のうち、最後に届いたもの。まだ届いていなければ空</summary>
+    public string Line(string id) => id != null && lines.TryGetValue(id, out var s) ? s : "";
+
+    /// <summary>台本の「(pause)」は読み上げの間なので、字幕には出さない</summary>
+    static string CleanLine(string s) => s.Replace("(pause) ", "").Replace("(pause)", "");
+
+    static Vector4 AnchorOf(RectTransform r) => new Vector4(r.anchorMin.x, r.anchorMin.y, r.anchorMax.x, r.anchorMax.y);
+    static void SetAnchor(RectTransform r, Vector4 a) => Ui.Anchor(r, a.x, a.y, a.z, a.w);
 }

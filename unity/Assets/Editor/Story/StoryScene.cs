@@ -1,10 +1,10 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）
 // 手描きスケッチの演出（#124）の舞台を Game.unity に組み立てる。シーンは手で直さず、ここを直して作り直す。
 //   メニュー Tools/Story/演出を組み立てる … Game.unity を開いて「Story」を作り直して保存する（GameFlow が要る）
 //   GameFlowScene.BuildScene（Tools/GameFlow/シーンを作り直す）からは BuildInto(flow) を呼ぶ
 // 舞台はどれも船内から遠く（y = -10000）に置き、ふだんは隠しておく。カメラは StoryDirector の1台（演出の間だけ）と、管制室の小窓の1台。
 //   LaunchStage   (0, -10000, 0)     地面・発射台・ロケット（0.05 倍）とクルー4人。宇宙の舞台は +3000（Z）先
-//   ReturnStage   (0, -10000, 6000)  海（y＝原点）と司令船・パラシュート
+//   ReturnStage   (0, -10000, 6000)  海（y＝原点）と司令船・パラシュート・雲（#130：光る熱シールド・流れる筋・しぶきの柱・紙吹雪）
 //   LostStage     (0, -10000, 9000)  漂う船と地球
 //   MissionControl(0, -10000, -3000) 管制室・先生・管制官
 // 向き：地上と管制室は 180° 回して、カメラが −Z 側から +Z を見るようにした（主光源 KeyEuler(55,-15) が前から当たる）。
@@ -23,6 +23,13 @@ public static class StoryScene
     const string FireMat = ArtFolder + "/M_Story_Fire.mat";
     const string OceanMat = ArtFolder + "/M_Story_Ocean.mat";
     const string SmokeMat = "Assets/Art/VFX/M_Smoke_Gas.mat";
+    // #130 帰還の演出
+    const string HeatCoreMat = ArtFolder + "/M_Story_HeatCore.mat";   // 熱の芯（不透明・HDR のオレンジ。M_Story_Fire は打ち上げの炎と共用なので別にした）
+    const string FireAddMat = ArtFolder + "/M_Story_FireAdd.mat";     // 炎の尾（煙のアトラスを加算で）
+    const string LineMat = ArtFolder + "/M_Story_Line.mat";           // 流れる筋（加算・模様なし）
+    const string ConfettiMat = ArtFolder + "/M_Story_Confetti.mat";   // 紙吹雪（四角・半透明）
+    const string CloudMat = ArtFolder + "/M_Story_Cloud.mat";         // 雲（Unlit の白）
+    const string HeadingFont = "Assets/Art/UI/Fonts/Baloo2-ExtraBold.ttf";   // 見出し（ui-guidelines.md）。無ければ既定の書体
 
     static readonly Vector3 LaunchOrigin = new Vector3(0f, -10000f, 0f);
     static readonly Vector3 SpaceOffset = new Vector3(0f, 0f, 3000f);
@@ -67,6 +74,8 @@ public static class StoryScene
         var dir = root.AddComponent<StoryDirector>();
         dir.flow = flow;
         dir.storyCamera = MakeCamera(root.transform, "StoryCamera", 40f, 0.1f, 900f, true);
+        dir.headingFont = AssetDatabase.LoadAssetAtPath<Font>(HeadingFont);
+        if (dir.headingFont == null) Debug.LogWarning(Tag + "見出しの書体が無い（既定の書体で出す）: " + HeadingFont);
         dir.launch = BuildLaunch(root.transform);
         dir.landing = BuildReturn(root.transform);
         dir.lost = BuildLost(root.transform);
@@ -166,25 +175,128 @@ public static class StoryScene
         ocean.transform.SetParent(go.transform, false);
         ocean.transform.localScale = new Vector3(400f, 1f, 400f);   // 4km 四方（端は遠くの切り捨て 900m より外）
         ocean.GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(OceanMat);
+        st.ocean = ocean.GetComponent<MeshRenderer>();
+        BuildClouds(go.transform);
 
         st.cm = Place(Models + "Ship/Ship_CM.fbx", go.transform);
         st.chute = Place(Models + "Fx/Fx_Parachute.fbx", st.cm);
         st.chute.localPosition = new Vector3(0f, 3.4f, 0f);       // DockRing の上
         st.chute.gameObject.SetActive(false);
-        st.glow = Blob("HeatGlow", st.cm, new Vector3(0f, 0.1f, 0f), new Vector3(4.4f, 1.6f, 4.4f));
+
+        // 熱：不透明の芯（底に貼りつく板）。横から撮るので光る縁に見える
+        //（包む光の層 HeatShell は、Unity で見ると縁の硬い板に見えたので作らない。#130）
+        st.glow = Blob("HeatGlow", st.cm, new Vector3(0f, -0.15f, 0f), new Vector3(4.2f, 0.9f, 4.2f));
+        st.glow.GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(HeatCoreMat);
         st.heatLight = PointLight(st.cm, "HeatLight", new Vector3(0f, -1.5f, 0f), Orange, 0f, 12f);
-        st.heatTrail = Smoke(st.cm, "HeatTrail", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 90f, life: new Vector2(0.8f, 1.3f),
-            speed: new Vector2(2f, 4f), size: new Vector2(0.8f, 1.6f), angle: 25f, radius: 1.8f,
-            c0: new Color(1f, 0.6f, 0.2f, 0.95f), c1: new Color(0.35f, 0.32f, 0.38f, 0.5f), drag: 1f, growth: 2f);
-        st.splash = Smoke(go.transform, "Splash", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 0f, life: new Vector2(0.8f, 1.4f),
-            speed: new Vector2(7f, 11f), size: new Vector2(0.6f, 1.3f), angle: 35f, radius: 1.8f,
-            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.5f, growth: 1.8f, burst: 80, gravity: 1.6f);
-        st.foam = Smoke(go.transform, "Foam", Vector3.zero, new Vector3(90f, 0f, 0f), rate: 0f, life: new Vector2(1.0f, 1.8f),
-            speed: new Vector2(3f, 5f), size: new Vector2(1.2f, 2.2f), angle: 0f, radius: 2.0f,
-            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.5f), drag: 1.5f, growth: 1.6f, burst: 60, circle: true);
+
+        // 炎の尾：速く短く、黄 → 赤で消える（灰色の煙にしない）。加算
+        st.heatTrail = Smoke(st.cm, "HeatTrail", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 160f, life: new Vector2(0.35f, 0.6f),
+            speed: new Vector2(2f, 4f), size: new Vector2(1.0f, 2.0f), angle: 25f, radius: 1.8f,
+            c0: new Color(Ui.Yellow.r, Ui.Yellow.g, Ui.Yellow.b, 0.9f), c1: new Color(Ui.Red.r, Ui.Red.g, Ui.Red.b, 0f), drag: 1f, growth: 2f);
+        st.heatTrail.GetComponent<ParticleSystemRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(FireAddMat);
+
+        // 流れる筋：船の進む向き（局所 −Y）の 18m 先の板から、後ろ（局所 +Y）へ 30 m/s。船について動く（Local）
+        st.speedLines = Particles(st.cm, "SpeedLines", new Vector3(0f, -18f, 0f), new Vector3(-90f, 0f, 0f), LineMat, 200);
+        {
+            var ps = st.speedLines;
+            var main = ps.main;
+            main.loop = true; main.duration = 2f;
+            main.startLifetime = 0.9f; main.startSpeed = 30f;
+            main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.1f);   // 細く長く（Unity で見て 0.12〜0.2 は板に見えた）
+            main.startColor = Color.white;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            var em = ps.emission; em.rateOverTime = 50f;
+            var sh = ps.shape; sh.enabled = true; sh.shapeType = ParticleSystemShapeType.Box; sh.scale = new Vector3(24f, 14f, 2f);
+            var col = ps.colorOverLifetime; col.enabled = true; col.color = FadeInOut(Ui.Cream, 0.5f);
+            var pr = ps.GetComponent<ParticleSystemRenderer>();
+            pr.renderMode = ParticleSystemRenderMode.Stretch; pr.velocityScale = 0.2f; pr.lengthScale = 1f;   // 長さ 約 6m
+        }
+
+        // 着水：しぶきの冠と柱、白い輪、船のまわりに残る泡
+        // 粒は小さめ（Unity で見て、0.8〜1.8・growth 1.8 だと白い煙の塊になり船が隠れた）
+        st.splash = Smoke(go.transform, "Splash", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 0f, life: new Vector2(0.9f, 1.5f),
+            speed: new Vector2(9f, 16f), size: new Vector2(0.5f, 1.1f), angle: 55f, radius: 2.2f,
+            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.5f, growth: 0.7f, burst: 100, gravity: 2.2f);
+        st.splashColumn = Smoke(go.transform, "SplashColumn", Vector3.zero, new Vector3(-90f, 0f, 0f), rate: 0f, life: new Vector2(1.0f, 1.4f),
+            speed: new Vector2(16f, 22f), size: new Vector2(0.45f, 0.9f), angle: 8f, radius: 0.6f,
+            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.6f), drag: 0.4f, growth: 0.6f, burst: 40, gravity: 2.5f);
+        st.foam = Smoke(go.transform, "Foam", Vector3.zero, new Vector3(90f, 0f, 0f), rate: 0f, life: new Vector2(1.6f, 2.4f),
+            speed: new Vector2(6f, 9f), size: new Vector2(1.5f, 2.6f), angle: 0f, radius: 2.0f,
+            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.5f), drag: 0.8f, growth: 1.6f, burst: 60, circle: true);
+        st.foamStay = Smoke(go.transform, "FoamStay", Vector3.zero, new Vector3(90f, 0f, 0f), rate: 12f, life: new Vector2(1.2f, 1.8f),
+            speed: new Vector2(0.3f, 0.8f), size: new Vector2(1.0f, 1.8f), angle: 0f, radius: 2.2f,
+            c0: Color.white, c1: new Color(0.9f, 0.95f, 1f, 0.5f), drag: 1f, growth: 1.2f, circle: true);
+
+        // ED-A だけの紙吹雪：席の4色（Red・Green・Yellow・Blue）の四角
+        st.confetti = Particles(go.transform, "Confetti", Vector3.zero, new Vector3(-90f, 0f, 0f), ConfettiMat, 200);
+        {
+            var ps = st.confetti;
+            var main = ps.main;
+            main.loop = false; main.duration = 1f;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(1.8f, 2.6f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(10f, 16f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.25f, 0.4f);
+            main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.gravityModifier = 1.2f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            var seats = new Gradient { mode = GradientMode.Fixed };
+            seats.SetKeys(new[] { new GradientColorKey(Ui.Red, 0.25f), new GradientColorKey(Ui.Green, 0.5f), new GradientColorKey(Ui.Yellow, 0.75f), new GradientColorKey(Ui.Blue, 1f) },
+                          new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 1f) });
+            main.startColor = new ParticleSystem.MinMaxGradient(seats) { mode = ParticleSystemGradientMode.RandomColor };
+            var em = ps.emission; em.rateOverTime = 0f; em.SetBursts(new[] { new ParticleSystem.Burst(0f, (short)80) });
+            var sh = ps.shape; sh.enabled = true; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 40f; sh.radius = 0.5f;
+            var lv = ps.limitVelocityOverLifetime; lv.enabled = true; lv.limit = 100f; lv.drag = 0.8f;
+            lv.multiplyDragByParticleSize = false; lv.multiplyDragByParticleVelocity = false;
+            var rol = ps.rotationOverLifetime; rol.enabled = true; rol.z = new ParticleSystem.MinMaxCurve(-6f, 6f);
+            var col = ps.colorOverLifetime; col.enabled = true;
+            var fade = new Gradient();
+            fade.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+                         new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 0.8f), new GradientAlphaKey(0f, 1f) });
+            col.color = fade;
+        }
 
         go.SetActive(false);
         return st;
+    }
+
+    // 雲：白い球3つを縦に潰したもの（#130）。動かさない（船が雲の前を降りるだけで速さが分かる）。原点からの位置と幅（m）
+    static readonly Vector3[] CloudAt =
+    {
+        new Vector3(-55f, 12f, 120f), new Vector3(-32f, 34f, 85f), new Vector3(-10f, 22f, 135f),
+        new Vector3(16f, 42f, 100f), new Vector3(36f, 14f, 65f), new Vector3(50f, 30f, 125f),
+    };
+    static readonly float[] CloudWidth = { 12f, 9f, 14f, 10f, 8f, 13f };
+
+    static void BuildClouds(Transform parent)
+    {
+        var root = new GameObject("Clouds").transform;
+        root.SetParent(parent, false);
+        var mat = AssetDatabase.LoadAssetAtPath<Material>(CloudMat);
+        for (int i = 0; i < CloudAt.Length; i++)
+        {
+            var c = new GameObject("Cloud_" + (i + 1)).transform;
+            c.SetParent(root, false);
+            c.localPosition = CloudAt[i];
+            c.localScale = new Vector3(1f, 0.45f, 1f);
+            float w = CloudWidth[i];
+            Puff(c, mat, new Vector3(0f, 0f, 0f), w * 0.5f);
+            Puff(c, mat, new Vector3(-w * 0.32f, -w * 0.06f, 0.5f), w * 0.36f);
+            Puff(c, mat, new Vector3(w * 0.33f, -w * 0.05f, -0.5f), w * 0.38f);
+        }
+    }
+
+    static void Puff(Transform parent, Material mat, Vector3 local, float size)
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        go.name = "Puff";
+        Object.DestroyImmediate(go.GetComponent<Collider>());
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = local;
+        go.transform.localScale = Vector3.one * size;
+        var mr = go.GetComponent<MeshRenderer>();
+        mr.sharedMaterial = mat;
+        mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        mr.receiveShadows = false;
     }
 
     // ------------------------------------------------------------------ 演出3'：帰れなかった（ED-C）
@@ -197,7 +309,7 @@ public static class StoryScene
         st.ship = Place(Models + "Ship/Ship_Stack.fbx", go.transform);
         st.ship.localScale = Vector3.one * 0.15f;
         st.earth = Place(Models + "Bodies/Body_Earth.fbx", go.transform);
-        st.earth.localPosition = new Vector3(4f, -9f, 40f); st.earth.localScale = Vector3.one * 14f;
+        st.earth.localPosition = new Vector3(6f, -13f, 40f); st.earth.localScale = Vector3.one * 14f;   // 「Mission lost」が暗い空の上に来るよう下げた（#130）
         go.SetActive(false);
         return st;
     }
@@ -323,6 +435,38 @@ public static class StoryScene
         return go.transform;
     }
 
+    /// <summary>模様なしの粒の土台（#130：流れる筋・紙吹雪）。中身は呼ぶ側で決める。局所 +Z に出る</summary>
+    static ParticleSystem Particles(Transform parent, string name, Vector3 local, Vector3 euler, string mat, int max)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        go.transform.localPosition = local;
+        go.transform.localRotation = Quaternion.Euler(euler);
+        var ps = go.AddComponent<ParticleSystem>();
+        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        var main = ps.main;
+        main.playOnAwake = false;
+        main.useUnscaledTime = true;
+        main.maxParticles = max;
+        main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        var pr = go.GetComponent<ParticleSystemRenderer>();
+        pr.renderMode = ParticleSystemRenderMode.Billboard;
+        pr.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(mat);
+        pr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        pr.receiveShadows = false;
+        pr.maxParticleSize = 3f;
+        return ps;
+    }
+
+    /// <summary>その色で、はじめと終わりだけ透ける（a は真ん中の濃さ）</summary>
+    static Gradient FadeInOut(Color c, float a)
+    {
+        var g = new Gradient();
+        g.SetKeys(new[] { new GradientColorKey(c, 0f), new GradientColorKey(c, 1f) },
+                  new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(a, 0.15f), new GradientAlphaKey(a, 0.7f), new GradientAlphaKey(0f, 1f) });
+        return g;
+    }
+
     /// <summary>煙・しぶき（GasLeak の作り方と同じ：URP Particles/Unlit、Kenney の煙4枚のアトラス）。局所 +Z に出る</summary>
     static ParticleSystem Smoke(Transform parent, string name, Vector3 local, Vector3 euler, float rate, Vector2 life, Vector2 speed, Vector2 size,
         float angle, float radius, Color c0, Color c1, float drag, float growth, int burst = 0, float gravity = 0f, bool circle = false)
@@ -404,7 +548,35 @@ public static class StoryScene
         ocean.SetFloat("_Smoothness", 0.35f);
         ocean.SetFloat("_Metallic", 0f);
         EditorUtility.SetDirty(ocean);
+
+        // #130 帰還の演出。色はパレットの名前（Ui）から
+        var core = Mat(HeatCoreMat, "Universal Render Pipeline/Unlit");
+        core.SetColor("_BaseColor", new Color(3.0f, 1.1f, 0.25f, 1f));   // orange 寄りの HDR（Bloom で光る）
+        EditorUtility.SetDirty(core);
+        var smoke = AssetDatabase.LoadAssetAtPath<Material>(SmokeMat);
+        var fireAdd = Mat(FireAddMat, "Universal Render Pipeline/Particles/Unlit");
+        if (smoke != null) fireAdd.SetTexture("_BaseMap", smoke.GetTexture("_BaseMap"));
+        fireAdd.SetColor("_BaseColor", Color.white);
+        Blend(fireAdd, 2f);
+        var line = Mat(LineMat, "Universal Render Pipeline/Particles/Unlit");
+        line.SetColor("_BaseColor", Color.white);
+        Blend(line, 2f);
+        var confetti = Mat(ConfettiMat, "Universal Render Pipeline/Particles/Unlit");
+        confetti.SetColor("_BaseColor", Color.white);
+        Blend(confetti, 0f);
+        var cloud = Mat(CloudMat, "Universal Render Pipeline/Unlit");
+        cloud.SetColor("_BaseColor", new Color(1.0f, 0.98f, 0.94f, 1f));
+        EditorUtility.SetDirty(cloud);
         AssetDatabase.SaveAssets();
+    }
+
+    /// <summary>透ける素材にする（blend：0 アルファ、2 加算）。URP の素材画面と同じ設定にする</summary>
+    static void Blend(Material m, float blend)
+    {
+        m.SetFloat("_Surface", 1f);
+        m.SetFloat("_Blend", blend);
+        BaseShaderGUI.SetupMaterialBlendMode(m);
+        EditorUtility.SetDirty(m);
     }
 
     static Material Mat(string path, string shader)
