@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 でイベントを CabinHud に配るだけにした・GameParams を読む）
 // ゲームの流れ。段階（title → lobby → design → practice/stir/flight(=Cabin) → ending → report）を IGameClient の OnPhase で切り替える。
 // シーンは分けず、1シーン（Game.unity。船内の 3D は常に置く）の中で UGUI の画面を切り替える。
 // 理由：船内のロードが1回で済む／サーバーの段階が途中で変わっても（再接続・again）画面の出し入れだけで追従できる／軽い。
@@ -13,6 +13,10 @@ public class GameModel
     public List<string> MySeats = new List<string>();
     public List<PlayerInfo> Players = new List<PlayerInfo>();
     public Dictionary<string, object> Design, Totals, Result, Report;
+    /// <summary>result のメッセージそのまま（result の外に並ぶ値：#148 の strict・strict_reason など）</summary>
+    public Dictionary<string, object> ResultMsg;
+    /// <summary>サーバーの時計の速さ（welcome の speed。1 = 実時間）</summary>
+    public float Speed = 1f;
     public string LaunchStatus = "";
     public GameState State;
     public HashSet<string> Practiced = new HashSet<string>();
@@ -27,7 +31,7 @@ public class GameModel
         max[key] = m;
         return m;
     }
-    public void ResetFlight() { State = null; Result = null; Report = null; max.Clear(); Practiced.Clear(); LaunchStatus = ""; }
+    public void ResetFlight() { State = null; Result = null; ResultMsg = null; Report = null; max.Clear(); Practiced.Clear(); LaunchStatus = ""; }
 }
 
 public class GameFlow : MonoBehaviour
@@ -35,6 +39,7 @@ public class GameFlow : MonoBehaviour
     public TextAsset partsJson;          // Data/Sim/parts.json
     public TextAsset timelineJson;       // Data/Sim/timeline_t1_good.json（オフライン再生。正は data/sim/）
     public TextAsset timelineFailJson;   // Data/Sim/timeline_t4_fail.json
+    public TextAsset parametersJson;     // Data/Sim/parameters.json（正は docs/design/。GameParams が読む。空なら UrgencyFx のものを使う）
     public TrajectoryView trajectory;    // 軌道の小窓（船内から遠くに置いた軌道の地図）
     public Camera trajectoryCamera;      // ↑を描くカメラ。RenderTexture に描いて HUD の隅に出す
     public string wsUrl = "ws://localhost:8765";
@@ -45,7 +50,7 @@ public class GameFlow : MonoBehaviour
 
     TitleScreen title; LobbyScreen lobby; DesignScreen design; CabinHud cabin; EndingScreen ending; ReportScreen report;
     HoustonBox houston;
-    Text toast; float toastUntil, pressClearAt;
+    Text toast; float toastUntil;
     GameObject debugBar; Text speedLabel;
 
     void Awake()
@@ -57,6 +62,7 @@ public class GameFlow : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1600, 900); scaler.matchWidthOrHeight = 0.5f;
         cgo.AddComponent<GraphicRaycaster>();
         var root = (RectTransform)cgo.transform;
+        LoadParams();
 
         RenderTexture miniRt = null;
         if (trajectoryCamera != null)
@@ -75,6 +81,14 @@ public class GameFlow : MonoBehaviour
         toast = Ui.Label(root, "", 28, Ui.Yellow, TextAnchor.MiddleCenter, FontStyle.Bold);
         Ui.Anchor(toast.rectTransform, 0.2f, 0.35f, 0.8f, 0.41f);
         ShowPhase("title");
+    }
+
+    /// <summary>parameters.json を GameParams に読む。シーンを作り直す前（parametersJson が空）は UrgencyFx に割り当てたものを使う</summary>
+    void LoadParams()
+    {
+        var ta = parametersJson;
+        if (ta == null) { var fx = Object.FindAnyObjectByType<UrgencyFx>(); if (fx != null) ta = fx.parametersJson; }
+        GameParams.Load(ta);
     }
 
     void OnDestroy() { Client?.Close(); }
@@ -132,6 +146,7 @@ public class GameFlow : MonoBehaviour
         if (trajectory != null) trajectory.SetState(s.t, s.route);
     }
 
+    /// <summary>Model を直して、HUD（CabinHud の土台）には全部の kind を渡す。HUD の中で何を出すかは部品が決める</summary>
     void OnEvent(GameEvent e)
     {
         switch (e.kind)
@@ -141,15 +156,13 @@ public class GameFlow : MonoBehaviour
                 Model.LaunchStatus = e.status == "ok" ? "" : e.status;
                 design.Refresh();
                 break;
-            case "press": cabin.ShowPress(e); break;
             case "warning": houston.Warn(e.text); break;   // 声なしの警告（通信できないとき）。パネルの文字だけ
             case "practice":
-                var done = J.Arr(e.raw, "done");
                 Model.Practiced.Clear();
-                if (done != null) foreach (var x in done) Model.Practiced.Add(x.ToString());
-                cabin.Refresh();
+                foreach (var x in e.done) Model.Practiced.Add(x);
                 break;
         }
+        cabin.OnEvent(e);   // press（同時押しの合図）・practice（練習の案内）などは HUD の部品が受ける
     }
 
     void OnMessage(Dictionary<string, object> m)
@@ -157,7 +170,7 @@ public class GameFlow : MonoBehaviour
         switch (J.Str(m, "type"))
         {
             case "welcome":
-                Model.Room = J.Str(m, "room"); Model.PlayerId = J.Str(m, "player_id");
+                Model.Room = J.Str(m, "room"); Model.PlayerId = J.Str(m, "player_id"); Model.Speed = J.Num(m, "speed", 1f);
                 PlayerPrefs.SetString("player_id_" + Model.Room, Model.PlayerId);
                 SetSeats(J.Arr(m, "seats"));
                 break;
@@ -175,7 +188,7 @@ public class GameFlow : MonoBehaviour
                 Model.Design = J.Obj(m, "design"); Model.Totals = J.Obj(m, "totals"); Model.LaunchStatus = "";
                 design.Refresh();
                 break;
-            case "result": Model.Result = J.Obj(m, "result"); ending.Refresh(); break;
+            case "result": Model.Result = J.Obj(m, "result"); Model.ResultMsg = m; ending.Refresh(); break;
             case "report": Model.Report = m; report.Refresh(); break;
             case "error": Toast("ERROR: " + J.Str(m, "code") + " " + J.Str(m, "detail")); break;
         }
@@ -213,14 +226,13 @@ public class GameFlow : MonoBehaviour
     }
 
     public void Toast(string s) { toast.text = s; toastUntil = Time.unscaledTime + 3f; }
-    public void ClearPressLater() { pressClearAt = Time.unscaledTime + 2.5f; }
 
     void Update()
     {
         Client?.Update(Time.unscaledDeltaTime);
         houston.Tick(Time.unscaledTime);
         if (toast.text != "" && Time.unscaledTime > toastUntil) toast.text = "";
-        if (pressClearAt > 0 && Time.unscaledTime > pressClearAt) { pressClearAt = 0; cabin.ClearPress(); }
+        cabin.Tick(Time.unscaledTime);   // 同時押しの文字を消すなど（HUD の部品の毎フレーム）
         if (Client is OfflineClient oc && speedLabel != null) speedLabel.text = (oc.Paused ? "PAUSED" : "x" + oc.Speed) + "  T=" + Mathf.RoundToInt(oc.Clock);
     }
 
