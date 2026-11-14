@@ -1,13 +1,17 @@
 // 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
 // 船室の窓の外の地球・月を、GMAT の軌道に合わせて動かす（#126）。
-//   宇宙船の位置：ゲームの t（事故からの秒）と route から GmatRoute で求める（TrajectoryView と同じ。EarthMoonRot：地球が原点、月は +X）
+//   宇宙船の位置：ゲームの t（事故からの秒）と route から GmatRoute で求める（EarthMoonRot：地球が原点、月は +X）
+//     ゲームの t は、state の t_los・t_aos・t_reentry で GMAT の time_map（los・aos・reentry）の t に写してから使う。
+//     time_map.json（LOS 120・AOS 300・再突入 A 420 / B 510）は parameters.json（LOS 90・AOS 210・再突入 A 300 / B 360）と
+//     ずれているため。そのままだと、月の裏側の途中で通信が戻り、月が目の前にいるうちに再突入の光が出る
 //   見かけ：本物の向き（窓の正面からの角度）と見かけの半径（asin(半径/距離)）を、窓の幅に入るよう縮め・太らせて、窓の穴の向こうに球を置く
 //     窓の正面：地球と月への向きを、見かけの大きさで重み付けして足した向き（大きく見える方へ寄る）
 //     往路：月が大きくなり、地球は小さく窓の端へ → 月の裏側：月が窓いっぱい、地球は月の後ろ（GMAT の LOS・AOS と同じ幾何）→ 帰還：地球が大きく
 //   再突入：state の t_reentry から、窓の外の板（Sprites/Default。実行時に作る）をオレンジに光らせ、船内にオレンジの点光源を足す
 // GameFlow は変えない：flow.Model.State を毎フレーム読むだけ。共有マテリアル（M_Core_Palette）は書き換えない。
 // 置き方：船室のカメラ（Cam_Top）から窓のまん中を通る線のまわり、カメラから nearDepth / farDepth m（カメラの far 100 m の内）。
-//   球の上の縁は、壁の上端より上（屋根がないので空が見える所）に出さない。数値は見た目だけ（軌道は GMAT のデータ）。
+//   大きい球は、上の縁（地平線）を窓の中（下から horizonAt の高さ）に置き、上に黒い宇宙を残す。窓より大きい分は壁の後ろに隠す
+//   （maxAngleDeg：大きすぎると船室のまわりの背景にはみ出す）。数値は見た目だけ（軌道は GMAT のデータ）。
 // 組み立ては Editor/WindowView/WindowViewScene.cs（Tools/GameFlow/シーンを作り直す から呼ばれる）。
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -23,17 +27,20 @@ public class WindowView : MonoBehaviour
     public Transform shipCenter;         // Slot_Center（窓の外向きを決める）
     public Transform earth, moon;        // Body_Earth・Body_Moon（大きさと位置はここが毎フレーム決める）
 
-    [Header("窓の穴（modeling/interior/build_interior.py の WIN_*・WALL_TOP。m）")]
+    [Header("窓の穴（modeling/interior/build_interior.py の WIN_*。m）")]
     public float windowHalfWidth = 0.75f;
     public float windowHalfHeight = 0.29f;
-    public float wallAboveWindow = 0.13f;   // 窓の上端から壁の上端まで。これより上は空なので、球をはみ出させない
+    public float wallDepth = 0.2f;          // 壁の厚み＋窓枠（WALL_T 0.15＋枠 0.05）。上から見ると、窓の上の縁は内側の面で決まる
 
     [Header("見せ方（見た目だけ。窓の半幅を 1 とした単位）")]
     public float fieldHalfDeg = 110f;    // 本物の角度で、窓の端（±1）に来る角度
     public float sizeGain = 0.2f;        // 窓の上の半径 = sizeGain × (見かけの半径・度)^sizePower
     public float sizePower = 0.75f;
-    public float minSize = 0.12f;        // 遠くても点にしない
-    public float maxAngleDeg = 35f;      // カメラから見た球の半径の上限（球が船室に食い込まない）
+    public float minSize = 0.1f;         // 遠くても点にしない
+    public float shrinkRefDeg = 1.1f;    // これより小さく見える天体は、小さくなり方を誇張する（事故の時点の地球 1.09°）
+    public float shrinkPower = 3f;       // 誇張：本物の見かけの比の shrinkPower 乗（往路の地球 0.83 倍 → 0.57 倍）
+    public float maxAngleDeg = 11f;      // カメラから見た球の半径の上限（窓の半幅 約4°。大きいと船室のまわりの背景にはみ出す）
+    public float horizonAt = 0.72f;      // 窓より大きい球の上の縁を置く高さ（窓の下端 0〜上端 1）
     public float focusPower = 1f;        // 窓の正面を、大きく見える方へ寄せる強さ
     public bool mirror;                  // 左右を入れ替える
     public float nearDepth = 50f, farDepth = 70f;   // カメラから球の中心まで（m）。本当に近い方の天体を手前に置く
@@ -41,21 +48,21 @@ public class WindowView : MonoBehaviour
     public float smoothRate = 4f;        // t（毎秒届く）をなめらかにする速さ（1/秒）
 
     [Header("再突入の光（見た目だけ。t_reentry からの秒）")]
-    public Color glowColor = new Color(1f, 0.45f, 0.1f);
-    public float glowIntensity = 2.5f;   // HDR。Bloom（しきい値 0.9）で窓のまわりもにじむ
-    public float glowMaxAlpha = 0.85f;   // 1 だと地球が見えなくなる
+    public Color glowColor = new Color(1f, 0.36f, 0.08f);
+    public float glowIntensity = 1.5f;   // HDR。Bloom（しきい値 0.9）で窓のまわりもにじむ。強いと黄色に飛ぶ
+    public float glowMaxAlpha = 0.7f;    // 1 だと地球が見えなくなる
     public float glowRampIn = 4f, glowHold = 30f, glowFadeOut = 12f;
     public float glowFlicker = 0.15f;
-    public float glowOffset = 0.1f;      // 壁の外側の面からの距離（m）
+    public float glowOffset = 0.02f;     // 壁の外側の面からの距離（m）。離すと上から見て壁の上の縁を越える
     public float cabinLightIntensity = 3f, cabinLightRange = 5f;
 
     [Header("確認用（Play 中にインスペクターで動かす）")]
     public bool debugOverride;
-    public float debugT;
+    public float debugT;                 // GMAT の time_map の t（0／120 LOS／300 AOS／360 噴射／A 420・B 510 再突入）
     public string debugRoute = "";
 
     [Header("今の値（読むだけ）")]
-    public float currentT;
+    public float currentT;               // GMAT の time_map の t
     public float earthDistanceKm, moonDistanceKm;
     public bool earthBehindMoon, moonBehindEarth;
     public float glow;
@@ -84,7 +91,7 @@ public class WindowView : MonoBehaviour
 
     // 毎フレームの窓の幾何（カメラから見た角度。単位はラジアン、窓の半幅の角度 = halfW）
     Vector3 camPos, d0, camRight, camUp;
-    float halfW, bottomY, skyY;
+    float halfW, bottomY, topY;
 
     void Awake()
     {
@@ -118,7 +125,7 @@ public class WindowView : MonoBehaviour
         currentT = tView;
 
         // 宇宙船の位置（km、EarthMoonRot）と、地球・月への向き・距離・見かけの半径
-        var r = route == "b" ? routeB : routeA;          // 噴射の前は A と B が同じ道
+        var r = RouteOf(route);
         var p = r.PosAtHours(r.HoursAt(tView));
         var toE = -p;
         var toM = new Vector3(r.moonCenterXKm, 0f, 0f) - p;
@@ -154,14 +161,38 @@ public class WindowView : MonoBehaviour
         UpdateGlow(tRe);
     }
 
+    /// <summary>t・tRe は GMAT の time_map の t（秒）</summary>
     void ReadState(out float t, out string route, out float tRe)
     {
         var s = flow != null ? flow.Model.State : null;
-        if (debugOverride) { t = debugT; route = debugRoute; tRe = 0f; }
-        else if (s != null) { t = s.t; route = s.route; tRe = s.tReentry; }
-        else { t = 0f; route = ""; tRe = 0f; }   // 事故の前・設計の画面：事故の時点の景色
+        route = debugOverride ? debugRoute : s != null ? s.route : "";
         route = (route ?? "").ToLowerInvariant();
-        if (tRe <= 0f) tRe = (route == "b" ? routeB : routeA).EndT;   // サーバーの値が無いときは GMAT の再突入（time_map の reentry）
+        var r = RouteOf(route);
+        if (debugOverride) t = debugT;
+        else if (s != null) t = ToMapT(r, s.t, s.tLos, s.tAos, s.tReentry);
+        else t = 0f;   // 事故の前・設計の画面：事故の時点の景色
+        tRe = KnotT(r, "reentry", r.EndT);
+    }
+
+    // route が決まる前はサーバーが B として t_reentry を出す（server/README.md）。噴射の前は A と B が同じ道
+    GmatRoute RouteOf(string route) => route == "a" ? routeA : routeB;
+
+    /// <summary>ゲームの t（秒）→ time_map の t。los・aos・reentry の区切りごとに線形、再突入の後はそのまま進める</summary>
+    static float ToMapT(GmatRoute r, float t, float tLos, float tAos, float tRe)
+    {
+        if (!(tLos > 0f && tAos > tLos && tRe > tAos)) return t;   // サーバーの値が無い：そのまま
+        float kL = KnotT(r, "los", tLos), kA = KnotT(r, "aos", tAos), kR = KnotT(r, "reentry", tRe);
+        if (t <= tLos) return t * kL / tLos;
+        if (t <= tAos) return Mathf.Lerp(kL, kA, (t - tLos) / (tAos - tLos));
+        if (t <= tRe) return Mathf.Lerp(kA, kR, (t - tAos) / (tRe - tAos));
+        return kR + (t - tRe);
+    }
+
+    static float KnotT(GmatRoute r, string label, float fallback)
+    {
+        if (r != null && r.knots != null)
+            foreach (var k in r.knots) if (k.label == label) return k.t;
+        return fallback;
     }
 
     /// <summary>天体の向き h と見かけの半径 a（ラジアン）→ 窓の上の (x, y, 半径)。窓の半幅が 1</summary>
@@ -171,7 +202,10 @@ public class WindowView : MonoBehaviour
         float x = Mathf.Atan2(s, f) * Mathf.Rad2Deg / fieldHalfDeg;
         float y = Mathf.Atan2(u, Mathf.Sqrt(s * s + f * f)) * Mathf.Rad2Deg / fieldHalfDeg;
         if (mirror) x = -x;
-        float r = Mathf.Max(minSize, sizeGain * Mathf.Pow(a * Mathf.Rad2Deg, sizePower));
+        float deg = a * Mathf.Rad2Deg;
+        float r = sizeGain * Mathf.Pow(deg, sizePower);
+        if (deg < shrinkRefDeg) r *= Mathf.Pow(deg / shrinkRefDeg, Mathf.Max(0f, shrinkPower - sizePower));   // 小さい側は本物の比の shrinkPower 乗
+        r = Mathf.Max(minSize, r);
         return new Vector3(x, y, r);
     }
 
@@ -186,7 +220,7 @@ public class WindowView : MonoBehaviour
         var wRight = Vector3.Cross(Vector3.up, Outward()).normalized;
         halfW = Mathf.Max(1e-4f, Mathf.Abs(AngX(w + wRight * windowHalfWidth)));
         bottomY = AngY(w - Vector3.up * windowHalfHeight) / halfW;
-        skyY = AngY(w + Vector3.up * (windowHalfHeight + wallAboveWindow)) / halfW;
+        topY = AngY(w - Outward() * wallDepth + Vector3.up * windowHalfHeight) / halfW;   // 見える上端（内側の面の上の縁）
     }
 
     float AngX(Vector3 p) { var v = p - camPos; return Mathf.Atan2(Vector3.Dot(v, camRight), Vector3.Dot(v, d0)); }
@@ -204,7 +238,7 @@ public class WindowView : MonoBehaviour
     {
         float rAng = Mathf.Min(w.z * halfW, maxAngleDeg * Mathf.Deg2Rad);
         float rU = rAng / halfW;
-        float y = Mathf.Min(w.y, skyY - rU);   // 大きい球は下げて、上の縁だけを窓に入れる（地平線のように見える）
+        float y = Mathf.Min(w.y, Mathf.Lerp(bottomY, topY, horizonAt) - rU);   // 大きい球は下げて、上の縁だけを窓に入れる（地平線のように見える）
         bool show = visible && Mathf.Abs(w.x) - rU < 1f && y + rU > bottomY;
         if ((show ? 1 : 0) != b.shown)
         {
@@ -289,9 +323,11 @@ public class WindowView : MonoBehaviour
         glowLight.enabled = on;
         if (!on) return;
         var outward = Outward();
-        glowT.position = window.position + outward * glowOffset;
+        // 板は穴より少し大きく（左右 +0.08 m・下 +0.08 m）。上は窓の上端まで：壁の上の縁（窓の上 0.13 m）を越えて空に出さない
+        const float m = 0.08f;
+        glowT.position = window.position + outward * glowOffset - Vector3.up * (m * 0.5f);
         glowT.rotation = Quaternion.LookRotation(outward, Vector3.up);
-        glowT.localScale = new Vector3(windowHalfWidth * 2.6f, windowHalfHeight * 5f, 1f);   // 斜めから見ても穴を覆う
+        glowT.localScale = new Vector3((windowHalfWidth + m) * 2f, windowHalfHeight * 2f + m, 1f);
         var c = glowColor * glowIntensity;
         c.a = Mathf.Clamp01(glow) * glowMaxAlpha;
         glowMat.color = c;
