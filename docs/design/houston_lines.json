@@ -1,0 +1,463 @@
+{
+  "_generated_by": "tools/xlsx_to_json.py（元：ミッション・リターン イベント表.xlsx）",
+  "milestone_lines": [
+    {
+      "id": "M01",
+      "phase": "0 Design",
+      "trigger": "Game start",
+      "line": "Houston here. Scientists on Earth need data on the far side of the Moon, the side we can never see from here. Your mission: fly around the Moon, observe the far side, send that data home, and come back safely. You have a parts catalog, a budget and a mass limit. How you build the ship is up to you. Just remember the four requirements.",
+      "line_ja": "こちらヒューストン。地球の科学者たちが、月の裏側のデータを待っている。地球からは決して見えない側だ。ミッションは、月を回って裏側を観測し、データを地球に送り、無事に帰ってくること。部品カタログと、予算と、重さの上限がある。船をどう作るかは君たち次第だ。4つの要件だけは忘れないでくれ。",
+      "opens": "Design screen opens: the free parts catalog (Parts sheet), trajectory and rocket. Running totals of mass, cost, power, oxygen and fuel are always visible",
+      "required": "None. The team builds freely, in any order",
+      "if_missed": "—",
+      "row": 2
+    },
+    {
+      "id": "M02",
+      "phase": "0 Design",
+      "trigger": "Team presses \"Ready for launch\"",
+      "line": "Let's verify before we fly. Mass against the rocket's limit. Cost against the budget. ...You're go for launch.",
+      "line_ja": "飛ぶ前に確かめよう。重さはロケットの上限以内か。コストは予算以内か。……よし、打ち上げだ。",
+      "opens": "Launch check",
+      "required": "Mass and cost are both within limits",
+      "if_missed": "Over mass or over budget: Houston says which, and the design screen stays open",
+      "row": 3
+    },
+    {
+      "id": "M03",
+      "phase": "1 Launch & cruise",
+      "trigger": "After launch (0:00)",
+      "line": "Launch was a success. Two days out from Earth, and the Moon is getting close. Take your seats and try your controls. Nothing can go wrong yet.",
+      "line_ja": "打ち上げ成功だ。地球を出て2日、月までもう少し。席について、自分の操作を試してみてくれ。今はまだ何も壊れない。",
+      "opens": "All seat controls unlock (Controls sheet). Free practice",
+      "required": "Each seat uses one control once, in any order, or 90 s pass",
+      "if_missed": "—",
+      "row": 4
+    },
+    {
+      "id": "M04",
+      "phase": "1 Launch & cruise",
+      "trigger": "After M03",
+      "line": "Looking good. One routine job. Life Support, switch on the oxygen tank stir, please.",
+      "line_ja": "いい感じだ。定期作業をひとつ。生命維持担当、酸素タンクのかき混ぜスイッチを入れてくれるかな。",
+      "opens": "—",
+      "required": "Life Support presses the tank stir switch",
+      "if_missed": "No input for 20 s: Houston repeats the line",
+      "row": 5
+    },
+    {
+      "id": "M05",
+      "phase": "2 Accident",
+      "trigger": "Right after the stir switch",
+      "line": "...What was that noise?! Oxygen pressure is dropping fast. One of your main tanks is leaking, and I can't stop it from here. From now on, you decide what stays on and what goes off. I'll tell you what I see.",
+      "line_ja": "……今の音は何だ!? 酸素の圧力が急に下がってる。メインタンクのどちらかが漏れている。こちらからは止められない。ここからは、何を残して何を切るか、君たちが決めるんだ。こちらは見えていることを伝える。",
+      "opens": "Oxygen leaks until the right tank valve is closed. Power -20%. CO2 starts rising. From here on every control is free and every resource runs in real time",
+      "required": "None forced. Fast, good decisions lose less",
+      "if_missed": "The leak keeps draining oxygen, up to the maximum loss",
+      "row": 6
+    },
+    {
+      "id": "M06",
+      "phase": "2 Accident",
+      "trigger": "20 s after M05",
+      "line": "...Everyone, listen. The mission as planned is over. From here on there is only one goal: all of you get back to Earth alive. Any science you can still bring home is a bonus, and it's your call.",
+      "line_ja": "……みんな、聞いてくれ。当初の計画は中止だ。ここからの目標はひとつだけ。全員、生きて地球に帰ること。持ち帰れる科学データがあれば、それはボーナスだ。どうするかは君たちが決めていい。",
+      "opens": "Requirement tracker highlights Req 1",
+      "required": "—",
+      "if_missed": "—",
+      "row": 7
+    },
+    {
+      "id": "M07",
+      "phase": "2 Accident",
+      "trigger": "After M06, only on the science trajectory",
+      "line": "There's one problem. To get better observations, you're flying a path that left the free-return trajectory. If nothing changes, you'll swing around the Moon and still not come back to Earth. You need a short engine burn before you go behind the Moon. Pilot, it's yours when you're ready.",
+      "line_ja": "ひとつ問題がある。君たちは観測のために、自由帰還軌道から外れた道を飛んでいる。このままだと、月を回っても地球には戻れない。月の裏側に入る前に、エンジンを短く噴く必要がある。操縦担当、準備ができたら頼む。",
+      "opens": "The correction burn becomes available on the Pilot seat",
+      "required": "Pilot does the correction burn before loss of signal. Timing is free",
+      "if_missed": "Not done before loss of signal: it must be done right after contact returns, with the retry penalty added",
+      "row": 8
+    },
+    {
+      "id": "M08",
+      "phase": "2 Accident",
+      "trigger": "After M06 (or M07)",
+      "line": "You can't turn around. We'll use the Moon's gravity to swing you around and send you home. There are two ways back. A: burn the engine hard after the far side and get home fast. Lots of fuel, but less oxygen and power. B: a small burn and a slower trip. You save fuel, but you'll need oxygen and power for longer. Tell me before the burn window. You can change your mind until ignition.",
+      "line_ja": "引き返すことはできない。月の重力を使って、ぐるっと回って帰る。帰り道は2つだ。A：裏側を抜けたらエンジンを強く噴いて、早く帰る。燃料は多く使うが、酸素と電力は少なくて済む。B：噴射を小さくして、ゆっくり帰る。燃料は節約できるが、そのぶん酸素と電力が長く要る。噴射窓の前に教えてくれ。点火するまでは変えていい。",
+      "opens": "Route choice opens on the Mission Planner seat. The orbit map shows both routes",
+      "required": "Choose route A or B any time before ignition",
+      "if_missed": "No choice when the burn window opens: Houston picks the route the current fuel allows",
+      "row": 9
+    },
+    {
+      "id": "M09",
+      "phase": "3 Far side of the Moon",
+      "trigger": "Ship goes behind the Moon",
+      "line": "You're about to go behind the Moon. The Moon will block our signal, so you're on your own for a while. It's also your only chance to observe the far side. What you run back there is up to you. ...You'll be fine.",
+      "line_ja": "もうすぐ月の裏側だ。月が電波をさえぎるから、しばらく君たちだけになる。裏側を観測できるのもこの時だけだ。何を動かすかは任せる。……君たちなら大丈夫だ。",
+      "opens": "Loss of signal: no Houston lines and no data transmission. The observation window opens: instruments collect data only here, and only while Moon-pointing",
+      "required": "None forced",
+      "if_missed": "—",
+      "row": 10
+    },
+    {
+      "id": "M10",
+      "phase": "4 Return",
+      "trigger": "Ship comes out from behind the Moon",
+      "line": "...Houston here! Do you read me? You made it through! I can take your data whenever you point the antenna at Earth.",
+      "line_ja": "……こちらヒューストン！ 聞こえるか？ よく持ちこたえた！ アンテナを地球に向けてくれれば、いつでもデータを受け取れる。",
+      "opens": "Signal returns. Data can be transmitted while comms are on and the ship is Earth-pointing",
+      "required": "None forced",
+      "if_missed": "—",
+      "row": 11
+    },
+    {
+      "id": "M11",
+      "phase": "4 Return",
+      "trigger": "Fixed time: 30 s after the signal returns",
+      "line": "Burn window is open. Navigation on, ship in burn attitude, then the two ignition switches. Pilot and Comms & Power, press them together when you're both ready.",
+      "line_ja": "噴射窓が開いた。航法をON、船を噴射の姿勢に。それから点火スイッチ2つだ。操縦担当と通信・電力担当、準備ができたら同時に押してくれ。",
+      "opens": "The burn window opens for a fixed time",
+      "required": "Navigation on + burn attitude + Pilot and Comms & Power press ignition together",
+      "if_missed": "Presses not together: lose fuel and retry. Window missed: the return angle is off and re-entry gets harder",
+      "row": 12
+    },
+    {
+      "id": "M12",
+      "phase": "5 Re-entry",
+      "trigger": "On approach to Earth",
+      "line": "There's Earth. One last hurdle: re-entry. The heat will cut our radio again. Heat shield forward, and make sure life support and navigation have power. See you on the other side.",
+      "line_ja": "地球が見えてきた。最後の山場、再突入だ。熱でまた通信が途切れる。熱シールドを前に向けて、生命維持と航法に電力が回っているか確かめてくれ。向こう側で会おう。",
+      "opens": "Re-entry check, then blackout",
+      "required": "Heat-shield attitude + navigation on",
+      "if_missed": "Attitude or navigation not ready: the re-entry check gets stricter",
+      "row": 13
+    },
+    {
+      "id": "ED-A",
+      "phase": "Ending",
+      "trigger": "Oxygen, power and temperature all at or above the thresholds",
+      "line": "...We see parachutes! Welcome home, everyone. You did great.",
+      "line_ja": "……パラシュートを確認！ おかえり、みんな。本当によくやった。",
+      "opens": "—",
+      "required": "—",
+      "if_missed": "—",
+      "row": 14
+    },
+    {
+      "id": "ED-B",
+      "phase": "Ending",
+      "trigger": "Survived, but a resource is below its threshold",
+      "line": "Splashdown confirmed. The ship is a wreck, but you're all safe. That's what matters most.",
+      "line_ja": "着水を確認。船はボロボロだけど、君たちは無事だ。それが一番大事なことだよ。",
+      "opens": "—",
+      "required": "—",
+      "if_missed": "—",
+      "row": 15
+    },
+    {
+      "id": "ED-C",
+      "phase": "Ending",
+      "trigger": "Oxygen or power hit 0 along the way",
+      "line": "...No response. (pause) That's as far as we got. What should we have kept, and what should we have shut down? Let's think it through together, one more time.",
+      "line_ja": "……応答がない。（間）ここまでだ。何を残して、何を切ればよかったのか。もう一度、一緒に考えてみよう。",
+      "opens": "—",
+      "required": "—",
+      "if_missed": "—",
+      "row": 16
+    },
+    {
+      "id": "R01",
+      "phase": "Mission report",
+      "trigger": "After the ending",
+      "line": "Time for the mission debrief. Let's see where each of your decisions made a difference.",
+      "line_ja": "ミッションの振り返りだ。君たちの判断が、どこでどう効いたのか見てみよう。",
+      "opens": "Report: pass/fail for the four requirements, the score breakdown, and a timeline of the resources with the team's key decisions marked",
+      "required": "Read the report -> press \"Redesign and fly again\"",
+      "if_missed": "—",
+      "row": 17
+    }
+  ],
+  "reactive_lines": [
+    {
+      "id": "H01",
+      "situation": "Design",
+      "when": "Mass is above the selected rocket's limit",
+      "line": "That's too heavy for this rocket. Lose some mass, or pay for the bigger one.",
+      "line_ja": "このロケットには重すぎる。軽くするか、大きいロケットにお金を払うかだ。",
+      "priority": "high",
+      "notes": "",
+      "row": 4
+    },
+    {
+      "id": "H02",
+      "situation": "Design",
+      "when": "Cost is above the budget",
+      "line": "You're over budget. Something has to come off.",
+      "line_ja": "予算オーバーだ。何かを降ろさないと。",
+      "priority": "high",
+      "notes": "",
+      "row": 5
+    },
+    {
+      "id": "H03",
+      "situation": "Design",
+      "when": "No instrument selected",
+      "line": "No instruments? Then there's no science to bring home. Check the requirements.",
+      "line_ja": "観測機器なし？ それだと持ち帰る科学がない。要件を確かめてくれ。",
+      "priority": "medium",
+      "notes": "",
+      "row": 6
+    },
+    {
+      "id": "H04",
+      "situation": "Design",
+      "when": "Only one battery module",
+      "line": "One battery is very thin. Think about what happens if something goes wrong.",
+      "line_ja": "バッテリー1個は心もとない。何かあったときのことを考えてみて。",
+      "priority": "low",
+      "notes": "",
+      "row": 7
+    },
+    {
+      "id": "H05",
+      "situation": "Design",
+      "when": "Science trajectory selected",
+      "line": "More science on that path. Just know it won't bring you home by itself.",
+      "line_ja": "その道のほうが科学は多く取れる。ただ、そのままでは帰ってこられないことは覚えておいて。",
+      "priority": "low",
+      "notes": "",
+      "row": 8
+    },
+    {
+      "id": "H06",
+      "situation": "Design",
+      "when": "No change for 30 s",
+      "line": "Take your time. There's more than one good answer here.",
+      "line_ja": "ゆっくりでいい。いい答えはひとつじゃないからね。",
+      "priority": "low",
+      "notes": "",
+      "row": 9
+    },
+    {
+      "id": "H07",
+      "situation": "Flight",
+      "when": "Leak still open 8 s after the accident",
+      "line": "You're still losing oxygen. Life Support, find the leaking tank and close its valve!",
+      "line_ja": "まだ酸素が減っている。生命維持担当、漏れているタンクを見つけてバルブを閉じて！",
+      "priority": "critical",
+      "notes": "Repeats every 8 s until closed",
+      "row": 10
+    },
+    {
+      "id": "H08",
+      "situation": "Flight",
+      "when": "A healthy tank's valve is closed",
+      "line": "That's the wrong tank. Open it again and check the pressure gauges.",
+      "line_ja": "そのタンクじゃない。開け直して、圧力計を確かめて。",
+      "priority": "critical",
+      "notes": "",
+      "row": 11
+    },
+    {
+      "id": "H09",
+      "situation": "Flight",
+      "when": "30 s after the accident and no system switched off",
+      "line": "Everything is still running. Power won't last like this. What can you live without for now?",
+      "line_ja": "全部ついたままだ。このままでは電力がもたない。今なくても困らないものは何だ？",
+      "priority": "high",
+      "notes": "",
+      "row": 12
+    },
+    {
+      "id": "H10",
+      "situation": "Flight",
+      "when": "Power below 50% of capacity",
+      "line": "Power is at half. Look at what's running. Do you need all of it right now?",
+      "line_ja": "電力が半分になった。動いているものを見てくれ。今、全部必要か？",
+      "priority": "medium",
+      "notes": "",
+      "row": 13
+    },
+    {
+      "id": "H11",
+      "situation": "Flight",
+      "when": "Power below 25% of capacity",
+      "line": "Power is getting low. You need to keep enough for navigation and re-entry.",
+      "line_ja": "電力が少なくなってきた。航法と再突入の分は残しておく必要がある。",
+      "priority": "high",
+      "notes": "",
+      "row": 14
+    },
+    {
+      "id": "H12",
+      "situation": "Flight",
+      "when": "Power below 10% of capacity",
+      "line": "Power critical! Shut down everything you can. Now!",
+      "line_ja": "電力が危険だ！ 切れるものは全部切って。今すぐ！",
+      "priority": "critical",
+      "notes": "",
+      "row": 15
+    },
+    {
+      "id": "H13",
+      "situation": "Flight",
+      "when": "Oxygen below 40%",
+      "line": "Oxygen is under forty percent. Check it against how long your route home takes.",
+      "line_ja": "酸素が40%を切った。帰り道の長さと比べてみてくれ。",
+      "priority": "medium",
+      "notes": "",
+      "row": 16
+    },
+    {
+      "id": "H14",
+      "situation": "Flight",
+      "when": "Oxygen below 20%",
+      "line": "Oxygen is very low. The faster route home may be your only option.",
+      "line_ja": "酸素がかなり少ない。早く帰れるルートしか選べないかもしれない。",
+      "priority": "high",
+      "notes": "",
+      "row": 17
+    },
+    {
+      "id": "H15",
+      "situation": "Flight",
+      "when": "Temperature below 10 °C",
+      "line": "It's getting cold in there. Your hands will slow down. A few minutes of heater might be worth the power.",
+      "line_ja": "船内が冷えてきた。手の動きが鈍くなるぞ。数分の暖房は、電力を使う価値があるかもしれない。",
+      "priority": "medium",
+      "notes": "",
+      "row": 18
+    },
+    {
+      "id": "H16",
+      "situation": "Flight",
+      "when": "Temperature below 5 °C",
+      "line": "You're too cold to work well. Get some heat on.",
+      "line_ja": "寒すぎてうまく動けていない。暖房を入れてくれ。",
+      "priority": "high",
+      "notes": "",
+      "row": 19
+    },
+    {
+      "id": "H17",
+      "situation": "Flight",
+      "when": "CO2 above 60",
+      "line": "CO2 is building up. It takes two of you to swap the filter.",
+      "line_ja": "CO2がたまってきた。フィルター交換には2人必要だ。",
+      "priority": "medium",
+      "notes": "",
+      "row": 20
+    },
+    {
+      "id": "H18",
+      "situation": "Flight",
+      "when": "CO2 above 80",
+      "line": "CO2 is too high. You'll be slow and you'll breathe harder. Swap the filter now.",
+      "line_ja": "CO2が高すぎる。動きが遅くなって、息も荒くなる。今すぐフィルターを交換して。",
+      "priority": "high",
+      "notes": "",
+      "row": 21
+    },
+    {
+      "id": "H19",
+      "situation": "Flight",
+      "when": "Last CO2 filter used",
+      "line": "That was your last filter. Make it count.",
+      "line_ja": "それが最後のフィルターだ。大事に使って。",
+      "priority": "low",
+      "notes": "",
+      "row": 22
+    },
+    {
+      "id": "H20",
+      "situation": "Flight",
+      "when": "Far side in 30 s and no instrument is on",
+      "line": "Far side in thirty seconds. If you want data, decide what to switch on and where to point.",
+      "line_ja": "裏側まであと30秒。データが欲しいなら、何をつけてどこを向くか決めてくれ。",
+      "priority": "medium",
+      "notes": "Last line before loss of signal",
+      "row": 23
+    },
+    {
+      "id": "H21",
+      "situation": "Flight",
+      "when": "Transmit pressed while not Earth-pointing",
+      "line": "I'm not getting anything. Point the antenna at Earth.",
+      "line_ja": "何も届いていない。アンテナを地球に向けてくれ。",
+      "priority": "medium",
+      "notes": "",
+      "row": 24
+    },
+    {
+      "id": "H22",
+      "situation": "Flight",
+      "when": "Signal is back, data is stored, and nothing sent for 20 s",
+      "line": "You still have data on board. Send it, or carry it home. Your call.",
+      "line_ja": "まだデータが船に残っている。送るか、持ち帰るか。任せるよ。",
+      "priority": "low",
+      "notes": "",
+      "row": 25
+    },
+    {
+      "id": "H23",
+      "situation": "Flight",
+      "when": "Sun-pointing with solar panels",
+      "line": "Good charge coming in. I can't receive data while you're pointed that way, though.",
+      "line_ja": "しっかり充電できている。ただ、その向きの間はデータを受け取れない。",
+      "priority": "low",
+      "notes": "",
+      "row": 26
+    },
+    {
+      "id": "H24",
+      "situation": "Flight",
+      "when": "Burn window in 30 s and navigation is off",
+      "line": "Burn window in thirty seconds, and navigation is still off.",
+      "line_ja": "噴射窓まで30秒。航法がまだOFFだ。",
+      "priority": "high",
+      "notes": "",
+      "row": 27
+    },
+    {
+      "id": "H25",
+      "situation": "Flight",
+      "when": "Burn window in 30 s and no route chosen",
+      "line": "I need a route. A or B?",
+      "line_ja": "ルートを決めてくれ。AかBか？",
+      "priority": "high",
+      "notes": "",
+      "row": 28
+    },
+    {
+      "id": "H26",
+      "situation": "Flight",
+      "when": "Fuel below 15%",
+      "line": "Fuel is low. Every turn of the ship costs a little.",
+      "line_ja": "燃料が少ない。船の向きを変えるたびに少しずつ減るぞ。",
+      "priority": "medium",
+      "notes": "",
+      "row": 29
+    },
+    {
+      "id": "H27",
+      "situation": "Flight",
+      "when": "Comms switched back on",
+      "line": "Good to hear you again. Here's what I see.",
+      "line_ja": "また声が聞けてよかった。今の状況を伝える。",
+      "priority": "medium",
+      "notes": "Followed by the highest-priority warning that is active",
+      "row": 30
+    },
+    {
+      "id": "H28",
+      "situation": "Flight",
+      "when": "All resources comfortable for 45 s",
+      "line": "You're doing fine. Keep an eye on the gauges.",
+      "line_ja": "いい調子だ。計器から目を離さずに。",
+      "priority": "low",
+      "notes": "",
+      "row": 31
+    }
+  ]
+}

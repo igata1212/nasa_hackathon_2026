@@ -10,6 +10,7 @@
 | `gmat/route_a.csv` `gmat/route_b.csv` | 上のスクリプトを GMAT R2026a で実行した出力（天体の位置は GMAT 付属の DE405） | Taiga |
 | `gmat/route_summary.csv` | 同上。噴射量と飛行時間のまとめ | Taiga |
 | `gmat/preview.svg` | `gmat/preview.py` が CSV から作る確認用の図 | Taiga |
+| `sim/timeline_t1_good.json` `sim/timeline_t4_fail.json` | NASA のデータではない。`server/tools/export_timeline.py` で生成（reference_sim の T1・T4 を1回遊んだ記録。Unity のオフライン再生用、#69） | iizuka（Claude） |
 
 ## gmat/ の中身（試作、Issue #65）
 
