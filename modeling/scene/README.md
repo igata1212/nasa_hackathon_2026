@@ -76,6 +76,16 @@ face.SetBlendShapeWeight(open, talking ? Mathf.PingPong(Time.time * 600f, 100f) 
 - まばたき：3〜5 秒に1回、`Blink` を 0.1 秒だけ 100 にする。
 - 表情：事故（M05）は `BrowsWorried`、成功は `Smile`。口のキーは足し合わせない（`MouthOpen` と `Smile` を同時に 100 にすると形が崩れる）。眉・目のキーは口と一緒に使える。
 
+### 話すアニメーション `Talk`（#120）
+
+`Crew_Houston` と `Crew_Controller_A/B/C` の FBX に、アニメーションクリップ `Talk` が入っている（12fps・36コマ＝3秒。最初と最後が同じ姿なので、くり返せる）。Unity が FBX を取り込むと、FBX の中にクリップ `Talk` ができる。
+
+- 中身：口（`MouthOpen`・`MouthO`・`MouthWide` の切り替え）、まばたき1回、眉を上げる、頭のうなずきと左右、左腕を1回上げる
+- 管制官3種は、同じ動きを時間をずらして入れてある（並べても口がそろわない）
+- 使い方：`Animator` を付け、`Talk` を入れた Animator Controller を作る。くり返すには FBX の Inspector → Animation タブ → `Talk` → **Loop Time** にチェックを入れる。話していない間は Animator を止めるか、口を閉じた Idle の状態に移す
+- 自分で口を動かしたいとき（音量に合わせるなど）は、クリップを使わずに上の C# の例のようにブレンドシェイプを直接動かす。両方を同時に使うと、Animator が値を上書きする
+- 作り方：`build_mission_control.py` の `talk_pose()` が1コマごとの姿を決め、`ck.export_all(root, KIND, anim=…)` が FBX に焼く。見本の動画は作っていない（`tmp/` に確認用の HTML を出しただけ）
+
 体の動き（`parts.json`。クルーと同じく `.Move_` を付けない）：
 
 | 部品 | 動き |
@@ -85,6 +95,6 @@ face.SetBlendShapeWeight(open, talking ? Mathf.PingPong(Time.time * 600f, 100f) 
 
 ### まだ確かめていないこと
 
-- Unity への取り込み（Unity を開いていなかった）。Blender で FBX を読み直して、7個のシェイプキーが入っていることは確かめた。上の C# とブレンドシェイプの名前は Unity で未確認。
+- Unity への取り込み（Unity を開いていなかった）。Blender で FBX を読み直して、7個のシェイプキーと、クリップ `Talk`（口・頭・腕が動く）が入っていることは確かめた。上の C#、ブレンドシェイプの名前、クリップの見え方は Unity で未確認。
 - core の `export.py` を直した（シェイプキーも一緒に Y-up に直す）。シェイプキーのないモデルには影響しない。
 - 肌の色は全員 `cream`（パレット16色にほかの肌色がない）。
