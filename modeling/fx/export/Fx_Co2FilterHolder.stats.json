@@ -1,0 +1,85 @@
+{
+ "name": "Fx_Co2FilterHolder",
+ "tris": 1436,
+ "min": [
+  -0.41,
+  -0.15,
+  0.0
+ ],
+ "max": [
+  0.41,
+  0.15,
+  0.32
+ ],
+ "size": [
+  0.82,
+  0.3,
+  0.32
+ ],
+ "objects": {
+  "Fx_Co2FilterHolder": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Fx_Co2FilterHolder.Base": {
+   "origin": [
+    0.0,
+    0.0,
+    0.02
+   ],
+   "tris": 108
+  },
+  "Fx_Co2FilterHolder.Duct": {
+   "origin": [
+    -0.27,
+    0.03,
+    0.28
+   ],
+   "tris": 188
+  },
+  "Fx_Co2FilterHolder.Move_Canister": {
+   "origin": [
+    -0.27,
+    0.0,
+    0.04
+   ],
+   "tris": 384
+  },
+  "Fx_Co2FilterHolder.Slot_1": {
+   "origin": [
+    0.03,
+    0.0,
+    0.06
+   ],
+   "tris": 0
+  },
+  "Fx_Co2FilterHolder.Slot_2": {
+   "origin": [
+    0.27,
+    0.0,
+    0.06
+   ],
+   "tris": 0
+  },
+  "Fx_Co2FilterHolder.Socket": {
+   "origin": [
+    -0.389,
+    0.01,
+    0.125
+   ],
+   "tris": 432
+  },
+  "Fx_Co2FilterHolder.Tray": {
+   "origin": [
+    0.15,
+    0.0,
+    0.05
+   ],
+   "tris": 324
+  }
+ }
+}

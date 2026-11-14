@@ -1,0 +1,109 @@
+{
+ "name": "Tank_OxygenSpare2",
+ "tris": 1420,
+ "min": [
+  -0.25469,
+  -0.25469,
+  0.0
+ ],
+ "max": [
+  0.25469,
+  0.25469,
+  0.645
+ ],
+ "size": [
+  0.50939,
+  0.50939,
+  0.645
+ ],
+ "objects": {
+  "Tank_OxygenSpare2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Tank_OxygenSpare2.Band": {
+   "origin": [
+    0.0,
+    0.0,
+    0.385
+   ],
+   "tris": 376
+  },
+  "Tank_OxygenSpare2.Cradle": {
+   "origin": [
+    0.0,
+    0.0,
+    0.12
+   ],
+   "tris": 188
+  },
+  "Tank_OxygenSpare2.Dot_1": {
+   "origin": [
+    -0.19526,
+    -0.15708,
+    0.43796
+   ],
+   "tris": 60
+  },
+  "Tank_OxygenSpare2.Dot_2": {
+   "origin": [
+    -0.10665,
+    -0.17823,
+    0.50505
+   ],
+   "tris": 60
+  },
+  "Tank_OxygenSpare2.Label": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Tank_OxygenSpare2.Neck": {
+   "origin": [
+    0.0,
+    0.0,
+    0.565
+   ],
+   "tris": 188
+  },
+  "Tank_OxygenSpare2.Pad": {
+   "origin": [
+    0.0,
+    0.0,
+    0.625
+   ],
+   "tris": 108
+  },
+  "Tank_OxygenSpare2.Plinth": {
+   "origin": [
+    0.0,
+    0.0,
+    0.04
+   ],
+   "tris": 108
+  },
+  "Tank_OxygenSpare2.Shell": {
+   "origin": [
+    0.0,
+    0.0,
+    0.325
+   ],
+   "tris": 224
+  },
+  "Tank_OxygenSpare2.Slot_Valve": {
+   "origin": [
+    0.0,
+    0.0,
+    0.645
+   ],
+   "tris": 0
+  }
+ }
+}
