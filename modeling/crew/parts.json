@@ -10,7 +10,7 @@
    "origin": [
     0.0,
     0.0,
-    0.72
+    0.645
    ],
    "unity_axis": "Y",
    "unity_sign": -1,
@@ -20,13 +20,13 @@
    "name": "Crew_CommsPower.Arm_L",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    0.245,
+    0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -36,13 +36,13 @@
    "name": "Crew_CommsPower.Arm_R",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    -0.245,
+    -0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -58,7 +58,7 @@
    "origin": [
     0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -74,7 +74,7 @@
    "origin": [
     -0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -92,7 +92,7 @@
    "origin": [
     0.0,
     0.0,
-    0.72
+    0.645
    ],
    "unity_axis": "Y",
    "unity_sign": -1,
@@ -102,13 +102,13 @@
    "name": "Crew_LifeSupport.Arm_L",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    0.245,
+    0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -118,13 +118,13 @@
    "name": "Crew_LifeSupport.Arm_R",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    -0.245,
+    -0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -140,7 +140,7 @@
    "origin": [
     0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -156,7 +156,7 @@
    "origin": [
     -0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -174,7 +174,7 @@
    "origin": [
     0.0,
     0.0,
-    0.72
+    0.645
    ],
    "unity_axis": "Y",
    "unity_sign": -1,
@@ -184,13 +184,13 @@
    "name": "Crew_MissionPlanner.Arm_L",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    0.245,
+    0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -200,13 +200,13 @@
    "name": "Crew_MissionPlanner.Arm_R",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    -0.245,
+    -0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -222,7 +222,7 @@
    "origin": [
     0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -238,7 +238,7 @@
    "origin": [
     -0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -256,7 +256,7 @@
    "origin": [
     0.0,
     0.0,
-    0.72
+    0.645
    ],
    "unity_axis": "Y",
    "unity_sign": -1,
@@ -266,13 +266,13 @@
    "name": "Crew_Pilot.Arm_L",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    0.245,
+    0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -282,13 +282,13 @@
    "name": "Crew_Pilot.Arm_R",
    "type": "rotate",
    "axis": "X",
-   "min": -45,
-   "max": 30,
+   "min": -180,
+   "max": 60,
    "default": 0,
    "origin": [
-    -0.245,
+    -0.2,
     0.0,
-    0.63
+    0.53
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -304,7 +304,7 @@
    "origin": [
     0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,
@@ -320,7 +320,7 @@
    "origin": [
     -0.1,
     0.0,
-    0.34
+    0.2
    ],
    "unity_axis": "X",
    "unity_sign": 1,

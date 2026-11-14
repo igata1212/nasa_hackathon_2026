@@ -1,8 +1,8 @@
-書いた人：iizuka（作成：Fable 5.2、追記：Opus-5）／ 最終更新：2026-11-14
+書いた人：iizuka（作成：Fable 5.2、追記：Opus-5、Opus 5.5）／ 最終更新：2026-11-14
 
 # modeling/core：3D モデル制作の共通の土台（#34）
 
-全員がここのキットとルールで作る。計画は `docs/design/modeling-plan.md`。ここはその C 章（ルール）と E 章（チェック基準）を、作る人がそのまま使える形にしたもの。
+全員がここのキットとルールで作る。計画は `docs/reference/modeling-plan.md`。ここはその C 章（ルール）と E 章（チェック基準）を、作る人がそのまま使える形にしたもの。
 
 ## 1. 流し方
 
@@ -29,7 +29,13 @@ python3 modeling/core/palette.py                        # パレットを作り�
 | `build_axis_check.py` | 軸の確認用モデル（FBX の設定や Unity の版を変えたときだけ使う） |
 | `run.sh` | `Blender -b --factory-startup --python <script> -- <引数>` |
 
-Unity 側：`unity/Assets/Editor/ModelImportReport.cs` が、`Assets/Models/` の FBX を取り込むたびに全部品の位置・回転・スケール・メッシュの大きさを `[ModelImportReport]` でログに出す（`unity/Logs/Editor.log`）。
+Unity 側（`unity/Assets/Editor/`。どれも取り込みのたびに自動で動く）：
+
+| ファイル | 中身 |
+|---|---|
+| `ModelImportReport.cs` | `Assets/Models/` の FBX を取り込むたびに、全部品の位置・回転・スケール・メッシュの大きさを `[ModelImportReport]` でログに出す（`unity/Logs/Editor.log`） |
+| `CorePaletteImport.cs` | `palette.png` の取り込み設定を決める。パレットの FBX の `M_Core_Palette` を共通マテリアルに差し替える（下の4章「色」） |
+| `CorePalette.cs` | 共通マテリアル `Assets/Models/Core/M_Core_Palette.mat` がなければ作る。メニュー **Tools/Models/Core Palette を確かめる** で、全モデルのマテリアルを `[CorePalette]` でログに出す |
 
 ## 2. corekit の使い方
 
@@ -62,9 +68,9 @@ ck.render_check(root, "fx", parts)                 # renders/ に画像
 | | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|
 | 船内 | `cream` #F2E3C6 | `orange` #F28C28 | `teal` #2A9D8F | `navy` #1D2D50 |
-| 席 | `seat_red` #E4572E（仮：Pilot） | `seat_blue` #3A86FF（仮：Mission Planner） | `seat_yellow` #FFC857（仮：Comms & Power） | `seat_green` #6BBF59（仮：Life Support） |
-| 無彩色（提案） | `white` #FBF7EE | `gray_light` #C8CCD4 | `gray` #8B93A1 | `gray_dark` #4B5263 |
-| 黒紺＋ランプ専用（提案） | `visor` #0E1630 | `lamp_green` #2ECC71 | `lamp_yellow` #FFD60A | `lamp_red` #FF3B30 |
+| 席 | `seat_red` #E4572E（Pilot ▲） | `seat_blue` #3A86FF（Mission Planner ◆） | `seat_yellow` #FFC857（Comms & Power ■） | `seat_green` #6BBF59（Life Support ●） |
+| 無彩色 | `white` #FBF7EE | `gray_light` #C8CCD4 | `gray` #8B93A1 | `gray_dark` #4B5263 |
+| 黒紺＋ランプ専用 | `visor` #0E1630 | `lamp_green` #2ECC71 | `lamp_yellow` #FFD60A | `lamp_red` #FF3B30 |
 
 | 項目 | ルール |
 |---|---|
@@ -101,15 +107,26 @@ ck.render_check(root, "fx", parts)                 # renders/ に画像
 
 `parts.json` の `unity_axis`・`unity_sign` はこの表のとおりに自動で入る（例：Blender の Z まわり → Unity では `localEulerAngles.y = −角度`）。
 
-**FBX の設定**（`export.py` の `FBX_SETTINGS`）：`apply_scale_options="FBX_SCALE_UNITS"`、`axis_forward="-Z"`、`axis_up="Y"`、**`bake_space_transform=False`**、`mesh_smooth_type="OFF"`、`path_mode="STRIP"`。Unity の取り込み設定は既定のまま。
+**FBX の設定**（`export.py` の `FBX_SETTINGS`）：`apply_scale_options="FBX_SCALE_UNITS"`、`axis_forward="-Z"`、`axis_up="Y"`、**`bake_space_transform=False`**、`mesh_smooth_type="OFF"`、`path_mode="STRIP"`。Unity の取り込み設定は既定のまま（マテリアルの差し替えだけ自動で入る。下の「色」）。
 
 midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2 の FBX 書き出しは、これを True にすると孫（子の子）の位置が狂い、90° 回って入る（子までは正しい）。代わりに `export.export_fbx()` が、書き出す間だけ自分で全部品を Y-up に組み替える（頂点も行列も）。そのため **FBX は必ず `ck.export_all()` か `export.export_fbx()` で出す**。`bpy.ops.export_scene.fbx` を直接呼ばない。
 
 色：FBX に入る画像のパスはマシンに依らない（同じフォルダの画像はファイル名だけ、`palette.png` は `Assets/Models/Core/palette.png` と `../Core/palette.png`）。`/Users/...` は入らない（`export._no_abs_image_paths`）。
 
-**未解決（2026-11-14 に Unity 6000.6.9f1 で確かめた）：Unity は `Core/palette.png` を貼らない。** パレットの FBX（33個のうち地球・月を除く31個）は、`M_Core_Palette` にテクスチャが付かず、灰色（0.906）で入る。地球・月は画像が同じフォルダにあるので貼られる。取り込み設定は既定（`ImportViaMaterialDescription`・`RecursiveUp`）。ためしに `Assets/Models/Textures/palette.png` に置くと貼られた（上の階層の `Textures/` を探す）。直し方は次のどれか（未決定）：
-1. `Core/palette.png` を `Assets/Models/Textures/palette.png` に移す（`.meta` ごと移せば GUID は変わらない）。いちばん小さい変更。ただし FBX ごとに `M_Core_Palette` が1つずつ作られるのは同じ
-2. Unity のエディタスクリプト（`AssetPostprocessor`）で、`M_Core_Palette` を共通のマテリアル1つ（例：`Assets/Models/Core/M_Core_Palette.mat`、`palette.png`・Point フィルタ）に差し替える。計画の「共通マテリアル1つ」に合う
+**色（共通マテリアル、#38）**：Unity は FBX の中の `M_Core_Palette` に `Core/palette.png` を貼らない（同じフォルダか、上の階層の `Textures/` しか探さない。2026-11-14 に確かめた）。そこで取り込みのときに、共通のマテリアル1つに差し替える。
+
+| 物 | 中身 |
+|---|---|
+| `Assets/Models/Core/M_Core_Palette.mat` | URP Lit、Base Map＝`palette.png`、Base Color 白、Smoothness 0、Metallic 0。Unity が作ったもの（手で書かない） |
+| `palette.png` の取り込み設定 | Point フィルタ・ミップマップなし・圧縮なし・sRGB・Clamp（マスの色がにじまない・変わらない）。`CorePaletteImport.OnPreprocessTexture` が毎回決める |
+| FBX の差し替え | `CorePaletteImport.OnPreprocessModel` が `ModelImporter.AddRemap` で「FBX の `M_Core_Palette` → 共通マテリアル」を付ける。`.fbx.meta` の `externalObjects` に残るので、ほかの人の環境でも同じになる。FBX ごとのマテリアルは作られない |
+| 対象 | `Assets/Models/` の `.fbx` のうち `NASA/`（midori の物）と `Bodies/`（地球・月は自分の画像の `M_Body_Earth`・`M_Body_Moon`）を除く全部 |
+
+- **新しいモデルを足したとき**：何もしなくてよい。`build_*.py` で `Assets/Models/<種類>/` に FBX を出せば、取り込みのときに自動で差し替わる（`.meta` も Unity が作り、差し替えが入る）。`Assets/Models/` の下に新しいフォルダを作っても同じ（`NASA/`・`Bodies/` だけが対象外）。
+- **共通マテリアルがないとき**（消した、など）：FBX は差し替えずに（灰色で）取り込み、取り込みのあと `OnPostprocessAllAssets` が共通マテリアルを作る。それを待っている FBX は Unity が自動で読み直し、こんどは差し替わる。手でマテリアルを作らない。
+- **パレットの色を変えたとき**：`python3 modeling/core/palette.py` で `palette.png` を作り直すだけ。共通マテリアルはその画像を指しているので、そのまま新しい色になる。
+- **確かめ方**：メニュー Tools/Models/Core Palette を確かめる（UnityMCP なら `execute_code` で `CorePalette.Report();`）。`[CorePalette] 合計 OK=31 NG=0 対象外=2` が出れば全部差し替わっている（2026-11-14）。見た目は `Assets/Scenes/ModelCheck.unity`（33個を並べた確認用シーン）。
+- **次にやること**：ランプ（`.Lamp_〜` の部品）の発光。いまはランプも共通マテリアル（光らない）。計画どおり Unity で `Lamp_` の部品のマテリアルを発光するものに差し替える（取り込み時にするか、ゲームの中で状態に合わせて切り替えるかは未決定）。
 
 ## 5. チェック基準（`check.py` が FBX を読み直して判定）
 
@@ -155,6 +172,7 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
    2026-11-14（2回目）は、このコマンドでも `open -a` でも走らなかった（Unity が前のまま、ほかのアプリが前に出なかった）。
    代わりに Unity MCP（`.mcp.json` の `UnityMCP`）の `refresh_unity`（`mode: if_dirty`、`scope: assets`）で走った。
 3. `grep "ModelImportReport\]" unity/Logs/Editor.log | tail -40` で、ルートが回転0・スケール1、`.Move_` の `pos` が `parts.json` の `origin` を (−x, z, −y) に直した値、`world size` が m の寸法になっているかを見る。
+4. 色：メニュー Tools/Models/Core Palette を確かめる で、新しいモデルが `[CorePalette] OK` になっているかを見る（4章「色」）。
 
 ## 8. 決定事項（2026-11-14、#34 の第1段のまとめ）
 
