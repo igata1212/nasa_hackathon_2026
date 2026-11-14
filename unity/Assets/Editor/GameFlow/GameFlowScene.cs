@@ -64,6 +64,7 @@ public static class GameFlowScene
 
         StoryScene.BuildInto(flow);   // 手描きスケッチの演出（#124）：打ち上げ・管制室の小窓・帰還
         UrgencyScene.BuildInto(flow); // 警告のときの赤い縁・カメラの揺れ・警報ランプ（#125）。StoryScene の後（StoryDirector を拾う）
+        WindowViewScene.BuildInto(flow);   // 窓の外の地球・月を軌道に合わせて動かす（#126）
 
         EditorSceneManager.SaveScene(scene, ScenePath, false);   // 別名で保存（LookDev.unity は触らない）
         var list = EditorBuildSettings.scenes.ToList();
