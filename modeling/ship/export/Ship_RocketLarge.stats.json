@@ -1,0 +1,181 @@
+{
+ "name": "Ship_RocketLarge",
+ "tris": 5984,
+ "min": [
+  -9.15,
+  -9.15,
+  0.0
+ ],
+ "max": [
+  9.15,
+  9.15,
+  110.7
+ ],
+ "size": [
+  18.3,
+  18.3,
+  110.7
+ ],
+ "objects": {
+  "Ship_RocketLarge": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Ship_RocketLarge.Adapter": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Band1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Band2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Band3": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Band4": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Engines": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 780
+  },
+  "Ship_RocketLarge.Fairings": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 656
+  },
+  "Ship_RocketLarge.Fins": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 368
+  },
+  "Ship_RocketLarge.Payload_CM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 332
+  },
+  "Ship_RocketLarge.Payload_SM": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Payload_Tower": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 156
+  },
+  "Ship_RocketLarge.Ring1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Ring2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Skirt": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Slot_Ship": {
+   "origin": [
+    0.0,
+    0.0,
+    96.8
+   ],
+   "tris": 0
+  },
+  "Ship_RocketLarge.Stage1": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Stage2": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Stage3": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  },
+  "Ship_RocketLarge.Taper": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 284
+  }
+ }
+}
