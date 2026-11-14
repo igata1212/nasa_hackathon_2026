@@ -1,5 +1,6 @@
-// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#141）
 // 押したら本体を下げて、影を 6 → 2 に縮める（UI ガイドライン 2章「影」）。UiKit のボタンが付ける
+// 押した瞬間に ui_click を鳴らす（#141。GameAudio が無ければ鳴らない。押せないボタンは鳴らさない）
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -22,6 +23,7 @@ public class UiPress : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IP
         if (e.button != PointerEventData.InputButton.Left || body == null) return;
         if (target != null && !target.IsInteractable()) return;
         down = true;
+        GameAudio.Click();
         body.anchoredPosition = rest + Vector2.down * (UiTokens.ShadowY - UiTokens.ShadowPressedY);
     }
 
