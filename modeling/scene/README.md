@@ -31,3 +31,60 @@
 腕は大型ロケットの太さに合わせてある。小型ロケット（直径 6.6m、高さ 約70m）だと、腕 1・2 は胴に約 1.7m 届かず、腕 3 とクレーンはロケットより上になる。
 
 ベベルは 0.25m（実寸で 100m を超えるので、ルールの 2〜4cm では角の光が見えないため。例外）。
+
+## 管制室の場面（#53、`build_mission_control.py`）
+
+`docs/design/storyboard.md` の場面4。ヒューストン先生のバストアップをポップアップ画面に出し、うしろは人が大勢いる管制室にする。
+
+| FBX | 中身 | 三角数 |
+|---|---|---|
+| `Scene_MissionControl` | 部屋（床、奥と左右の壁、段2つ）、机の列3つ、奥の壁の画面3つ、ランプ | 4,432 |
+| `Crew_Houston` | ヒューストン先生。白いベスト、navy のネクタイ、ヘッドセット、短い平らな髪 | 2,768 |
+| `Crew_Controller_A`・`B`・`C` | うしろの管制官3種（服と髪が違う）。作りは先生と同じ | 1,780〜2,152 |
+
+見本：`renders/houston_popup_1_closed.png`・`2_open.png`・`3_worried.png`（ポップアップの見え方）、`renders/mission_control_scene.png`（部屋の全体）。
+
+### 組み立て方（Unity）
+
+1. `Scene_MissionControl` を置く（床の上面は高さ 0.10。手前の壁と天井はない）。
+2. 子の `Slot_Houston` に `Crew_Houston` を置く。
+3. 子の `Slot_Seat_11`〜`36`（列・左から。3列×6人）に `Crew_Controller_A/B/C` を好きに置く。空席があってよい。全員、手前（Unity の +Z）を向く。
+4. 子の `Slot_PopupCamera` にカメラを置き、先生のほう（Blender の +Y＝Unity の −Z）へまっすぐ向ける。縦の画角 30° で、先生の胸から上と、うしろの管制室が入る。このカメラの絵を RenderTexture に出して、ポップアップの UI に貼る。
+
+### 話す動き（シェイプキー＝Unity のブレンドシェイプ）
+
+顔は `Crew_Houston.Face`（`Head` の子）。Unity では `SkinnedMeshRenderer` になり、ブレンドシェイプが7個入る（値は 0〜100）。管制官の `Face` にも同じ7個が入っている。
+
+| 名前 | 動き |
+|---|---|
+| `MouthOpen` | 口を大きく開ける（あ） |
+| `MouthO` | 小さく丸く開ける（お・う） |
+| `MouthWide` | 横に広げる（い・え） |
+| `Smile` | 口の両端を上げる |
+| `Blink` | 目を閉じる |
+| `BrowsUp` | 眉を上げる（驚き） |
+| `BrowsWorried` | 眉の内側を上げる（心配） |
+
+```csharp
+var face = houston.transform.Find("Crew_Houston.Head/Crew_Houston.Face").GetComponent<SkinnedMeshRenderer>();
+int open = face.sharedMesh.GetBlendShapeIndex("MouthOpen");
+// 話している間：毎フレーム、口を細かく開け閉めする
+face.SetBlendShapeWeight(open, talking ? Mathf.PingPong(Time.time * 600f, 100f) : 0f);
+```
+
+- 話す：`MouthOpen` を 0 → 40〜100 → 0 と 1秒に 5〜8 回上下させる。ときどき `MouthO`・`MouthWide` を混ぜると単調にならない。台詞の音声があるなら、音量をそのまま `MouthOpen` に入れてもよい。
+- まばたき：3〜5 秒に1回、`Blink` を 0.1 秒だけ 100 にする。
+- 表情：事故（M05）は `BrowsWorried`、成功は `Smile`。口のキーは足し合わせない（`MouthOpen` と `Smile` を同時に 100 にすると形が崩れる）。眉・目のキーは口と一緒に使える。
+
+体の動き（`parts.json`。クルーと同じく `.Move_` を付けない）：
+
+| 部品 | 動き |
+|---|---|
+| `Head` | Blender の Z まわり ±40°（左右を見る）。Unity では `localEulerAngles.y = −角度`。うなずきは X まわり ±12° まで |
+| `Arm_L`・`Arm_R` | X まわり −150°（前・上へ）〜 +40° |
+
+### まだ確かめていないこと
+
+- Unity への取り込み（Unity を開いていなかった）。Blender で FBX を読み直して、7個のシェイプキーが入っていることは確かめた。上の C# とブレンドシェイプの名前は Unity で未確認。
+- core の `export.py` を直した（シェイプキーも一緒に Y-up に直す）。シェイプキーのないモデルには影響しない。
+- 肌の色は全員 `cream`（パレット16色にほかの肌色がない）。
