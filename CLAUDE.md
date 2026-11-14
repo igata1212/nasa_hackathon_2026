@@ -2,7 +2,7 @@
 
 お題：[Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/)。宇宙ミッションの設計から運用までを、最大4人で協力して遊べるゲームにする。ゲームの中身は `docs/design/SPEC.md` を読む。
 
-3人・2日間。迷ったら作らない。作るなら細部まで詰める。
+3人・2日間。迷ったら作らない。作るなら細部まで詰める。役割分担と2日間の予定は `docs/design/planning-meeting.md`。
 
 ## 最初に：誰が作業しているか
 
