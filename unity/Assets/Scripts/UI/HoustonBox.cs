@@ -19,6 +19,8 @@ public enum HoustonLink { Ok, NoSignal, CommsOff }
 public class HoustonBox
 {
     public readonly GameObject Root;
+    /// <summary>最後に作った吹き出し（GameFlow の外から台詞やブリーフィングを流すとき・確認用。例：HoustonBox.Current.PlayBriefing((TextAsset)null, null)）</summary>
+    public static HoustonBox Current { get; private set; }
     /// <summary>声の口（既定は Resources/Voice/Houston/&lt;id&gt; を鳴らす。ファイルが無ければ字幕だけ）。HoustonVoice.cs</summary>
     public IHoustonVoice Voice;
 
@@ -61,6 +63,7 @@ public class HoustonBox
         view.OnSkip += SkipBriefing;
         Voice = new HoustonClipVoice(parent.gameObject);
         place = S.Cabin; view.Place(place);
+        Current = this;
     }
 
     // ================================================================== 読み取り（HoustonWindow などが使う）
