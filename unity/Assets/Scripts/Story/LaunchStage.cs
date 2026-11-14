@@ -40,7 +40,7 @@ public class LaunchStage : StoryStage
     [SerializeField] float armOpenFrom = 1.5f, armOpenTo = 2.3f;
 
     [Header("カメラ（寄ったあと：低い位置から見上げる）")]
-    [SerializeField] float camLowY = 0.8f, camDist0 = 4.0f, camDistPerH = 1.45f, lookFrac = 0.42f;
+    [SerializeField] float camLowY = 0.8f, camDist0 = 4.4f, camDistPerH = 1.6f, lookFrac = 0.52f;   // 実機で確認：0.42 だと小型の先端が上の黒帯に切れた（ロケットは舗装の 0.7m 上に立つ）
     [SerializeField] float followK = 3f;           // 追い方 hf = K·(1 − e^(−h/K))。小さいほど早く画面の上へ抜ける
     [SerializeField] float fovStart = 40f, fovPunch = 36f, fovLift = 48f, fovSpace = 40f;
 
@@ -52,6 +52,8 @@ public class LaunchStage : StoryStage
 
     [Header("炎")]
     [SerializeField] float flameWidthK = 0.7f, flameLenK = 0.5f, flameHdr = 2.5f;
+    [Tooltip("外・内・芯の明るさ（flameHdr に掛ける）。外を上げすぎるとトーンマップで黄色に飛び、帯が見えなくなる")]
+    [SerializeField] Vector3 flameGlow = new Vector3(0.45f, 0.75f, 1f);
     [SerializeField] float fireFlash = 14f, fireSteady = 6f, fireRange = 14f;
 
     [Header("煙")]
@@ -61,12 +63,13 @@ public class LaunchStage : StoryStage
 
     [Header("宇宙のカット")]
     [SerializeField] float shipScale = 0.3f, moonScale = 4.5f;
-    [SerializeField] Vector3 shipFrom = new Vector3(-4.2f, -2.2f, 0f), shipTo = new Vector3(0.6f, 0.4f, 0f);
+    [SerializeField] Vector3 shipFrom = new Vector3(-5.4f, -3.0f, 0f), shipTo = new Vector3(-2.4f, -1.1f, 0f);   // 終わりに月を隠さない（実機で確認）
 
     [Header("字幕（Canvas の 0〜1。x0, y0, x1, y1）")]
     [SerializeField] Vector4 countArea = new Vector4(0.08f, 0.48f, 0.5f, 0.78f), dateArea = new Vector4(0.04f, 0.78f, 0.56f, 0.86f);
     [SerializeField] Vector4 liftoffArea = new Vector4(0f, 0.14f, 1f, 0.34f), moonArea = new Vector4(0f, 0.1f, 1f, 0.24f);
     [SerializeField] int moonFontSize = 56, outlineBig = 4, outlineSmall = 3;
+    public Font captionFont;                       // 字幕の書体：Baloo 2 ExtraBold（StoryScene が入れる。無ければ元の書体のまま）
 
     Transform rocket;
     Vector3 rocketBase, rocketScale0 = Vector3.one;
@@ -82,7 +85,7 @@ public class LaunchStage : StoryStage
     Vector3[] crewHome, crewScale;
 
     // 字幕の元の姿（End で戻す）
-    struct TextHome { public Vector2 aMin, aMax, oMin, oMax; public int size; }
+    struct TextHome { public Vector2 aMin, aMax, oMin, oMax; public int size; public Font font; public FontStyle style; }
     TextHome bigHome, smallHome;
     bool captionSaved;
     Outline bigLine, smallLine;
@@ -118,6 +121,7 @@ public class LaunchStage : StoryStage
         }
 
         BuildFlames();
+        FlameColors();
         BuildBurst();
         burstFired = false;
         if (flame != null) flame.gameObject.SetActive(false);
@@ -299,6 +303,7 @@ public class LaunchStage : StoryStage
         if (!captionSaved) { bigHome = Save(big); smallHome = Save(small); captionSaved = true; }
         bigLine = Line(big, bigLine, outlineBig);
         smallLine = Line(small, smallLine, outlineSmall);
+        if (captionFont != null) foreach (var t in new[] { big, small }) { t.font = captionFont; t.fontStyle = FontStyle.Normal; }   // ExtraBold なので太字の合成はしない
         lastArea = -1;
     }
 
@@ -307,6 +312,7 @@ public class LaunchStage : StoryStage
         var big = d.CaptionBig; var small = d.CaptionSmall;
         if (!captionSaved || big == null || small == null) return;
         Load(big, bigHome); Load(small, smallHome);
+        big.font = bigHome.font; big.fontStyle = bigHome.style; small.font = smallHome.font; small.fontStyle = smallHome.style;
         if (bigLine != null) bigLine.enabled = false;
         if (smallLine != null) smallLine.enabled = false;
         lastArea = -1;
@@ -327,7 +333,7 @@ public class LaunchStage : StoryStage
     static TextHome Save(Text t)
     {
         var r = t.rectTransform;
-        return new TextHome { aMin = r.anchorMin, aMax = r.anchorMax, oMin = r.offsetMin, oMax = r.offsetMax, size = t.fontSize };
+        return new TextHome { aMin = r.anchorMin, aMax = r.anchorMax, oMin = r.offsetMin, oMax = r.offsetMax, size = t.fontSize, font = t.font, style = t.fontStyle };
     }
 
     static void Load(Text t, TextHome h)
@@ -357,7 +363,6 @@ public class LaunchStage : StoryStage
         coneMesh = ConeMesh(12);
         var src = flame != null ? flame.GetComponent<Renderer>() : null;
         var baseMat = src != null ? src.sharedMaterial : null;
-        Color[] cols = { Orange, SeatYellow, Cream };
         string[] names = { "Flame_Outer", "Flame_Inner", "Flame_Core" };
         flames = new Transform[3]; flameMats = new Material[3];
         for (int i = 0; i < 3; i++)
@@ -368,13 +373,23 @@ public class LaunchStage : StoryStage
             var mr = go.AddComponent<MeshRenderer>();
             var m = baseMat != null ? new Material(baseMat) : new Material(Shader.Find("Universal Render Pipeline/Unlit"));
             m.name = names[i];
-            m.SetColor("_BaseColor", new Color(cols[i].r * flameHdr, cols[i].g * flameHdr, cols[i].b * flameHdr, 1f));
             m.SetFloat("_Cull", (float)UnityEngine.Rendering.CullMode.Front);   // 裏の面だけ描く（上の説明）
             mr.sharedMaterial = m;
             mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             mr.receiveShadows = false;
             go.SetActive(false);
             flames[i] = go.transform; flameMats[i] = m;
+        }
+    }
+
+    /// <summary>炎の色（外 orange・内 seat_yellow・芯 cream。外ほど暗くして、トーンマップ後も3色の帯に見せる）</summary>
+    void FlameColors()
+    {
+        Color[] cols = { Orange, SeatYellow, Cream };
+        for (int i = 0; i < flameMats.Length; i++)
+        {
+            float k = flameHdr * flameGlow[i];
+            flameMats[i].SetColor("_BaseColor", new Color(cols[i].r * k, cols[i].g * k, cols[i].b * k, 1f));
         }
     }
 
