@@ -138,7 +138,7 @@ midori と同じ `bake_space_transform=True` は**使わない**。Blender 5.1.2
 | 原点 | ルート (0,0,0)、底面 z=0±1mm（地球・月は中心が原点）。`parts.json` の部品が別オブジェクトで、原点が表の値と一致 |
 | 命名 | `^(Ctrl|Console|Crew|Tank|Ship|Body|Fx|Part)_[A-Z][A-Za-z0-9_]*$`、`.001` なし |
 | 太さ | 部品ごとの外形の、いちばん薄い向きが 2cm 以上 |
-| 容量 | FBX 1つ 500KB 以下、追加合計 20MB 以下（FBX・glb・レンダー・テクスチャなど。`modeling/source/`（ダウンロードした元データ）、midori のフォルダ、NASA の FBX、.blend は数えない） |
+| 容量 | FBX 1つ 500KB 以下、追加合計 30MB 以下（#34 では 20MB。モデルが増えたので広げた）（FBX・glb・レンダー・テクスチャなど。`modeling/source/`（ダウンロードした元データ）、midori のフォルダ、NASA の FBX、.blend は数えない） |
 | 再取り込み | FBX を読み直して、三角数・寸法・全部品の原点が書き出し時（`stats.json`）と同じ |
 
 試し書き（`ck.trial()`）のフォルダを渡すと（例：`check.py tmp/modeling_trial/fx`）、試し書きの FBX と、その横の `parts*.json`・`stats.json` を使う（本番より先に見る）。
