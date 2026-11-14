@@ -122,7 +122,8 @@ practice の間は同じメッセージが「練習」として数えられる�
 {"type":"design","design":{"parts":{"battery":3,"camera":1},"trajectory":"science","rocket":"large"},
  "totals":{"mass":96,"cost":90,"status":"ok","mass_limit":140,"budget":110,"capacity":150,"oxygen":100,"fuel":100}}
 {"type":"state","t":120,"state":{ ... 下の表 ... }}                                          // flight の間、毎秒
-{"type":"result","result":{ ... reference_sim の result() と同じ ... }}
+{"type":"result","result":{ ... reference_sim の result() と同じ ... },"strict":false,"strict_reason":null}
+// strict_reason：null / "missed_burn"（噴射窓を逃した）/ "reentry_not_ready"（再突入の準備不足）。report にも同じ2つが付く
 {"type":"report","result":{...},"design":{...},"score_breakdown":{"ending":500,"science":337.5,"resources":113.1,"teamwork":100,"budget":10,"all_requirements":200},
  "history":[{"t":0,"power":130,"oxygen":100,"fuel":100,"temp":22,"co2":10,"data_collected":0,"data_sent":0,"attitude":"earth"}, ...],
  "commands":[{"t":0,"seat":"comms_power","player":"9f3a01bc","cmd":"switch","args":{"name":"lights","on":false},"ok":true}, ...]}
@@ -158,8 +159,12 @@ M04 の繰り返しは `"repeat":true` が付く。
 | `attitude` `transmit` | 姿勢、送信 |
 | `observed_s` `data_collected` `data_sent` | 科学データ |
 | `correction_done` `route` `burn_done` `first_try` `strict` `swaps` `ending` | 軌道・判定 |
+| `strict_reason` | `strict` の理由。`null`（strict でない）/ `"missed_burn"` / `"reentry_not_ready"` |
 | `has_signal` `in_farside` | 通信できるか、観測の窓の中か |
-| `t_los` `t_aos` `t_burn_open` `t_burn_close` `t_reentry` `t_splashdown` | 軌道の時刻（Unity が GMAT の CSV と対応づける。`t_reentry` は route で変わる。route が null の間は B として計算） |
+| `t_los` `t_aos` `t_burn_open` `t_burn_close` `t_reentry` `t_splashdown` | 軌道の時刻（Unity が GMAT の CSV と対応づける。`t_reentry` `t_splashdown` は route で変わる。route が null の間は B として計算） |
+| `t_reentry_a` `t_splashdown_a` `t_reentry_b` `t_splashdown_b` | ルート A・B それぞれの再突入・着水の時刻（route を選ぶ前から両方入っている） |
+| `thresholds` | ゲージ・警告の閾値（UI は数字を持たない）。`power_frac`：`half`・`low`・`crit`（容量に対する割合 0.5・0.25・0.10）、`oxygen`：`mid`・`low`（40・20）、`fuel`：`low`（15）、`co2`：`warn`・`slow`、`temp`：`slow`・`slower`（℃）、`end_min`：`oxygen`・`power`・`temp`（生還ライン）、`strict_margin`、`req_science_min`、`reentry_ready_s`。値の出どころは parameters.json と `game/config.py` |
+| `science_now` | Req 2 の今の見込み。「ここで観測と送信をやめて、無事に帰ってきたら」の science。`req_science_min` と比べる |
 | `slow_pct` | 操作の遅れ（%）。`max(寒さ, CO2)`。長押しの時間「0.5秒 ×（1 + slow_pct/100）」は Unity 側 |
 
 エラーの `code`：`bad_json` `not_in_room` `no_such_room` `room_full` `game_started` `unknown_player` `wrong_phase` `unknown_type` `unknown_cmd` `bad_args` `not_your_seat` `seat_not_allowed` `locked` `seat_taken` `no_free_seat`。
@@ -188,7 +193,7 @@ M04 の繰り返しは `"repeat":true` が付く。
 
 - 計算（CO2・フィルター・ソーラーパネル・難易度を含む）は reference_sim をそのまま呼ぶので、サーバー側で削ったものはない。Unity 側で後回しにしてよいのは、それらの**画面**（フィルター交換のボタン、太陽向きの表示、難易度の選択など）
 - 状況に反応する台詞は critical と high だけ流す（`game/config.py` の `HOUSTON_PRIORITIES`）：H01 H02 H07 H08 H09 H11 H12 H14 H16 H18 H24 H25。加えて SPEC 9章のルールの H27。medium の閾値の台詞（H10 H13 H15 H17 H26）はコードにあるが止めてある
-- 食い違いは SPEC と reference_sim のとおり（`close_valve` は Tank 2 固定、かき混ぜは Life Support の押しボタン `stir`）
+- 食い違いは SPEC と reference_sim のとおり（`close_valve` はタンク1か2を選ぶ（漏れているのは Tank 2）、かき混ぜは Life Support の押しボタン `stir`）
 
 ## TODO（未実装）
 
