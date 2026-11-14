@@ -56,28 +56,7 @@ public static class GmatOrbitMapScene
         LookDevSettings.ApplyLighting(lighting.transform);
 
         var root = new GameObject("TrajectoryView");
-        var view = root.AddComponent<TrajectoryView>();
-        view.routeA = AssetDatabase.LoadAssetAtPath<GmatRoute>(GmatImport.OutFolder + "/Route_A.asset");
-        view.routeB = AssetDatabase.LoadAssetAtPath<GmatRoute>(GmatImport.OutFolder + "/Route_B.asset");
-        view.lineMaterial = GmatImport.EnsureLineMaterial();
-
-        // 地球と月：球の中心が原点。半径は見栄えの大きさ（TrajectoryView の earthVisualKm・moonVisualKm）
-        var earth = Place("Assets/Models/Bodies/Body_Earth.fbx", root.transform, "Earth");
-        var moon = Place("Assets/Models/Bodies/Body_Moon.fbx", root.transform, "Moon");
-        FitSphere(earth, view.earthVisualKm * view.unitsPerKm, Vector3.zero);
-        FitSphere(moon, view.moonVisualKm * view.unitsPerKm, new Vector3(view.routeA.moonCenterXKm, 0f, 0f) * view.unitsPerKm);
-        view.earth = earth.transform; view.moon = moon.transform;
-
-        // 宇宙船：長さ約 2 unit（実際より大きい）。+Z が進行方向
-        var shipPivot = new GameObject("Ship").transform;
-        shipPivot.SetParent(root.transform, false);
-        var stack = Place("Assets/Models/Ship/Ship_Stack.fbx", shipPivot, "Ship_Stack");
-        var sb = LocalBounds(stack);
-        float len = Mathf.Max(sb.size.x, sb.size.y, sb.size.z);
-        stack.transform.localScale = Vector3.one * (2f / len);
-        stack.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);   // モデルの長軸は Unity の +Y。+Z（進行方向）へ倒す
-        Debug.Log(Tag + "Ship_Stack の大きさ " + sb.size + "、原点からの中心 " + (sb.center - stack.transform.position));
-        view.ship = shipPivot;
+        var view = BuildRig(root.transform);
 
         // カメラ：斜め上から全体
         var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
@@ -98,20 +77,51 @@ public static class GmatOrbitMapScene
         Debug.Log(Tag + ScenePath + " を作り直した");
     }
 
+    /// <summary>軌道の地図（線・地球・月・宇宙船）を root の下に組み立てる。Game.unity の HUD の小窓でも使う</summary>
+    public static TrajectoryView BuildRig(Transform root)
+    {
+        var view = root.gameObject.AddComponent<TrajectoryView>();
+        view.routeA = AssetDatabase.LoadAssetAtPath<GmatRoute>(GmatImport.OutFolder + "/Route_A.asset");
+        view.routeB = AssetDatabase.LoadAssetAtPath<GmatRoute>(GmatImport.OutFolder + "/Route_B.asset");
+        view.lineMaterial = GmatImport.EnsureLineMaterial();
+
+        // 地球と月：球の中心が原点。半径は見栄えの大きさ（TrajectoryView の earthVisualKm・moonVisualKm）
+        var earth = Place("Assets/Models/Bodies/Body_Earth.fbx", root, "Earth");
+        var moon = Place("Assets/Models/Bodies/Body_Moon.fbx", root, "Moon");
+        FitSphere(earth, view.earthVisualKm * view.unitsPerKm, Vector3.zero);
+        FitSphere(moon, view.moonVisualKm * view.unitsPerKm, new Vector3(view.routeA.moonCenterXKm, 0f, 0f) * view.unitsPerKm);
+        view.earth = earth.transform; view.moon = moon.transform;
+
+        // 宇宙船：長さ約 2 unit（実際より大きい）。+Z が進行方向
+        var shipPivot = new GameObject("Ship").transform;
+        shipPivot.SetParent(root, false);
+        var stack = Place("Assets/Models/Ship/Ship_Stack.fbx", shipPivot, "Ship_Stack");
+        var sb = LocalBounds(stack);
+        float len = Mathf.Max(sb.size.x, sb.size.y, sb.size.z);
+        stack.transform.localScale = Vector3.one * (2f / len);
+        stack.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);   // モデルの長軸は Unity の +Y。+Z（進行方向）へ倒す
+        Debug.Log(Tag + "Ship_Stack の大きさ " + sb.size + "、原点からの中心 " + (sb.center - stack.transform.position));
+        view.ship = shipPivot;
+
+        view.t = 0f;
+        return view;
+    }
+
     static void FitSphere(GameObject go, float radiusUnits, Vector3 center)
     {
-        go.transform.position = Vector3.zero; go.transform.localScale = Vector3.one;
+        // center は親（軌道の地図の根。回転・拡大なし）から見た位置。根がどこに置かれていても合うように local で置く
+        go.transform.localPosition = Vector3.zero; go.transform.localScale = Vector3.one;
         var b = LocalBounds(go);
         float r = Mathf.Max(b.extents.x, b.extents.y, b.extents.z);
         go.transform.localScale = Vector3.one * (radiusUnits / r);
-        go.transform.position = center - (b.center - Vector3.zero) * (radiusUnits / r);
+        go.transform.localPosition = center - (b.center - go.transform.position) * (radiusUnits / r);
     }
 
     [MenuItem("Tools/GMAT/軌道の地図のスクリーンショット")]
     public static void Screenshots()
     {
         if (EditorSceneManager.GetActiveScene().path != ScenePath) EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-        var view = Object.FindFirstObjectByType<TrajectoryView>();
+        var view = Object.FindAnyObjectByType<TrajectoryView>();
         var cam = Camera.main;
         var outDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Application.dataPath)), ShotFolder);
         Directory.CreateDirectory(outDir);

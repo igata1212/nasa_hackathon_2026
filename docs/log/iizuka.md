@@ -25,3 +25,4 @@
 - 16:47 #69 Python の WebSocket ゲームサーバー（reference_sim をそのまま使う、47 テスト合格）、xlsx からパラメータ JSON（T1〜T5 完全一致）、Unity のオフライン再生用の記録
 - 16:49 #96 Unity のゲームの流れの骨組み（Title → Lobby → Design → Cabin → Ending → Report、1シーンで画面切替）。IGameClient、OfflineClient（記録の再生）、WsClient（ClientWebSocket）
 - 16:49 #113 物語の台本の下書き story/script.md（材料を並べただけ。Taiga が仕上げる）
+- 17:13 #115 Unity（WsClient）と Python サーバーをつないで最後まで通しで遊べた（ED-A 1260.6、reference_sim と一致）。オフライン再生をサーバーの記録の形に、軌道の小窓、パネル警告、遊び方 how-to-play-local.md
