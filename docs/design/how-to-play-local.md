@@ -14,7 +14,7 @@
 ## 人数ごと
 
 - **4人**：1人1席。**3人**：[Pilot] [Comms & Power + Mission Planner] [Life Support]。**2人**：[Pilot + Mission Planner] [Life Support + Comms & Power]
-- **1人**：全席を持つ（下のタブで席を切り替える）。同時押し（IGNITE・SWAP CO2 FILTER）は1人だと難しいので、相手の席はボットに持たせるのがおすすめ（例：自分は Pilot だけ、ほかの3席をボット）
+- **1人**：ボットなしで全席を持って遊べる（下のタブで席を切り替える）。同時押しは、2席を自分が持っていれば **IGNITE (both seats)**（Pilot と Comms & Power）・**SWAP FILTER (both seats)**（Life Support と自分の別の席）のボタンが出て、1回押すと両方の席の分を続けて送る。相手の席をボットに持たせてもよい
 - 2台以上の PC：サーバーの PC の IP で `ws://192.168.x.x:8765`。外から：`cloudflared tunnel --url http://localhost:8765` → `wss://xxxx.trycloudflare.com`
 
 ## サーバーなしで見る

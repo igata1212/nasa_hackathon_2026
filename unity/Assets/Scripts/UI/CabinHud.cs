@@ -185,6 +185,10 @@ public class CabinHud
         }
         var row = Ui.HBox(seatPanel, 12, 0, TextAnchor.MiddleLeft, true); Ui.Fill(row);
         string me = activeSeat;
+        var mine = f.Model.MySeats;
+        bool bothIgnite = mine.Contains(Seats.Pilot) && mine.Contains(Seats.Comms);
+        // 同じ人が swap_filter の相手の席（Pilot / Comms / Planner のどれか）も持っているか
+        string filterMate = mine.Contains(Seats.Life) ? (mine.Contains(Seats.Pilot) ? Seats.Pilot : mine.Contains(Seats.Comms) ? Seats.Comms : mine.Contains(Seats.Planner) ? Seats.Planner : null) : null;
         Color tint = Seats.Tint(me);
         if (f.Model.Phase == "stir")
         {
@@ -197,18 +201,21 @@ public class CabinHud
                 var att = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(att, flexW: 3);
                 foreach (var a in Attitudes) { string aa = a; attBtns[a] = Ui.Btn(att, a.ToUpper(), Ui.Gray, () => f.Client.Send(Cmd.Attitude(me, aa)), 20, Ui.Cream); }
                 Ui.Size(Ui.Btn(row, "CORRECTION BURN", tint, () => f.Client.Send(Cmd.Simple("correction_burn", me)), 24), flexW: 1);
-                Ui.Size(Ui.Btn(row, "IGNITE (with Comms)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
+                if (bothIgnite) Ui.Size(Ui.Btn(row, "IGNITE (both seats)", tint, SendBothIgnite, 24), flexW: 1);
+                else Ui.Size(Ui.Btn(row, "IGNITE (with Comms)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
                 break;
             case Seats.Life:
                 Ui.Size(Ui.Btn(row, "CLOSE VALVE 1", tint, () => f.Client.Send(Cmd.Valve(me, 1)), 26), flexW: 1);
                 Ui.Size(Ui.Btn(row, "CLOSE VALVE 2", tint, () => f.Client.Send(Cmd.Valve(me, 2)), 26), flexW: 1);
-                Ui.Size(Ui.Btn(row, "SWAP CO2 FILTER (with a partner)", tint, () => f.Client.Send(Cmd.Simple("swap_filter", me)), 22), flexW: 1);
+                if (filterMate != null) { string mate = filterMate; Ui.Size(Ui.Btn(row, "SWAP FILTER (both seats)", tint, () => { f.Client.Send(Cmd.Simple("swap_filter", Seats.Life)); f.Client.Send(Cmd.Simple("swap_filter", mate)); }, 22), flexW: 1); }
+                else Ui.Size(Ui.Btn(row, "SWAP CO2 FILTER (with a partner)", tint, () => f.Client.Send(Cmd.Simple("swap_filter", me)), 22), flexW: 1);
                 break;
             case Seats.Comms:
                 var sw = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(sw, flexW: 3);
                 foreach (var n in new[] { "heater", "lights", "nav", "comms" }) AddToggle(sw, "sw:" + n, n.ToUpper(), me, () => { var st = f.Model.State; return st != null && st.Switch(n); }, v => Cmd.Switch(me, n, v), tint);
                 AddToggle(row, "tx", "TRANSMIT", me, () => f.Model.State != null && f.Model.State.transmit, v => Cmd.Transmit(me, v), tint);
-                Ui.Size(Ui.Btn(row, "IGNITE (with Pilot)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
+                if (bothIgnite) Ui.Size(Ui.Btn(row, "IGNITE (both seats)", tint, SendBothIgnite, 24), flexW: 1);
+                else Ui.Size(Ui.Btn(row, "IGNITE (with Pilot)", tint, () => f.Client.Send(Cmd.Simple("ignite", me)), 24), flexW: 1);
                 break;
             case Seats.Planner:
                 var ins = Ui.HBox(row, 6, 0, TextAnchor.MiddleLeft, true); Ui.Size(ins, flexW: 3);
@@ -219,6 +226,8 @@ public class CabinHud
                 break;
         }
     }
+
+    void SendBothIgnite() { f.Client.Send(Cmd.Simple("ignite", Seats.Pilot)); f.Client.Send(Cmd.Simple("ignite", Seats.Comms)); }
 
     void AddToggle(Transform parent, string key, string label, string seat, System.Func<bool> get, System.Func<bool, Dictionary<string, object>> make, Color tint)
     {

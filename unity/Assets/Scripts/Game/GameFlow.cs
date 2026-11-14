@@ -136,7 +136,7 @@ public class GameFlow : MonoBehaviour
     {
         switch (e.kind)
         {
-            case "houston": houston.Push(e.text); break;
+            case "houston": houston.Push(e.text, e.priority); break;
             case "launch":
                 Model.LaunchStatus = e.status == "ok" ? "" : e.status;
                 design.Refresh();
