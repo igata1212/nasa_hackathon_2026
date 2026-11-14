@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 段階の閾値を thresholds に）
 //
 // 警告のときに画面の緊急性を上げる（#125）。サーバーから来た状態で緊急の段階 Level（0〜3）を決め、
 //   ・画面の縁が赤く脈打つ：画面の縁に赤い枠（UI。GameCanvas の下・3D の上に描くので、HUD のゲージは赤に埋もれない）
@@ -6,10 +6,11 @@
 //     Vignette だけだと、明るい船内では縁が赤黒く沈むだけで赤く見えなかった（Unity で確認、2026-11-14）。
 //   ・メインカメラの小さな揺れ（段階 2 から）。事故の瞬間（M05 の台詞／stir → flight）は大きく1回
 //   ・警報ランプ（LampGlow）の点滅を速める（LampGlow の period を変えるだけ。LampGlow は変えない）
-// 段階の決め方（閾値は新しく決めない。CabinHud のゲージの色と、parameters.json の値を使う）：
-//   1 注意：電力が容量の 50% 未満／酸素がゲージの上限の 50% 未満（CabinHud が黄にする所）／CO2 > co2_warn
-//   2 危険：電力が容量の 25% 未満／酸素がゲージの上限の 25% 未満（CabinHud が赤にする所）／CO2 >= co2_slow
-//   3 危機：電力 < end_power_min／酸素 < end_oxygen_min（生還ラインの下）／事故直後の漏れ（leak_open かつ t < oxygen_leak_max ÷ oxygen_leak_per_s）
+// 段階の決め方（閾値は新しく決めない。サーバーが state で送る thresholds（#148）＝ StatusPanel・CrisisBanner と同じ値。#146 でそろえた）：
+//   1 注意：電力 < 容量 × power_frac.half／酸素 < oxygen.mid／CO2 > co2.warn（StatusPanel がオレンジにする所）
+//   2 危険：電力 < 容量 × power_frac.low／酸素 < oxygen.low／CO2 >= co2.slow（StatusPanel がクリムゾンにする所）
+//   3 危機：電力 < end_min.power／酸素 < end_min.oxygen（生還ラインの下）／漏れている間（leak_open かつ leaked < oxygen_leak_max）
+//   thresholds が届いていないとき（古い記録など）だけ parameters.json の値を使う
 // 段階は flight の間だけ。それ以外の段階・演出（StoryDirector）の間は 0 に戻す。
 // 見た目だけの値（脈の速さ・色・揺れの大きさ）はこの部品の SerializeField。ほかの部品は Level と OnLevelChanged を使う（警報の音など）。
 // GameFlow は変えない：シーンに置いて flow を指すだけ（Editor/Urgency/UrgencyScene.cs が組む）。GameFlow.Client が差し替わったら付け直す。
@@ -180,7 +181,7 @@ public class UrgencyFx : MonoBehaviour
             if (o is Dictionary<string, object> d && J.Has(d, "key")) P[J.Str(d, "key")] = J.Num(d, "value");
     }
 
-    bool Param(string key, out float v) => P.TryGetValue(key, out v);
+    bool Param(string key, out float v) => GameParams.TryGet(key, out v) || P.TryGetValue(key, out v);
 
     // ------------------------------------------------------------------ つなぐ
     void Hook()
@@ -228,24 +229,28 @@ public class UrgencyFx : MonoBehaviour
         int best = 0; string why = "";
         void Raise(int l, string c) { if (l > best) { best = l; why = c; } }
 
-        // CabinHud.SetGauge と同じ：悪さ（1 − 残り/上限）が 0.5 で黄、0.75 で赤
-        if (s.capacity > 0f) Raise(Band(1f - s.power / s.capacity), "power");
-        float o2Max = m != null ? m.Max("oxygen", s.oxygen) : 0f;
-        if (o2Max > 0f) Raise(Band(1f - s.oxygen / o2Max), "oxygen");
-        // CO2：parameters.json（サーバーの H17・H18 と同じ）
-        if (Param("co2_slow", out var co2Slow) && s.co2 >= co2Slow) Raise(2, "co2");
-        else if (Param("co2_warn", out var co2Warn) && s.co2 > co2Warn) Raise(1, "co2");
+        // 電力：容量に対する割合（power_frac）。酸素：量（oxygen.mid・low）。StatusPanel と同じ比べ方
+        if (s.capacity > 0f)
+        {
+            if (s.Threshold("power_frac", "low", out var pLow) && s.power < s.capacity * pLow) Raise(2, "power");
+            else if (s.Threshold("power_frac", "half", out var pHalf) && s.power < s.capacity * pHalf) Raise(1, "power");
+        }
+        if (s.Threshold("oxygen", "low", out var oLow) && s.oxygen < oLow) Raise(2, "oxygen");
+        else if (s.Threshold("oxygen", "mid", out var oMid) && s.oxygen < oMid) Raise(1, "oxygen");
+        // CO2（サーバーの H17・H18 と同じ）
+        if (Th(s, "co2", "slow", "co2_slow", out var co2Slow) && s.co2 >= co2Slow) Raise(2, "co2");
+        else if (Th(s, "co2", "warn", "co2_warn", out var co2Warn) && s.co2 > co2Warn) Raise(1, "co2");
         // 生還ライン（ED-A の基準）の下
-        if (Param("end_oxygen_min", out var o2Min) && s.oxygen < o2Min) Raise(3, "oxygen");
-        if (Param("end_power_min", out var pMin) && s.power < pMin) Raise(3, "power");
-        // 事故直後の漏れ：漏れは oxygen_leak_max に届くと止まる（state に leaked が無いので時間で見る）
-        if (s.leakOpen && Param("oxygen_leak_max", out var leakMax) && Param("oxygen_leak_per_s", out var leakRate) && leakRate > 0f
-            && s.t < leakMax / leakRate) Raise(3, "leak");
+        if (Th(s, "end_min", "oxygen", "end_oxygen_min", out var o2Min) && s.oxygen < o2Min) Raise(3, "oxygen");
+        if (Th(s, "end_min", "power", "end_power_min", out var pMin) && s.power < pMin) Raise(3, "power");
+        // 漏れている間：漏れは oxygen_leak_max に届くと止まる（leaked は #148 の state）
+        if (s.leakOpen && (!Param("oxygen_leak_max", out var leakMax) || s.leaked < leakMax)) Raise(3, "leak");
         cause = why;
         return best;
     }
 
-    static int Band(float bad) => bad >= 0.75f ? 2 : bad >= 0.5f ? 1 : 0;   // CabinHud.SetGauge の 0.5／0.75
+    /// <summary>サーバーの thresholds。無ければ parameters.json の paramKey</summary>
+    bool Th(GameState s, string group, string key, string paramKey, out float v) => s.Threshold(group, key, out v) || Param(paramKey, out v);
 
     bool StoryPlaying => story != null && story.Playing;
 
