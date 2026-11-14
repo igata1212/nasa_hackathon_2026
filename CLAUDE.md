@@ -2,7 +2,9 @@
 
 お題：[Space Mission Design Game](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/)。宇宙ミッションの設計から運用までを、最大4人で協力して遊べるゲームにする。ゲームの中身は `docs/design/SPEC.md` を読む。
 
-3人・2日間。迷ったら作らない。作るなら細部まで詰める。役割分担と2日間の予定は `docs/design/planning-meeting.md`。
+3人・2日間。迷ったら作らない。作るなら細部まで詰める。役割分担と2日間の予定は `docs/reference/planning-meeting.md`。
+
+**docs との食い違いに気づいたら、作業を止めずにすぐ伝える。** 本人の指示・コード・ほかの資料が `docs/design/` と合わないときは、その場で一言言う（どのファイルの何と、何が違うか）。`docs/design/` が正。直すなら Issue にする。
 
 ## 最初に：誰が作業しているか
 
@@ -44,10 +46,11 @@ Issue の担当を付けるときは GitHub の名前を使う：`gh issue edit 
 | 場所 | 中身 |
 |---|---|
 | `unity/` | Unity プロジェクトのルート（Unity Hub でここに作る） |
-| `modeling/` | モデルの元データ（`.blend` など）。書き出した `.fbx` は `unity/Assets/Models/` へ |
+| `modeling/` | モデルを作るスクリプトとレンダー。FBX は `unity/Assets/Models/` へ。新しい `.blend` はコミットしない（スクリプトから作り直す）。ルールは `modeling/core/README.md` |
 | `data/` | NASA のデータ、GMAT の出力など、ゲームが読む外部データ |
 | `story/` | ゲームの物語、台詞の下書き |
-| `docs/design/` | 設計・仕様のメモ |
+| `docs/design/` | **最新の設計だけ**（SPEC、見た目、ゲームの流れ）。決まったことが変わったらここを直す |
+| `docs/reference/` | 経緯の資料（議事録、調査、計画、参考画像）。古いことがあるので、`docs/design/` と違えば `docs/design/` が正 |
 | `docs/log/` | 作業ログ（1人1ファイル） |
 | `tmp/` | 作業用の置き場。コミットされない。使うものは正しい場所に移す |
 
