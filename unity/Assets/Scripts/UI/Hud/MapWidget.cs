@@ -527,10 +527,12 @@ public class MapWidget : HudPart
             if (isBig)
             {
                 Label(Words.Earth, earthPx + new Vector2(0f, -rE - T.S1 * 0.5f), new Vector2(0.5f, 1f), Caption);
-                // #212：月の名前は月の印の下
-                var mlPos = moonPx + new Vector2(0f, -rM - T.S1 * 0.5f);
-                Label(Words.Moon, mlPos, new Vector2(0.5f, 1f), Caption);
-                blocked.Add(LabelRect(Words.Moon, mlPos, new Vector2(0.5f, 1f)));
+                // #212：月の名前は月の印の下。噴射の印（月のそば）と反対の側へ寄せて、印に隠れないように
+                bool burnLeft = At(a, hBurn).x < moonPx.x;
+                var mlPv = burnLeft ? new Vector2(0f, 1f) : new Vector2(1f, 1f);
+                var mlPos = moonPx + new Vector2(burnLeft ? -rM * 0.2f : rM * 0.2f, -rM - T.S1 * 0.5f);
+                Label(Words.Moon, mlPos, mlPv, Caption);
+                blocked.Add(LabelRect(Words.Moon, mlPos, mlPv));
                 blocked.Add(new Rect(moonPx.x - rM, moonPx.y - rM, rM * 2f, rM * 2f));
                 blocked.Add(new Rect(earthPx.x - rE, earthPx.y - rE, rE * 2f, rE * 2f));
             }
