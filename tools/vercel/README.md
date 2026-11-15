@@ -52,8 +52,8 @@ uv run python tools/bot_client.py --url ws://localhost:8766/api/ws --bots 4
 
 出典：<https://vercel.com/docs/functions/websockets>
 
-- **部屋はメモリの中**。Vercel は新しい接続を同じインスタンスに届けるとは限らない。人が少ない間は同じインスタンスに集まるが、保証はない。`no_such_room` が出たら、`/api/health` の `instance` が人によって違っていないか見る。確実にするには部屋を外の保存先（Redis）に置く作り直しが要る（やっていない）
-- **接続は関数の最大時間で切れる**。切れたらクライアントが自動で同じ部屋・同じ席に戻る（#94）。そのとき画面に RECONNECTING が出る。最大時間はプランで違うので、置いたあとに実測する
+- **部屋は Redis に置く**。Vercel は接続ごとに別のインスタンスへ届ける（実測：メモリの部屋だと、ボット4人のうち1人が `no_such_room` になった）。Vercel のプロジェクトに Redis（Storage → Upstash for Redis）をつなぐと環境変数 `REDIS_URL`（か `KV_URL`）が入り、`server/app.py` が `game/redis_server.py` を使う。`/api/health` の `store` が `redis`、`redis` が `true` ならよい
+- **接続は 270 秒でサーバーから閉じる**（Vercel が関数の最大時間で黙って切る前に）。クライアントが自動で同じ部屋・同じ席に戻る（#94）。そのとき画面に RECONNECTING が出ることがある。秒数は環境変数 `MISSION_RETURN_MAX_CONN_S`
 - **予備**：同じサーバーを `server/main.py` で動かして Cloudflare Tunnel で出す（`server/README.md`）。`?server=xxxx.trycloudflare.com` か Developer の Server URL でそちらにつなぐ
 
 ## iOS（Apple Developer Program）
