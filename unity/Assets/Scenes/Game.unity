@@ -23943,9 +23943,9 @@ MonoBehaviour:
     screen: {fileID: 2114374759}
     side: -1
   seatViewOnStart: 1
-  cameraOffset: {x: 0.55, y: 1.55, z: 2.05}
-  lookDown: 0.33
-  fieldOfView: 42
+  cameraOffset: {x: 0.95, y: 1.95, z: 1.45}
+  lookDown: 0.12
+  fieldOfView: 40
   moveSpeed: 6
   closeCabin: 1
   enclosure:

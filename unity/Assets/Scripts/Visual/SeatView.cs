@@ -33,9 +33,9 @@ public class SeatView : MonoBehaviour
 
     [Header("カメラ（肩ごし）")]
     public bool seatViewOnStart = true;
-    [Tooltip("モニターのルートから見たカメラの位置（m）。x は side を掛ける")] public Vector3 cameraOffset = new Vector3(0.55f, 1.55f, 2.05f);
-    [Tooltip("画面のまん中から、見る点を下げる量（m）。コンソールの操作部品も入るように")] public float lookDown = 0.33f;
-    public float fieldOfView = 42f;
+    [Tooltip("モニターのルートから見たカメラの位置（m）。x は side を掛ける")] public Vector3 cameraOffset = new Vector3(0.95f, 1.95f, 1.45f);   // クルーの頭（高さ 1.48・半径 0.25）の上と横を通って画面が見える位置
+    [Tooltip("画面のまん中から、見る点を下げる量（m）。コンソールの操作部品も入るように")] public float lookDown = 0.12f;
+    public float fieldOfView = 40f;
     [Tooltip("席を替えたとき・切り替えたときに移る速さ（大きいほど速い）")] public float moveSpeed = 6f;
 
     [Header("船室を閉じる（狭く感じさせる）")]
