@@ -42,7 +42,7 @@ public class CabinHud
         (HudSlot.CenterMid, 0.22f, 0.42f, 0.78f, 0.915f),   // 同時押しの合図・点火の準備（上端から下へ伸びる）
         (HudSlot.Right,     0.79f, 0.45f, 0.99f, 0.63f),   // 要件トラッカー（#90。まだ空）。オフライン再生の操作（GameFlow）・切断の札（ConnectionUi）も地図の下に出る
         (HudSlot.Bottom,    0.01f, 0.01f, 0.99f, 0.24f),   // 席タブ（48）＋席のパネル（143）
-        (HudSlot.MapBig,    0f,    0f,    1f,    0.79f),  // 大きく開いた軌道の地図（#212：全画面。上の帯と「いま何をするか」の行は隠さない。いちばん手前）
+        (HudSlot.MapBig,    0f,    0f,    1f,    1f),     // 大きく開いた軌道の地図（#212：画面全体の暗い幕＋真ん中に地図1枚。いちばん手前）
     };
     const float TabH = 48f, TabGapTop = 4f, ControlsPadBottom = 8f, PadX = 10f;   // 下の領域の中（px）
 
