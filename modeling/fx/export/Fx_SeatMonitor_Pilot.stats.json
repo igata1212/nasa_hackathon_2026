@@ -1,0 +1,93 @@
+{
+ "name": "Fx_SeatMonitor_Pilot",
+ "tris": 1284,
+ "min": [
+  -0.48,
+  0.13924,
+  0.0
+ ],
+ "max": [
+  0.48,
+  0.47,
+  1.89577
+ ],
+ "size": [
+  0.96,
+  0.33076,
+  1.89577
+ ],
+ "objects": {
+  "Fx_SeatMonitor_Pilot": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_Pilot.Frame": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 168
+  },
+  "Fx_SeatMonitor_Pilot.Hood": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 108
+  },
+  "Fx_SeatMonitor_Pilot.Lamp_Green": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 188
+  },
+  "Fx_SeatMonitor_Pilot.Lamp_Red": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 188
+  },
+  "Fx_SeatMonitor_Pilot.Lamp_Yellow": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 188
+  },
+  "Fx_SeatMonitor_Pilot.MonScreen": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 12
+  },
+  "Fx_SeatMonitor_Pilot.Slot_Screen": {
+   "origin": [
+    0.0,
+    0.22358,
+    1.55842
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_Pilot.Stand": {
+   "origin": [
+    0.0,
+    0.4,
+    0.67
+   ],
+   "tris": 432
+  }
+ }
+}
