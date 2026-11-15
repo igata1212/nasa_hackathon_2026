@@ -20,6 +20,11 @@ public static class SeatMonitorScene
     [MenuItem("Tools/SeatMonitor/計器モニターを置く")]
     public static void BuildMenu()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)   // Play 中はシーンを保存できない（黙って失敗しないように知らせる）
+        {
+            EditorUtility.DisplayDialog("Seat Monitor", "Play を止めてから、もう一度押してください。\n（Play 中はシーンを保存できません）", "OK");
+            return;
+        }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         Build();
     }
