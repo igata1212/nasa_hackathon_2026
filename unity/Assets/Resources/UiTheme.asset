@@ -15,12 +15,21 @@ MonoBehaviour:
   heading: {fileID: 11400000, guid: 60837b97b1dce47ebb7d776d14aef245, type: 2}
   body: {fileID: 11400000, guid: 48da9b8824d8a404ab1d898eb66d2ec9, type: 2}
   shapes: {fileID: 11400000, guid: 07b7308398bd74ca0b296df9a1441efc, type: 2}
+  strong: {fileID: 11400000, guid: 3daba148e966b4425ad85065f0d0f16b, type: 2}
   round16: {fileID: 21300000, guid: 9d4f4d3b9f1ca4ad991390d2e51e12b6, type: 3}
   round28: {fileID: 21300000, guid: 5cebae7ce1efc434dbc5ec03298b5f01, type: 3}
   round40: {fileID: 21300000, guid: 47a53fded3665438491a0071382714a4, type: 3}
   pill: {fileID: 21300000, guid: ee6b8713c654b4b61bf3a454bf28337d, type: 3}
   caretDown: {fileID: 21300000, guid: 6ff268fccbe75415399110e51eac6be8, type: 3}
   stripes: {fileID: 21300000, guid: c313fb1f3f0d14e779355039dacdecb1, type: 3}
+  blobBubble: {fileID: 21300000, guid: ab4791f842e0d4f64beec86524093fa0, type: 3}
+  blobPanel: {fileID: 21300000, guid: e3e018ede94034a86b3f74fe2e0a982b, type: 3}
+  blobPill: {fileID: 21300000, guid: 2f82344850b274cc5bbebfdec4137237, type: 3}
+  blobDisc: {fileID: 21300000, guid: a473cda804b404040b34932e0bcf6dd7, type: 3}
+  waveEdge: {fileID: 21300000, guid: 30776b37f57d64da0b0118faf11b7fb5, type: 3}
+  caretSoft: {fileID: 21300000, guid: 76216d9d72c294b038a21b0ec6f64339, type: 3}
+  bands64: {fileID: 21300000, guid: d872f2d47f84f4597b95d58f1bc36f65, type: 3}
+  glovePoint: {fileID: 21300000, guid: d0189d04617a64bf6904a067873dac78, type: 3}
   icons:
   - {fileID: 21300000, guid: b8e6d6852a3a843069bb58c7a2da99e9, type: 3}
   - {fileID: 21300000, guid: 2df1e5a121579445394feba71116a389, type: 3}
