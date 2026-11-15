@@ -3,7 +3,10 @@ import json
 import os
 import sys
 
-DESIGN_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "docs", "design"))
+_HERE = os.path.dirname(__file__)
+# Vercel bundle (tools/vercel/make_bundle.py) puts a copy in server/design. The repo keeps the source in docs/design.
+_BUNDLED = os.path.abspath(os.path.join(_HERE, "..", "design"))
+DESIGN_DIR = _BUNDLED if os.path.isdir(_BUNDLED) else os.path.abspath(os.path.join(_HERE, "..", "..", "docs", "design"))
 if DESIGN_DIR not in sys.path:
     sys.path.insert(0, DESIGN_DIR)
 

@@ -1,7 +1,8 @@
 // 書いた人：Claude ／ 最終更新：2026-11-14
 // WebSocket でサーバー（Python、server/README.md）につなぐクライアント。
 // .NET の System.Net.WebSockets.ClientWebSocket を使う（パッケージなし）。エディタ・iOS・デスクトップで動く。
-// WebGL のビルドでは動かない（今日はやらない。#if UNITY_WEBGL のとき未対応のログだけ）。WebGL は後で NativeWebSocket などに差し替える。
+// WebGL のビルドでは ClientWebSocket が使えないので、ブラウザの WebSocket を呼ぶ（Plugins/WebGL/MrWebSocket.jslib。#222 更新：Taiga 2026-11-15）。
+// 状態の文（Connected / Disconnected / Connection error: …）はどちらも同じ。https のページからは wss:// だけつながる（ブラウザの決まり）。
 // 受信は別スレッドで読み、ConcurrentQueue に積んで、Update（メインスレッド）でイベントを出す。
 // つなぐ先：ws://localhost:8765（server/main.py の既定）。公開は wss://…（Cloudflare Tunnel）。
 // 最初の1通：{"type":"create","name":…} か {"type":"join","room":"1234","name":…,"player_id":…}（再接続は player_id を付ける）
@@ -14,6 +15,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 #if !UNITY_WEBGL || UNITY_EDITOR
 using System.Net.WebSockets;
+#else
+using System.Runtime.InteropServices;
 #endif
 
 public class WsClient : GameClientBase
@@ -27,6 +30,15 @@ public class WsClient : GameClientBase
     ClientWebSocket ws;
     CancellationTokenSource cts;
     readonly SemaphoreSlim sendLock = new SemaphoreSlim(1, 1);
+#else
+    [DllImport("__Internal")] static extern void MrWsOpen(string url);
+    [DllImport("__Internal")] static extern int MrWsState();
+    [DllImport("__Internal")] static extern int MrWsSend(string json);
+    [DllImport("__Internal")] static extern string MrWsPoll();
+    [DllImport("__Internal")] static extern string MrWsError();
+    [DllImport("__Internal")] static extern void MrWsClose();
+    bool active;        // Connect してから、閉じたのを知らせるまで
+    string firstJson;   // つながったら最初に送る1通（create / join）
 #endif
 
     public override string Label => "ONLINE " + Url;
@@ -48,7 +60,10 @@ public class WsClient : GameClientBase
         }
         string firstJson = MiniJson.Serialize(first);
 #if UNITY_WEBGL && !UNITY_EDITOR
-        status.Enqueue("WebSocket is not supported in WebGL builds yet");
+        this.firstJson = firstJson;
+        open = false;
+        active = true;
+        MrWsOpen(Url);
 #else
         cts = new CancellationTokenSource();
         ws = new ClientWebSocket();
@@ -100,11 +115,27 @@ public class WsClient : GameClientBase
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         _ = SendRaw(MiniJson.Serialize(message));
+#else
+        if (open) MrWsSend(MiniJson.Serialize(message));
 #endif
     }
 
     public override void Update(float dt)
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        if (active)
+        {
+            int st = MrWsState();
+            if (st == 1 && !open) { open = true; status.Enqueue("Connected"); MrWsSend(firstJson); }
+            for (string m = MrWsPoll(); m != null; m = MrWsPoll()) inbox.Enqueue(m);
+            if (st >= 2)
+            {
+                if (st == 3) status.Enqueue("Connection error: " + MrWsError());
+                open = false; active = false;
+                status.Enqueue("Disconnected");
+            }
+        }
+#endif
         while (status.TryDequeue(out var s)) OnStatus?.Invoke(s);
         while (inbox.TryDequeue(out var json))
         {
@@ -117,6 +148,9 @@ public class WsClient : GameClientBase
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         try { cts?.Cancel(); ws?.Dispose(); } catch { }
+#else
+        active = false;
+        MrWsClose();
 #endif
         open = false;
     }

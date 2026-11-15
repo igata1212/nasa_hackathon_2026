@@ -69,6 +69,7 @@ public class GameFlow : MonoBehaviour
         cgo.AddComponent<GraphicRaycaster>();
         var root = (RectTransform)cgo.transform;
         LoadParams();
+        wsUrl = WebLink.ServerUrl(wsUrl);   // #222 ブラウザで開いたら、ページの ?server=… をつなぐ先にする
 
         RenderTexture miniRt = null;
         if (trajectoryCamera != null)

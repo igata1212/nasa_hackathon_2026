@@ -25,6 +25,6 @@ Title の **REPLAY: SUCCESS (T1)** / **REPLAY: FAILURE (T4)**：記録（`data/s
 ## よくあるつまずき
 
 - `ERROR: game_started`：START のあとは新しく入れない（ボットも）。START の前に全員そろえる
-- `Connection error`：サーバーが動いていない／URL の打ち間違い（`ws://` を付ける。WebGL のビルドは未対応）
+- `Connection error`：サーバーが動いていない／URL の打ち間違い（`ws://` を付ける）。ブラウザ版（WebGL）と Vercel は `tools/vercel/README.md`
 - 席のボタンが無い：自分の席でない（Lobby の表示を見る）。CORRECTION BURN と ROUTE は事故から20秒（M06）までは `locked`
 - エディタを裏に回すと Play が止まる（Unity の仕様）。通しの確認は Unity を前に出して行う
