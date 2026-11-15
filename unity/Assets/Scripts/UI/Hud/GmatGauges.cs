@@ -1,13 +1,14 @@
 // 書いた人：Taiga（作成：Opus 5.5）／ 最終更新：2026-11-15
 // 作る Issue：#167（NASA GMAT の軌道の値を、針のメーターで読む）
 //
-// 画面の左に出すポップアップ。NASA GMAT で計算した帰還ルート（data/gmat/route_a.csv・route_b.csv）の、今の船の位置から
+// 大きい地図（MapWidget）を開いている間だけ、その左に出すパネル。ふだんは出さない（#210。収納のつまみは無くした）。
+// 元の説明：画面の左に出すポップアップ。NASA GMAT で計算した帰還ルート（data/gmat/route_a.csv・route_b.csv）の、今の船の位置から
 //   ① 地球までの距離（km）  ② 月までの距離（km）  ③ 速さ（km/s）
-// を針のメーター3つで見せる。右の端の矢印のつまみで、左へ収納・引き出しができる。
+// を針のメーター3つで見せる。
 // 船の位置は軌道の地図（MapWidget）と同じ値を読む（ShipRoute・ShipH）。この部品は計算しない。
 //   距離：GmatRoute.posKm は EarthMoonRot（地球が原点、月は +X の moonCenterXKm）。地球までは |pos|、月までは |pos − 月|
 //   速さ：位置の差（回る座標の速さ）に、座標の回転のぶん ω×r を足して、止まった座標（慣性系）の速さにする
-// 見下ろしのとき（左のゲージ StatusPanel が出ているとき）は、ゲージと重なるので出さない。一人称（SeatView）のときだけ出す。
+// #210：地図は Mission Planner の席だけ（#200）。メーターは地図について出入りするので、ほかの席には出ない。
 // 大きさ・色・文言・メーターの目盛りは、このファイルの上の「直しやすい所」の1か所。
 using System.Globalization;
 using TMPro;
@@ -27,17 +28,16 @@ public class GmatGauges : HudPart
         public const float Dial = 92f;                // メーターの直径
         public const float NeedleW = 5f, NeedleL = 38f, Hub = 14f;
         public const float TickW = 3f, TickL = 9f;
-        public const float TabW = 34f, TabH = 72f;    // 収納のつまみ
-        public const float Margin = 14f;              // 画面の左の端から
-        public const float CenterY = 0.57f;           // パネルのまん中の高さ（画面の割合。上の帯と下の盆の間）
+        public const float Margin = 14f;              // 大きい地図の左の端から
+        public const float CenterY = 0.5f;            // パネルのまん中の高さ（大きい地図の割合）
         public const float Sweep = 120f;              // 針の振れ幅（±度。0 が真上）
-        public const float NeedleSpeed = 4f, SlideSpeed = 10f;
+        public const float NeedleSpeed = 4f;
     }
 
     static class Words
     {
         public const string Title = "NASA GMAT";
-        public const string Earth = "TO EARTH", Moon = "TO MOON", Speed = "SPEED";
+        public const string Earth = "To Earth", Moon = "To Moon", Speed = "Speed";
         public const string Km = "{0} km", Kms = "{0} km/s";
     }
 
@@ -48,12 +48,10 @@ public class GmatGauges : HudPart
     // ================================================================== 中身
     class Gauge { public RectTransform needle; public TextMeshProUGUI value; public float angle = -Look.Sweep; }
 
-    RectTransform panel, tab, caret;
+    RectTransform panel;
     readonly Gauge[] gauges = new Gauge[3];
     readonly float[] target = new float[3];
     MapWidget map;
-    bool open = true, userOpen = true, wasWide;   // userOpen：つまみで選んだ開け閉め
-    float slide = 1f;   // 1 = 開いている、0 = 収納
 
     protected override void Build(RectTransform root)
     {
@@ -78,23 +76,7 @@ public class GmatGauges : HudPart
             float top = Look.Pad + Look.HeadH + Look.Gap + Look.RowH * i;
             gauges[i] = BuildGauge(panel, top, labels[i], icons[i]);
         }
-
-        // 収納のつまみ（パネルの右の端の外。矢印：開いているときは ◀、収納しているときは ▶）
-        tab = Ui.Rect("Tab", panel);
-        tab.anchorMin = tab.anchorMax = new Vector2(1f, 0.5f); tab.pivot = new Vector2(0f, 0.5f);
-        tab.sizeDelta = new Vector2(Look.TabW, Look.TabH); tab.anchoredPosition = new Vector2(-6f, 0f);
-        var face = UiKit.Round(tab, 14f, T.HudFace, "Face"); UiKit.Fill(face.rectTransform);
-        face.raycastTarget = true;
-        var btn = tab.gameObject.AddComponent<Button>();
-        btn.targetGraphic = face; btn.transition = Selectable.Transition.None;
-        btn.navigation = new Navigation { mode = Navigation.Mode.None };
-        btn.onClick.AddListener(() => userOpen = !userOpen);
-        var sp = T.Theme != null ? T.Theme.caretDown : null;
-        var ci = UiKit.Shape(tab, sp, T.HudText, 0f, "Arrow");
-        caret = ci.rectTransform;
-        caret.anchorMin = caret.anchorMax = new Vector2(0.5f, 0.5f); caret.pivot = new Vector2(0.5f, 0.5f);
-        caret.sizeDelta = new Vector2(22f, 13f); caret.anchoredPosition = new Vector2(3f, 0f);
-        ci.raycastTarget = false;
+        panel.gameObject.SetActive(false);   // #210：大きい地図が開くまで出さない（開くとき地図の中に移す）
     }
 
     Gauge BuildGauge(RectTransform parent, float top, string label, string icon)
@@ -178,18 +160,20 @@ public class GmatGauges : HudPart
     // ================================================================== 毎フレーム
     public override void Tick(float now)
     {
-        // 見下ろし（左のゲージが出ている）ときは出さない
-        bool wide = Ctx.Hud != null && Ctx.Hud.Slot(HudSlot.Left).gameObject.activeSelf;
-        if (wide != wasWide) { wasWide = wide; panel.gameObject.SetActive(!wide); }
-        if (wide) return;
-        open = userOpen;
+        // #210：大きい地図が開いている間だけ、その左（地図の中）に出す
+        if (map == null) foreach (var p in Ctx.Parts) if (p is MapWidget m) { map = m; break; }
+        bool show = map != null && map.BigOpen && map.BigRect != null;
+        if (show && panel.parent != map.BigRect)
+        {
+            panel.SetParent(map.BigRect, false);
+            panel.anchorMin = panel.anchorMax = new Vector2(0f, Look.CenterY);
+            panel.anchoredPosition = new Vector2(Look.Margin, 0f);
+        }
+        if (show) panel.SetAsLastSibling();
+        if (panel.gameObject.activeSelf != show) panel.gameObject.SetActive(show);
+        if (!show) return;
 
         float dt = Time.unscaledDeltaTime;
-        slide = Mathf.MoveTowards(slide, open ? 1f : 0f, dt * Look.SlideSpeed * 0.5f);
-        float e = slide * slide * (3f - 2f * slide);
-        panel.anchoredPosition = new Vector2(Mathf.Lerp(-Look.W + 6f, Look.Margin, e), 0f);
-        caret.localRotation = Quaternion.Euler(0f, 0f, open ? -90f : 90f);   // ▼ を回す：開いているとき ◀（しまう）、収納のとき ▶（出す）
-
         float k = 1f - Mathf.Exp(-Look.NeedleSpeed * dt);
         for (int i = 0; i < 3; i++)
         {

@@ -252,6 +252,8 @@ public class MapWidget : HudPart
     }
 
     /// <summary>今の船の軌道（A／B。噴射の前は A）と、その上の GMAT の経過時間（時間）。地図と同じ値（#167：GmatGauges が読む）。軌道が無ければ null</summary>
+    public bool BigOpen => bigOpen;            // #210：GMAT のメーター（GmatGauges）が、大きい地図の開閉について出入りする
+    public RectTransform BigRect => big;
     public GmatRoute ShipRoute { get; private set; }
     public float ShipH { get; private set; }
 
