@@ -24,3 +24,4 @@
 - 14:05 #167 計器盤を針のメーター5つに・一人称のカメラ（V で見下ろし）・ヒューストンの顔を盤に・揺れを強く・一人称の間は船室を閉じる・GMAT のメーター3つ（左のポップアップ）・下の盆をしまうつまみ。窓の外は未着手（Opus 5.5）
 - 14:48 #206 デモ動画の参考映像 2 本（DEADLINE DELIVERY トレーラー、Splatoon 紹介映像）を docs/reference/demo-video-ref/ に入れ、earshot で音を解析した。構成・カット・音の調査メモを書いた。Splatoon は 71MB → 44MB に圧縮。公開前に mp4 は消す（Fable 5.2）
 - 17:32 #222 サーバーを Vercel に置いた（https://mission-return.vercel.app。部屋は Redis、/api/ws）。WebGL からつなぐ WebSocket とブラウザ版のビルドを足した。本番でボット4人の通しプレイを確認。iOS 実機は未確認（Fable 5.2）
+- 22:35 #230 船内の HUD に「V Change view」の札を足した（下の盆の左上。V キーの視点切り替えの案内）。WebGL を作り直して Vercel の本番に上げ、本番で表示と V の切り替えを確認。iOS は未更新（Fable 5.2）
