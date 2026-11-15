@@ -1,4 +1,4 @@
-書いた人：iizuka（下書き：Fable 5.2）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#141 音）
+書いた人：iizuka（下書き：Fable 5.2）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#141 音）／ 更新：iizuka（Opus 5.5、2026-11-15、#220 NASA のツールと文書・AI で作った物）
 
 # CREDITS（下書き）
 
@@ -26,12 +26,36 @@ NASA の素材は [NASA Images and Media Usage Guidelines](https://www.nasa.gov/
 
 | 名前 | 作者 | URL | ライセンス | 何に使ったか |
 |---|---|---|---|---|
-| Universe Study | The_Mountain（Pixabay） | https://pixabay.com/music/ （Pixabay ID 141461。曲ページの URL 要確認） | Pixabay Content License（表記は不要。書いておく） | BGM（設計・練習・飛行）。`Music/space_universe_study.mp3`。そのまま |
+| Universe Study | The_Mountain（Pixabay） | https://pixabay.com/music/ （Pixabay ID 141461、元のファイル名 `the_mountain-universe-study-141461.mp3`。曲ページの URL 要確認） | Pixabay Content License（表記は不要。書いておく） | BGM（設計・練習・飛行）。`Music/space_universe_study.mp3`。そのまま |
 | Music Jingles（`STEEL02`・`STEEL04`・`STEEL07`・`STEEL10`・`PIZZI08`・`PIZZI13`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/music-jingles | CC0 1.0 | ジングル（生還・ぎりぎりの生還・失敗・打ち上げ・部屋に人が入った・危機）。`Music/jingle_*.wav`。音量をそろえて WAV にした |
 | Interface Sounds（`click_001`・`switch_004`・`switch_007`・`confirmation_003`・`error_005`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/interface-sounds （取得元：https://github.com/Calinou/kenney-interface-sounds ） | CC0 1.0 | ボタン・スイッチ・成功・エラーの音（`Sfx/ui_*.wav`）。スイッチはモノラルにした |
 | Sci-Fi Sounds（`space_engine_low_000`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/sci-fi-sounds （取得元：https://github.com/Boyquotes/kenney-sci-fi-sounds-for-godot ） | CC0 1.0 | 噴射の音（`Sfx/thruster_burn_loop.wav`）。ループにして音量を下げた |
 | Apollo 13 の交信「Houston, we've had a problem」 | NASA | https://commons.wikimedia.org/wiki/File:Apollo13-wehaveaproblem.ogg | パブリックドメイン（Commons の表記 "NASA public domain"。NASA 本体での確認は未了）。NASA Media Usage Guidelines | 事故の瞬間の本物の声（`Sfx/voice_problem.wav`）。7.21〜8.29 秒を切り出し、音量をそろえて低音を切った |
 | 合成の効果音（警報・ガス漏れ・Quindar トーン・無線の雑音・再突入・着水・バルブ） | このチーム（iizuka。Claude が合成） | リポジトリ内 `art/audio/synth_sfx.py`・`art/audio/synth_valve.py` | 自作 | `Sfx/` の `alarm_*`・`gas_hiss_loop`・`quindar_*`・`radio_static_loop`・`reentry_rumble_loop`・`splash`・`valve_turn` |
+
+## NASA のツールと文書（軌道と数値の裏付け。画像や音としてはゲームに入らない）
+
+軌道はゲームが描く線（`data/gmat/`）になる。文書は時刻・事故の中身・数値を本物に合わせるために読んだ。数値と文書の対応は `docs/reference/apollo13-data.md`。PDF はリポジトリに入れていない（下の URL から取れる）。
+
+| 名前 | 作者 | URL | ライセンス | 何に使ったか |
+|---|---|---|---|---|
+| GMAT（General Mission Analysis Tool）R2026a | NASA Goddard Space Flight Center | https://software.nasa.gov/software/GSC-19468-1 | Apache License 2.0（要確認：GMAT の配布物の License を見る） | 帰りのルート A / B の軌道を計算した（自作スクリプト `data/gmat/return_routes.script`。天体の位置は GMAT 付属の DE405）。出力の CSV を地図と窓の外の景色に使う（`data/README.md`） |
+| Apollo 13 Mission Report（MSC-02680） | NASA Manned Spacecraft Center | https://ntrs.nasa.gov/citations/19710003598 （NTRS 19710003598） | NASA の公開文書 | 事故・月の裏・噴射・再突入の時刻と数値 |
+| Report of Apollo 13 Review Board | NASA | https://ntrs.nasa.gov/citations/19700076776 （NTRS 19700076776。別版 TMX-65270：NTRS 20170000913） | NASA の公開文書 | 事故の原因（酸素タンク2） |
+| Apollo Experience Report（NASA TN D-6725） | NASA | https://ntrs.nasa.gov/citations/19720013191 （NTRS 19720013191） | NASA の公開文書 | 再突入などの数値 |
+| Apollo 13 Press Kit | NASA | https://www.nasa.gov/wp-content/uploads/static/apollo50th/pdf/A13_PressKit.pdf | NASA の公開文書 | 打ち上げ前に公表された値 |
+| Apollo Flight Journal（Apollo 13） | NASA History（今は apollojournals.org に移転） | https://apollojournals.org/afj/ap13fj/ | 公開資料 | 時刻と交信の確認 |
+| NASA SP-4029 Apollo by the Numbers | NASA History | https://www.nasa.gov/wp-content/uploads/static/history/SP-4029/ | NASA の公開文書 | 数値の確認 |
+| NSSDC Apollo 13 Chronology | NASA NSSDC | https://nssdc.gsfc.nasa.gov/planetary/lunar/ap13chrono.html | NASA の公開資料 | 時刻の確認 |
+| SVS 5536 | NASA's Scientific Visualization Studio | https://svs.gsfc.nasa.gov/5536/ | NASA Media Usage Guidelines | 軌道と時刻の確認 |
+
+## AI で作った物
+
+| 名前 | ツール | 何に使ったか |
+|---|---|---|
+| ヒューストンの声（台詞の読み上げ 53 本） | Google Gemini 3.8 Flash TTS（`google/gemini-3.8-flash-tts`、OpenRouter 経由）、声は Achird | `unity/Assets/Resources/Voice/Houston/*.mp3`。台詞の文はチーム（Taiga）が書いた。作り方は同じフォルダの `README.md` |
+| 合成の効果音 | Claude（Anthropic）が Python で合成 | 上の「音」の表の最後の行 |
+| コード・文書・3D モデルを作るスクリプト | Claude Code（Anthropic。Fable・Opus・Sonnet・Haiku） | 開発の手伝い。決めたことと確認はチームが行った（`docs/log/`） |
 
 ## 寸法取りだけに使った素材（ゲームには入らない）
 
@@ -50,5 +74,5 @@ NASA の素材は [NASA Images and Media Usage Guidelines](https://www.nasa.gov/
 ## まだ決まっていないこと
 
 - midori のスクリプトのライセンス（チーム内の成果物として使ってよいか、表記のしかた）
-- ゲーム内のクレジット画面に出す文面。案：「Earth and Moon imagery: NASA Earth Observatory / NASA's Scientific Visualization Studio」「Spacecraft reference models: NASA 3D Resources」
+- ゲーム内のクレジット画面に出す文面。案：「Orbits: computed with NASA GMAT」「Earth and Moon imagery: NASA Earth Observatory / NASA's Scientific Visualization Studio」「Apollo 13 audio: NASA」「Houston voice: generated with Google Gemini TTS」「Spacecraft reference models: NASA 3D Resources」
 - 取ってきた元ファイルの置き場所と sha256 は `modeling/source/README.md`
