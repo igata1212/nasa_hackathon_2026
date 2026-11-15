@@ -22,3 +22,4 @@
 - 12:10 #157 Mission Planner の役を決めた（地図・カウントダウン・ルートの比較は Planner の画面にだけ出す）。SPEC 6章に書いた。Unity への組み込みは iizuka（Fable 5.2）
 - 12:39 #167 席ごとの計器モニター Fx_SeatMonitor_*（4席分、画面 0.80×0.50m、状態ランプ3つ、Slot_Screen）を作った。check.py 合格。船室への配置と数値の表示は未（Fable 5.2）
 - 14:05 #167 計器盤を針のメーター5つに・一人称のカメラ（V で見下ろし）・ヒューストンの顔を盤に・揺れを強く・一人称の間は船室を閉じる・GMAT のメーター3つ（左のポップアップ）・下の盆をしまうつまみ。窓の外は未着手（Opus 5.5）
+- 14:48 #206 デモ動画の参考映像 2 本（DEADLINE DELIVERY トレーラー、Splatoon 紹介映像）を docs/reference/demo-video-ref/ に入れ、earshot で音を解析した。構成・カット・音の調査メモを書いた。Splatoon は 71MB → 44MB に圧縮。公開前に mp4 は消す（Fable 5.2）
