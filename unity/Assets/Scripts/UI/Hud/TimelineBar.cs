@@ -22,8 +22,6 @@ public class TimelineBar : HudPart
     static class Words
     {
         public const string Clock = "T+ {0}";
-        public const string Practice = "Practice";
-        public const string Stir = "Get ready";
         // 帯の中（長い順。入らなければ次の短いもの、最後はアイコンだけ）
         public static readonly string[] FarSide = { "Far side (no radio)", "No radio", "" };
         public static readonly string[] BurnWindow = { "Burn window", "Burn", "" };
@@ -74,6 +72,19 @@ public class TimelineBar : HudPart
     Seg far, burn, reA, reB;
     Image splash;
     TimelineKit.Countdown next;
+
+    const float CompactAspect = 2f;   // #216：横長のスマホ（844×390 など。幅÷高さが 2 より大きい）は、帯の中の小さい文字を消してアイコンだけにする。px の幅で見ると高解像度の iPhone（2532 px）で効かないので比で見る
+    bool wide = true;                     // #216：いまの bar が全幅か（事故の前は時計のチップだけ）
+
+    // #216：全幅の帯と、時計だけの小さなチップ（左上）を切り替える
+    void SetWide(bool w)
+    {
+        if (w == wide) return;
+        wide = w;
+        if (w) { Ui.Anchor(bar, 0, 0, 1, 1, T.S2, BarInsetY, T.S2, BarInsetY); return; }
+        bar.anchorMin = new Vector2(0f, 0f); bar.anchorMax = new Vector2(0f, 1f);
+        bar.offsetMin = new Vector2(T.S2, BarInsetY); bar.offsetMax = new Vector2(T.S2 + ClockW + T.S3 * 2f, -BarInsetY);
+    }
 
     protected override void Build(RectTransform root)
     {
@@ -141,11 +152,11 @@ public class TimelineBar : HudPart
         track.gameObject.SetActive(has);
         next.Root.gameObject.SetActive(has);
         idle.gameObject.SetActive(!has);
+        SetWide(has);   // #216：事故の前は時計のチップだけ（練習の案内の「Practice 3/4」と二重にしない）
         if (!has)
         {
             clock.text = string.Format(Words.Clock, Ui.Mmss(0f));
-            string p = Ctx.Model.Phase;
-            idle.text = p == "practice" ? Words.Practice : p == "stir" ? Words.Stir : "";
+            idle.gameObject.SetActive(false);
             return;
         }
         clock.text = string.Format(Words.Clock, Ui.Mmss(s.t));
@@ -230,6 +241,7 @@ public class TimelineBar : HudPart
         float iconW = T.IconS;
         float badgeW = g.Badges.Count > 0 ? T.S1 + g.Badges.Width : 0f;
         string pick = null; bool badges = g.Badges.Count > 0;
+        if (Screen.height > 0 && (float)Screen.width / Screen.height > CompactAspect) texts = NoText;   // #216：横長のスマホは区間の文字を消してアイコンだけ
         foreach (var tx in texts)
             if (Need(g, tx, iconW, badgeW) <= room) { pick = tx; break; }
         if (pick == null)
@@ -243,6 +255,8 @@ public class TimelineBar : HudPart
         g.Badges.Root.gameObject.SetActive(badges);
         g.Icon.gameObject.SetActive(g.Icon.sprite != null && iconW <= room);
     }
+
+    static readonly string[] NoText = { "" };
 
     static float Need(Seg g, string text, float iconW, float badgeW) =>
         iconW + badgeW + (string.IsNullOrEmpty(text) ? 0f : T.S1 + g.Text.GetPreferredValues(text).x);

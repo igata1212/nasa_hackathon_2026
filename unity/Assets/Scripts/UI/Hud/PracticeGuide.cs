@@ -7,6 +7,8 @@
 //         兼任の人は、今の席が済んだら少し待って、まだの席へ自動で切り替える（帯を押しても切り替わる）
 //   かき混ぜ：[HOUSTON]  Life Support の人 → Tap STIR TANKS（Highlight("stir")）／ほかの人 → Waiting for LIFE SUPPORT
 //         Life Support を持っている人は、始まったらその席へ自動で切り替える。M04 の繰り返し（サーバーが 20 秒ごと）で帯を弾ませる
+// #216（less is more）：席バッジ4つと2行目をやめ、[札] + 1行 だけにする（点火の準備の1行と同じ置き場・同じ形）。
+//   済んだら札の右上にチェックがぽんと付き、次の文が右から滑り込んで帯が1回弾む（約 0.3 秒）
 // 直す所は1か所ずつ：文言は Words、どの操作を光らせるかは TryCmd、大きさ・時間は下の定数。共通の部品（#71 UiKitHud）ができたら Tag・バッジを差し替える
 // 練習した席は Model.Practiced（practice イベントの done。GameFlow が入れる）。UI は判定しない（済んだかはサーバーの done だけを見る）
 // 練習の残り秒は出さない：締め切り（server/game/config.py の PRACTICE_MAX_S = 90）をサーバーが配っていない
@@ -28,20 +30,13 @@ public class PracticeGuide : HudPart
         public const string PracticeTag = "Practice {0}/{1}";          // {0} 済んだ席の数 {1} 席の数
         public const string HoustonTag = "Houston";
         public const string TryAny = "Tap any button below";           // TryCmd に無い席
-        public const string Safe = "Nothing breaks yet. Try it!";
         public const string NiceNext = "Nice! Next: {0}";              // {0} 次の席の名前
-        public const string Switching = "Switching seats...";
-        public const string NextSeat = "Next: try {0}";
-        public const string TapToSwitch = "Tap here to switch seats";
+        public const string NextSeat = "Tap here: try {0}";            // #216 2行目（Tap here to switch）を1行に
         public const string WaitOthers = "Nice! Wait for the others";
-        public const string WaitOthersSub = "Every seat tries one button";
         public const string StirDo = "Tap Stir tanks";
-        public const string StirDoSub = "Mission control asks: stir the oxygen tanks";
-        public const string StirGo = "Go to {0}";                      // {0} = LIFE SUPPORT
-        public const string StirGoSub = "Tap here. Mission control needs you";
+        public const string StirDoAgain = "Again! Tap Stir tanks";     // #216 M04 の繰り返し（2行目をやめて1行で）
+        public const string StirGo = "Tap here: go to {0}";            // {0} = LIFE SUPPORT
         public const string StirWait = "Waiting for {0}";
-        public const string StirWaitSub = "Mission control asked them to stir the tanks";
-        public const string StirAgain = "Mission control is asking again!";
     }
 
     // 席ごとの「まず押すもの」：光らせるコマンド（SeatPanel.Commands の名前）と1行目の文（席の仕事：押すもの）
@@ -57,15 +52,14 @@ public class PracticeGuide : HudPart
 
     // ================================================================== 大きさ・時間（UiTokens に移す候補）
     const float BannerH = T.SecondaryH;        // 帯の高さの目安（ピルの角の半径 = これの半分。slot が低いときは角が縮む）
-    const float BadgeD = T.TagH;               // 席バッジ（slot の高さ 72 に入る大きさ）
     const float CaretW = T.CaretW, CaretH = T.CaretH;   // 帯の下の ▼（#190：吹き出しと同じ角の丸い三角 32×22・accent。【12】）
     const float CaretBob = T.CaretBob;         // ▼ の上下の幅（6）
     const float BobPeriod = T.CaretPeriod;     // ▼ が1往復する秒
     const float HoustonTilt = T.NameTagTilt;   // Houston の名前タグの傾き（度、反時計回り。#190：吹き出しの名前タグと同じ −6°。【12】）
     const float NiceHold = 1.5f;               // 今の席が済んでから、次の席へ自動で切り替えるまで（秒）
     const float AgainHold = 6f;                // M04 の繰り返しのあと「asking again」を出す秒
-    const float PopTime = 0.35f, PopScale = 0.3f;        // 済んだ席のバッジが弾む
-    const float BounceTime = 0.4f, BounceScale = 0.06f;  // 帯が弾む（押すものが変わったとき・M04 の繰り返し）
+    const float BounceTime = 0.3f, BounceScale = 0.05f;  // 帯が弾む（文が変わったとき・M04 の繰り返し。#216 0.4 → 0.3）
+    const float SlideTime = 0.22f, SlideX = 48f;         // #216 次の文が右から滑り込む（秒・距離）
 
     enum View { Hidden, Try, NiceNext, NextManual, WaitOthers, StirDo, StirGo, StirWait }
 
@@ -73,10 +67,8 @@ public class PracticeGuide : HudPart
     RectTransform box, tag;
     Image face, tagFace, caret;
     Button tap;
-    TextMeshProUGUI tagText, line1, line2;
-    readonly UiSeatBadge[] badges = new UiSeatBadge[4];
-
-    readonly float[] popEnd = new float[4];
+    TextMeshProUGUI tagText, line1;
+    float slideEnd;                     // #216 文が滑り込み終わる時刻
 
     // ================================================================== 流れ
     string lastPhase;
@@ -102,37 +94,30 @@ public class PracticeGuide : HudPart
         tap.colors = cb;
         tap.onClick.AddListener(() => { if (tapTo != null) Ctx.SelectSeat(tapTo); });
 
-        var row = UiKit.Row(box, T.S2, TextAnchor.MiddleCenter, T.S2); UiKit.Fill(row);
+        // #216 [札] + 1行（左寄せ。点火の準備の1行と同じ並び）
+        var row = UiKit.Row(box, T.S3, TextAnchor.MiddleLeft, T.S3); UiKit.Fill(row);
         tag = NameTag(row, Words.HoustonTag, out tagFace, out tagText);
+        UiSelect.Check(tag, false);   // 済んだ印（札の右上。【09】）
 
-        var col = UiKit.Col(row, 0f, TextAnchor.MiddleCenter, 0f, 0f, true);
-        var le = Ui.Size(col, w: 0f, flexW: 1f); le.minWidth = 0f;   // 残りの幅を全部もらう
-        line1 = Line(col, TextStyle.Body, T.Text);
+        line1 = Line(row, TextStyle.Body, T.Text);
+        var le = Ui.Size(line1, w: 0f, flexW: 1f); le.minWidth = 0f;   // 残りの幅を全部もらう
         line1.enableAutoSizing = true; line1.fontSizeMin = T.TextLabel; line1.fontSizeMax = T.TextBody;   // 長い文は 22 まで縮める
-        line2 = Line(col, TextStyle.Label, T.TextSoft);
 
         // 帯の下の ▼：席のパネル（画面の下）を指す。押すものがあるときだけ
         var sp = T.Art(T.CaretSoft) ?? (T.Theme != null ? T.Theme.caretDown : null);
-        caret = UiKit.Shape(col, sp, T.Accent, 0f, "Caret");
+        caret = UiKit.Shape(box, sp, T.Accent, 0f, "Caret");
         caret.preserveAspect = true;
         UiKit.Ignore(caret);
         var cr = caret.rectTransform;
         cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0f); cr.pivot = new Vector2(0.5f, 1f);
         cr.sizeDelta = new Vector2(CaretW, CaretH);
         caret.gameObject.SetActive(false);
-
-        var bRow = UiKit.Row(row, T.S1, TextAnchor.MiddleCenter);
-        for (int i = 0; i < Seats.All.Length; i++)
-        {
-            badges[i] = UiKit.SeatBadge(bRow, Seats.All[i], BadgeD);
-            UiSelect.Check(badges[i].Root, false);   // 済んだ印（右上のチェック。【09】）
-        }
         box.gameObject.SetActive(false);
     }
 
     static TextMeshProUGUI Line(Transform col, TextStyle st, Color c)
     {
-        var t = UiKit.Text(col, "", st, c, TextAlignmentOptions.Midline);
+        var t = UiKit.Text(col, "", st, c, TextAlignmentOptions.MidlineLeft);
         t.overflowMode = TextOverflowModes.Ellipsis;
         var le = Ui.Size(t, h: UiKit.Size(st) * T.BodyLineHeight); le.minWidth = 0f;
         return t;
@@ -166,8 +151,6 @@ public class PracticeGuide : HudPart
         float now = Time.unscaledTime;
         if (e.kind == "practice" && e.seat != null)
         {
-            int i = System.Array.IndexOf(Seats.All, e.seat);
-            if (i >= 0) popEnd[i] = now + PopTime;
             if (e.seat == Active && Ctx.Model.MySeats.Contains(e.seat)) { niceSeat = e.seat; niceUntil = now + NiceHold; }
         }
         else if (e.kind == "houston" && e.id == "M04" && e.repeat)
@@ -201,9 +184,10 @@ public class PracticeGuide : HudPart
         int key = Key(v, other, again);
         if (key != lastKey)
         {
-            if (v != view && (v == View.Try || v == View.StirDo || v == View.StirGo)) bounceEnd = now + BounceTime;
             lastKey = key; view = v;
+            string before = line1.text;
             Apply(v, other, again);
+            if (line1.text != before && before.Length > 0) { slideEnd = now + SlideTime; bounceEnd = now + BounceTime; }   // #216 文が変わったら滑り込んで弾む
         }
         Animate(now);
         SyncHighlight(v);
@@ -291,33 +275,25 @@ public class PracticeGuide : HudPart
         tagText.color = stir ? T.Panel : T.Ink;
         tag.localRotation = Quaternion.Euler(0f, 0f, stir ? HoustonTilt : 0f);
 
-        string life = Seats.Title(Seats.Life), l1, l2;
+        string life = Seats.Title(Seats.Life), l1;
         switch (v)
         {
-            case View.Try: l1 = TryCmd.TryGetValue(Active, out var t) ? t.hint : Words.TryAny; l2 = Words.Safe; break;
-            case View.NiceNext: l1 = string.Format(Words.NiceNext, Seats.Title(other)); l2 = Words.Switching; break;
-            case View.NextManual: l1 = string.Format(Words.NextSeat, Seats.Title(other)); l2 = Words.TapToSwitch; break;
-            case View.WaitOthers: l1 = Words.WaitOthers; l2 = Words.WaitOthersSub; break;
-            case View.StirDo: l1 = Words.StirDo; l2 = again ? Words.StirAgain : Words.StirDoSub; break;
-            case View.StirGo: l1 = string.Format(Words.StirGo, life); l2 = again ? Words.StirAgain : Words.StirGoSub; break;
-            default: l1 = string.Format(Words.StirWait, life); l2 = Words.StirWaitSub; break;
+            case View.Try: l1 = TryCmd.TryGetValue(Active, out var t) ? t.hint : Words.TryAny; break;
+            case View.NiceNext: l1 = string.Format(Words.NiceNext, Seats.Title(other)); break;
+            case View.NextManual: l1 = string.Format(Words.NextSeat, Seats.Title(other)); break;
+            case View.WaitOthers: l1 = Words.WaitOthers; break;
+            case View.StirDo: l1 = again ? Words.StirDoAgain : Words.StirDo; break;
+            case View.StirGo: l1 = string.Format(Words.StirGo, life); break;
+            default: l1 = string.Format(Words.StirWait, life); break;
         }
-        line1.text = l1; line2.text = l2;
-        line2.gameObject.SetActive(!string.IsNullOrEmpty(l2));
+        line1.text = l1;
+        // #216 今の席が済んだら札にチェック（出るときに UiSelect がぽんと弾ませる）
+        UiSelect.Check(tag, !stir && m.Practiced.Contains(Active));
 
         caret.gameObject.SetActive(caret.sprite != null && (v == View.Try || v == View.StirDo));
         tapTo = v == View.NiceNext || v == View.NextManual || v == View.StirGo ? other : null;
         tap.interactable = tapTo != null;
         face.raycastTarget = tapTo != null;   // 押せないときは後ろへ通す
-
-        for (int i = 0; i < Seats.All.Length; i++)
-        {
-            string s = Seats.All[i];
-            badges[i].Root.gameObject.SetActive(!stir || s == Seats.Life);   // かき混ぜの間は Life Support だけ
-            bool done = !stir && m.Practiced.Contains(s);
-            badges[i].Set(s, m.MySeats.Contains(s), !stir && !done);         // まだの席は灰色、済んだ席は席の色＋✓
-            UiSelect.Check(badges[i].Root, done);
-        }
     }
 
     void Animate(float now)
@@ -325,11 +301,11 @@ public class PracticeGuide : HudPart
         FitFace();
         float b = 1f + BounceScale * Ease(bounceEnd - now, BounceTime);
         box.localScale = new Vector3(b, b, 1f);
-        for (int i = 0; i < badges.Length; i++)
-        {
-            float p = 1f + PopScale * Ease(popEnd[i] - now, PopTime);
-            badges[i].Root.localScale = new Vector3(p, p, 1f);
-        }
+        // #216 文の滑り込み：左右の余白をずらす（幅は変えないので、自動の文字の大きさは動かない）。レイアウトに位置を上書きされない
+        float k = slideEnd > now ? 1f - UiEase.OutCubic(1f - (slideEnd - now) / SlideTime) : 0f;
+        float dx = SlideX * k;
+        line1.margin = new Vector4(dx, 0f, -dx, 0f);
+        line1.alpha = 1f - k;
         if (caret.gameObject.activeSelf)
             caret.rectTransform.anchoredPosition = new Vector2(0f, -CaretBob * (0.5f + 0.5f * Mathf.Sin(now * 2f * Mathf.PI / BobPeriod)));
     }

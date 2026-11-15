@@ -15,6 +15,7 @@ public class BottomFold : HudPart
     const float TabW = 72f, TabH = 30f;      // つまみ（1600×900 基準）
     const float TabX = 0.94f;                // つまみの横の位置（盆の幅の割合）
     const float Speed = 5f;                  // 開け閉めの速さ（1/秒）
+    const float HitBelow = 16f;              // #216 押せる範囲（96×96）がつまみの下の端からはみ出す分
 
     RectTransform slot, tab, caret;
     bool open = true;
@@ -30,6 +31,12 @@ public class BottomFold : HudPart
         tab.sizeDelta = new Vector2(TabW, TabH); tab.anchoredPosition = new Vector2(0f, -2f);
         var face = UiKit.Round(tab, 12f, T.HudFace, "Face"); UiKit.Fill(face.rectTransform);
         face.raycastTarget = true;
+        // #216：見た目は 72×30 のまま、押せる範囲を 96×96 に（透明の当たり。つまみの下の端の少し下から上へ。下は盆なので広げすぎない）
+        var hit = Ui.Rect("Hit", tab);
+        hit.anchorMin = hit.anchorMax = new Vector2(0.5f, 0f); hit.pivot = new Vector2(0.5f, 0f);
+        hit.sizeDelta = new Vector2(T.Hit, T.Hit); hit.anchoredPosition = new Vector2(0f, -HitBelow);
+        hit.SetAsFirstSibling();
+        var hi = hit.gameObject.AddComponent<Image>(); hi.color = T.Clear; hi.raycastTarget = true;
         var btn = tab.gameObject.AddComponent<Button>();
         btn.targetGraphic = face; btn.transition = Selectable.Transition.None;
         btn.navigation = new Navigation { mode = Navigation.Mode.None };
