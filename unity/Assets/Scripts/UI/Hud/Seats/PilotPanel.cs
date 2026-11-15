@@ -1,14 +1,14 @@
-// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#80）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 左のカードを向きの見出しに）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#80）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 左のカードを向きの見出しに）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せた）
 // 作る Issue：#80（Pilot のパネル）。下の PilotCommsKit は #82（Comms & Power）と共用の小さな部品
 //
-// Pilot（▲）の席：左から「向きの見出し（POINT SHIP AT ＋燃料。表示だけ）」「船の向き（5つから1つ）」「大ボタン1つ（軌道修正・点火・HELP SWAP のどれか）」。
-//   ・#189（Fable）：左のカードは EARTH・MOON などが「船を向ける先」だと分かるように見出しにした。燃料と1回の量は2行目
+// Pilot（▲）の席：左から「燃料の数のチップ」「向きの見出し（Point ship at）」「船の向き（丸い枠 4〜5 つから1つ）」、盆の右端に「大ボタン1つ（軌道修正・点火・HELP SWAP のどれか）」。
+//   ・#190（ui-guidelines 3章「グリッドの選択」【09】【10】）：向きは丸い枠（UiKit.Slot）。今の向きの右上にチェック、上に品名の札（何のための向きか）。
+//     丸い枠の下に向きの名前（【09】の値段の位置）。手は今の向きに乗る。いま要る物があれば手はそこへ動いて突き、札はその「何をするか」
 //   ・HELP SWAP：CO2 が注意の値を超え、フィルターが残っていて、自分が Life Support を持っていないときだけ（#81・#83 と同じ条件と文言）
-//   ・いま要る物を1つだけ橙の輪で光らせ、そのカードの2行目に「何をするか」を書く（NowTarget）
-//   ・押せない大ボタンは灰色＋鍵。2行目に「足りない物（担当の席の形つき）」か「あと何秒」
+//   ・押せない大ボタンは line の面＋鍵。2行目に「足りない物（担当の席の形つき）」か「あと何秒」。いま押せる大ボタンは主ボタン（go＋縞）で息をする
 //   ・UI は判定しない：押せる・要るの見た目は state の値（t・t_burn_open・sw・attitude・correction_done・burn_done）を
 //     SPEC 6章のとおりに並べただけ。効くかどうかはサーバーが決める
-//   ・練習（M03）の間は state が無いので、全部押せる見た目にする。#84 は Highlight("set_attitude") で向きの列を光らせる
+//   ・練習（M03）の間は state が無いので、全部押せる見た目にする。#84 は Highlight("set_attitude") で向きを「次に押す物」にする
 // 文言は下の Words と Attitudes（Fable が直すのはここ）。数値は parameters.json（GameParams）と state から
 using System;
 using System.Collections.Generic;
@@ -25,32 +25,30 @@ public class PilotPanel : SeatPanel
     public override IEnumerable<string> Commands => new[] { "set_attitude", "correction_burn", "ignite" };
 
     // ------------------------------------------------------------------ 文言
-    // 向き（server の ATTITUDES）：名前・アイコン・何のための向きか。sun はソーラーパネルを積んだときだけ出す
+    // 向き（server の ATTITUDES）：名前（丸い枠の下）・アイコン・何のための向きか（品名の札）。sun はソーラーパネルを積んだときだけ出す
     static readonly (string mode, string title, string icon, string note)[] Attitudes =
     {
-        ("earth", "EARTH", "earth", "Send data"),
-        ("moon", "MOON", "moon", "Observe"),
-        ("sun", "SUN", "sun", "Charge"),
-        ("burn", "BURN", "rocket", "Fire engine"),
-        ("heatshield", "SHIELD", "heat_shield", "Heat shield first"),
+        ("earth", "Earth", "earth", "Send data"),
+        ("moon", "Moon", "moon", "Observe"),
+        ("sun", "Sun", "sun", "Charge"),
+        ("burn", "Burn", "rocket", "Fire engine"),
+        ("heatshield", "Shield", "heat_shield", "Heat shield first"),
     };
 
     static class Words
     {
-        // 左のカード：向きの列の見出し（#189）。2行目は {0} = 燃料の残り、{1} = 向きを変える1回の燃料。
-        //   <nobr> は「per turn」を2行に割らないため（表示は "Fuel 83, -1 per turn"。幅が足りなければ "Fuel 83, -1" / "per turn"）
-        public const string Fuel = "POINT SHIP AT";
-        public const string FuelPractice = "POINT SHIP AT";
-        public const string FuelNote = "Fuel {0}, -{1} <nobr>per turn</nobr>";
-        // いま要る向きのカードの2行目
-        // （向きのカードは幅が約 200 しかないので短く。2行まで）
+        // 向きの見出し（#189）。2行目は {0} = 向きを変える1回の燃料
+        public const string Heading = "Point ship at";
+        public const string FuelNote = "-{0} fuel per turn";
+        public const string FuelUnit = "fuel";
+        // いま要る向きの品名の札
         public const string TurnObserve = "Observe now!";
         public const string TurnSend = "Send data now!";
         public const string TurnBurn = "Engine burn now!";
         public const string TurnGetReady = "Next: engine burn";
         public const string TurnShield = "Re-entry now!";
         // 軌道修正（correction_burn）
-        public const string Fix = "FIX COURSE";
+        public const string Fix = "Fix course";
         public const string FixUnlocks = "Unlocks in {0}";
         public const string FixCost = "Uses {0} fuel";
         public const string FixLate = "Late: uses {0} fuel";
@@ -60,51 +58,65 @@ public class PilotPanel : SeatPanel
     static readonly string[] Instruments = { "camera", "spectrometer", "radar" };   // reference_sim の INSTRUMENTS
 
     // ------------------------------------------------------------------ 部品
-    readonly Dictionary<string, PcCard> att = new Dictionary<string, PcCard>();
+    readonly Dictionary<string, UiSlot> att = new Dictionary<string, UiSlot>();
     readonly HashSet<string> highlighted = new HashSet<string>();
-    PcCard fuel, fix, ignite;
+    SeatStrip strip;
+    UiCounter fuel;
+    TextMeshProUGUI heading, headNote;
+    PcCard fix, ignite;
     PcHelp help;
-    Image dialGlow;
+    UiItemTag tag; RectTransform tagAt; string tagText;
+    string practiceAtt;   // 練習の間（state が無い）に押した向き。見た目だけ
     bool built;
 
     protected override void BuildControls(RectTransform row)
     {
         RootAsDetail();   // 照明 OFF で暗くしてよい（#87 が量を決める）
         string me = Seat;
-        var line = K.Line(row);
+        strip = SeatLook.Strip(row);
 
-        fuel = K.Card(line, "Heading", null, null);   // 向きの見出し（表示だけ。アイコンなし）。2行目に燃料
-        // 幅：InfoW（176）では「POINT SHIP AT」（Baloo 24 で約 157）が内側 16×2 に入らないので、見出しの幅に合わせて広げる（約 189）
-        float headW = Mathf.Max(fuel.Title.GetPreferredValues(Words.Fuel).x, fuel.Title.GetPreferredValues(Words.FuelPractice).x);
-        K.Width(fuel.Root, Mathf.Max(K.InfoW, Mathf.Ceil(headW) + K.PadX * 2f), 0f);
+        fuel = UiKit.Counter(strip.Rect, "fuel", Words.FuelUnit);
+        var head = UiKit.Col(strip.Rect, 0f, TextAnchor.MiddleLeft);
+        heading = UiKit.Text(head, Words.Heading, TextStyle.RowName, T.Text, TextAlignmentOptions.MidlineLeft);
+        SeatLook.Tight(heading);
+        headNote = UiKit.Text(head, "", TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
+        SeatLook.ReserveWidth(headNote, K.Words.PracticeTry, K.Words.PracticeDone, K.F(Words.FuelNote, 99));
 
-        var dial = UiKit.Row(line, K.Gap, TextAnchor.MiddleLeft);
-        dial.name = "Attitude";
-        dial.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
-        K.Width(dial, T.Hit, 1f);
-        dialGlow = K.GroupGlow(dial);
+        var grid = UiKit.Row(strip.Rect, T.SlotGap, TextAnchor.MiddleCenter);
+        grid.name = "Attitude";
         foreach (var a in Attitudes)
         {
             if (a.mode == "sun" && !Ctx.HasPart(SolarPart)) continue;
             string mode = a.mode;
-            var c = K.Card(dial, "Att_" + mode, a.icon, () => Ctx.Send(Cmd.Attitude(me, mode)));
-            K.Width(c.Root, T.Hit, 1f);
-            att[mode] = c;
+            var col = UiKit.Col(grid, T.S1 / 2f, TextAnchor.UpperCenter);
+            col.name = "Att_" + mode;
+            var slot = UiKit.Slot(col, a.icon, () => TurnTo(mode));
+            var name = UiKit.Text(col, a.title, TextStyle.Price, T.TextSoft, TextAlignmentOptions.Center);
+            SeatLook.Tight(name);
+            att[mode] = slot;
         }
 
-        var slot = K.Slot(line);
-        fix = K.Card(slot, "FixCourse", "route", () => Ctx.Send(Cmd.Simple("correction_burn", me)), big: true);
-        ignite = K.Card(slot, "Ignite", "ignition", () => Ctx.SendDual("ignite", me), big: true);
-        UiKit.Fill(fix.Root); UiKit.Fill(ignite.Root);
-        help = PcHelp.Build(slot, Ctx, me);
+        SeatLook.Spacer(strip.Rect);
+        var slotR = K.Slot(strip.Rect);
+        fix = K.BigButton(slotR, "FixCourse", "route", () => Ctx.Send(Cmd.Simple("correction_burn", me)));
+        ignite = K.BigButton(slotR, "Ignite", "ignition", () => Ctx.SendDual("ignite", me));
+        help = PcHelp.Build(slotR, Ctx, me);
         built = true;
     }
 
     protected override void BuildStir(RectTransform row) => K.StirNote(row);
 
+    void TurnTo(string mode)
+    {
+        Ctx.Send(Cmd.Attitude(Seat, mode));
+        if (Ctx.State == null) practiceAtt = mode;   // 練習の間は state が来ないので、押した向きを見た目だけ残す
+        UiSelect.CursorOf(Root).Poke();
+        Refresh(Ctx.State);
+    }
+
     public override void OnEvent(GameEvent e) { if (built) help.OnEvent(e); }
 
-    /// <summary>#84：練習の間「まだ試していない操作」を橙の輪で光らせる（set_attitude → 向きの列、correction_burn・ignite → 大ボタン）</summary>
+    /// <summary>#84：練習の間「まだ試していない操作」を「次に押す物」にする（set_attitude → 向き、correction_burn・ignite → 大ボタン）</summary>
     public override void Highlight(string cmd, bool on)
     {
         if (on ? !highlighted.Add(cmd) : !highlighted.Remove(cmd)) return;   // #84 は毎フレーム呼ぶので、変わったときだけ描き直す
@@ -114,9 +126,8 @@ public class PilotPanel : SeatPanel
     public override void Tick(float now)
     {
         if (!built) return;
-        K.Pulse(dialGlow, now);
-        foreach (var c in att.Values) K.Pulse(c.Glow, now);
-        K.Pulse(fix.Glow, now); K.Pulse(ignite.Glow, now); K.Pulse(help.Card.Glow, now);
+        strip.Fit();
+        PokeCursor(now);
         if (help.Tick(now)) Refresh(Ctx.State);
     }
 
@@ -128,30 +139,60 @@ public class PilotPanel : SeatPanel
         string hint = null;
         string now = s != null ? NowTarget(s, out hint) : null;
 
-        // 向きの見出し＋燃料（練習の間は state が無いので、2行目は練習の案内）
-        if (s == null) fuel.Set(PcLook.Normal, Words.FuelPractice, K.PracticeNote(Ctx, Seat));
-        else fuel.Set(PcLook.Normal, Words.Fuel, K.F(Words.FuelNote, K.Whole(s.fuel), K.P("fuel_attitude_change")));
+        // 燃料と見出し（練習の間は state が無いので、2行目は練習の案内）
+        fuel.Set(s != null ? K.Whole(s.fuel) : K.Words.NoValue);
+        headNote.text = s == null ? K.PracticeNote(Ctx, Seat) : K.F(Words.FuelNote, K.P("fuel_attitude_change"));
 
-        // 向き：いまの向きは濃紺、いま要る向きは橙の輪＋2行目が「何をするか」
-        dialGlow.enabled = highlighted.Contains("set_attitude");
-        foreach (var a in Attitudes)
-        {
-            if (!att.TryGetValue(a.mode, out var c)) continue;
-            bool want = now == "att:" + a.mode;
-            c.Set(s != null && s.attitude == a.mode ? PcLook.Selected : PcLook.Normal, a.title, want ? hint : a.note);
-            c.SetGlow(want);
-        }
+        // 向き：今の向きにチェック。札と手は「いま要る向き」があればそこ、無ければ今の向き
+        string cur = s != null ? s.attitude : practiceAtt;
+        foreach (var kv in att) UiSelect.Check(kv.Value.Root, kv.Key == cur);
+        string tagMode = now != null && now.StartsWith("att:") ? now.Substring(4) : cur;
+        bool attNow = tagMode != cur;
+        if (tagMode == null && highlighted.Contains("set_attitude")) tagMode = FirstAttitude();
+        ShowTag(tagMode, attNow ? hint : Note(tagMode));
 
         // 大ボタン：いま押せる物を優先して1つだけ（軌道修正・点火 ＞ HELP SWAP ＞ まだ押せない軌道修正・点火）
         string act = ActionToShow(s);
         fix.Show(act == "fix"); ignite.Show(act == "ignite"); help.Card.Show(act == "help");
-        if (act == "fix") RefreshFix(s, now == "fix");
-        else if (act == "help") help.Refresh(now == "help");
+        bool actNow;
+        if (act == "fix") actNow = RefreshFix(s, now == "fix");
+        else if (act == "help") actNow = help.Refresh(now == "help");
         else
         {
             K.RefreshIgnite(ignite, s, Ctx, Seat);
-            ignite.SetGlow(now == "ignite" || highlighted.Contains("ignite"));
+            actNow = now == "ignite" || highlighted.Contains("ignite");
+            ignite.SetNow(actNow);
         }
+        if (s == null && !actNow && highlighted.Contains("correction_burn")) actNow = true;
+
+        // 手（1画面に1つ）：いま要る向き ＞ いま押す大ボタン ＞ 練習で試す向き ＞ 今の向き
+        var actCard = act == "fix" ? fix : act == "help" ? help.Card : ignite;
+        if (attNow && tagMode != null) Point(att[tagMode].Root, CursorDir.UpLeft, true);
+        else if (actNow) Point(actCard.Root, CursorDir.UpLeft, true);
+        else if (tagMode != null && att.ContainsKey(tagMode)) Point(att[tagMode].Root, CursorDir.UpLeft, highlighted.Contains("set_attitude"));
+        else Point(null, CursorDir.UpLeft);
+    }
+
+    /// <summary>品名の札を mode の丸い枠の上に（null で隠す）。変わったときだけ出し直す（出すたびにぽんと弾むので）</summary>
+    void ShowTag(string mode, string text)
+    {
+        RectTransform at = mode != null && att.TryGetValue(mode, out var sl) ? sl.Root : null;
+        if (at == tagAt && text == tagText) return;
+        if (tag != null && at != tagAt) tag.Hide();
+        tagAt = at; tagText = text;
+        tag = at != null && !string.IsNullOrEmpty(text) ? UiSelect.ItemTag(at, text) : null;
+    }
+
+    string FirstAttitude()
+    {
+        foreach (var a in Attitudes) if (att.ContainsKey(a.mode)) return a.mode;
+        return null;
+    }
+
+    static string Note(string mode)
+    {
+        foreach (var a in Attitudes) if (a.mode == mode) return a.note;
+        return null;
     }
 
     bool NeedFix(GameState s) => s != null && !s.correctionDone && !s.burnDone;
@@ -167,7 +208,8 @@ public class PilotPanel : SeatPanel
         return NeedFix(s) ? "fix" : "ignite";
     }
 
-    void RefreshFix(GameState s, bool glow)
+    /// <summary>軌道修正のボタンを描く。「いま押す物」なら true</summary>
+    bool RefreshFix(GameState s, bool now)
     {
         float unlock = GameParams.Get("m06_delay_s");   // M07 で解禁（server は t < m06_delay_s を locked で返す）
         if (s.t < unlock) fix.Set(PcLook.Waiting, Words.Fix, K.F(Words.FixUnlocks, Ui.Mmss(unlock - s.t)));
@@ -178,10 +220,12 @@ public class PilotPanel : SeatPanel
             float cost = GameParams.Get("fuel_correction_burn") + (late ? GameParams.Get("fuel_burn_retry") : 0f);
             fix.Set(PcLook.Ready, Words.Fix, K.F(late ? Words.FixLate : Words.FixCost, K.Num(cost)));
         }
-        fix.SetGlow(glow || highlighted.Contains("correction_burn"));
+        bool on = now || highlighted.Contains("correction_burn");
+        fix.SetNow(on);
+        return on;
     }
 
-    /// <summary>いま Pilot が一番やるべき物（"att:moon"・"fix"・"ignite"）。無ければ null。hint は向きのカードの2行目</summary>
+    /// <summary>いま Pilot が一番やるべき物（"att:moon"・"fix"・"ignite"）。無ければ null。hint は品名の札の文</summary>
     string NowTarget(GameState s, out string hint)
     {
         hint = null;
@@ -219,52 +263,31 @@ public class PilotPanel : SeatPanel
 
 // ======================================================================
 // PilotCommsKit：Pilot（#80）と Comms & Power（#82）の席のパネルが使う小さな部品と、点火のボタンの中身。
-// #71 の UiKitHud（Toggle・CountdownChip・HoldButton など）ができたら、ここを差し替える。パネルの側は PcCard の口だけを使う。
-// 色・大きさは UiTokens から組む。下の定数は UiTokens に移す候補（第2波は UiTokens を触らないので、ここに置いた）
+// #190：大ボタン（PcCard）は盆の右端のピル（主ボタン＝go＋縞、押せない＝line＋鍵）。見た目は SeatPanel.cs の SeatLook／SeatFace
 // ======================================================================
 
-/// <summary>カードの見た目の段階</summary>
+/// <summary>大ボタンの見た目の段階</summary>
 public enum PcLook
 {
-    Normal,     // panel の面（ふつうに押せる・表示だけ）
-    Selected,   // ink の面（選んでいる向き）
-    Ready,      // go の面（いま押せる大ボタン）
+    Normal,     // 副（panel の面＋bgDeep のふち。SEND DATA）
+    Ready,      // 主ボタン（go＋縞。いま押せる）
     Waiting,    // line の面＋鍵（まだ押せない。2行目に理由）
-    Done,       // panel の面＋チェック（済んだ）
-    Missed,     // panel の面＋バツ（逃した）
+    Done,       // 副の面＋チェック（済んだ）
+    Missed,     // 副の面＋バツ（逃した）
 }
 
-/// <summary>ON/OFF のつまみ（ピルの溝の中を丸が動く。ON は右で go、OFF は左で line。文字も出すので色だけに頼らない）</summary>
-public class PcKnob
-{
-    public RectTransform Root, Dot;
-    public Image Track;
-    public TextMeshProUGUI Label;
-
-    public void Set(bool on)
-    {
-        Track.color = on ? T.Go : T.Line;
-        Label.text = on ? PilotCommsKit.Words.On : PilotCommsKit.Words.Off;
-        Label.color = on ? T.Panel : T.Ink;
-        float x = on ? 1f : 0f, pad = PilotCommsKit.KnobPad, d = PilotCommsKit.KnobH;
-        Dot.anchorMin = Dot.anchorMax = Dot.pivot = new Vector2(x, 0.5f);
-        Dot.anchoredPosition = new Vector2(on ? -pad : pad, 0f);
-        var lr = Label.rectTransform;   // 文字は丸の反対側
-        lr.offsetMin = new Vector2(on ? pad : d, 0f);
-        lr.offsetMax = new Vector2(on ? -d : -pad, 0f);
-    }
-}
-
-/// <summary>角丸のカード：左にアイコン、右に「題（＋つまみ）」と「2行目（最大2行に折り返す）」。押せるカードはカード全体が押せる所</summary>
+/// <summary>大ボタン：ピル 96 の左にアイコン、右に「題（＋つまみ）」と「2行目（最大2行に折り返す）」。ボタン全体が押せる所</summary>
 public class PcCard
 {
     public RectTransform Root, Body;
-    public Button Button;        // null なら表示だけ
-    public Image Glow, Face, Icon;   // Icon は null のことがある
+    public Button Button;
+    public SeatFace Face;
+    public Image Icon;
     public TextMeshProUGUI Title, Note;
-    public PcKnob Knob;          // スイッチだけ
+    public SeatKnob Knob;          // SEND DATA だけ
     internal string icon;
     PcLook look = (PcLook)(-1);
+    bool now;
 
     public void Set(PcLook l, string title, string note) { SetLook(l); SetText(title, note); }
 
@@ -276,8 +299,13 @@ public class PcCard
         Note.gameObject.SetActive(note.Length > 0);
     }
 
-    /// <summary>橙の輪（いま要る物・練習で光らせる物）。明るさは Tick の Pulse で揺らす</summary>
-    public void SetGlow(bool on) { if (Glow != null) Glow.enabled = on; }
+    /// <summary>いま押す物：息をする（手は SeatPanel.Point が乗せる）</summary>
+    public void SetNow(bool on)
+    {
+        if (on == now) return;
+        now = on;
+        SeatLook.Breathe(Root, Button, on);
+    }
 
     public void Show(bool on) { if (Root.gameObject.activeSelf != on) Root.gameObject.SetActive(on); }
 
@@ -285,23 +313,15 @@ public class PcCard
     {
         if (l == look) return;
         look = l;
-        Color face = T.Panel, fg = T.Ink, sub = T.InkSub, ic = T.Ink;
-        string sprite = icon; bool can = true;
-        switch (l)
-        {
-            case PcLook.Selected: face = T.Ink; fg = sub = ic = T.Panel; break;
-            case PcLook.Ready: face = T.Go; fg = sub = ic = T.Panel; break;
-            case PcLook.Waiting: face = T.Line; fg = T.InkSub; sub = T.Ink; ic = T.InkSub; sprite = "lock"; can = false; break;
-            case PcLook.Done: ic = T.Go; sprite = "check"; can = false; break;
-            case PcLook.Missed: ic = T.Danger; sprite = "cross"; can = false; break;
-        }
-        Face.color = face; Title.color = fg; Note.color = sub;
-        if (Icon != null)
-        {
-            Icon.sprite = sprite != null ? T.Icon(sprite) : null; Icon.color = ic;
-            Icon.gameObject.SetActive(Icon.sprite != null);
-        }
-        if (Button != null) Button.interactable = can;
+        var tone = l == PcLook.Ready ? SeatTone.Main : l == PcLook.Waiting ? SeatTone.Off : SeatTone.Plain;
+        Face.Paint(tone);
+        SeatFace.Ink(tone, out var fg, out var sub);
+        Title.color = fg; Note.color = sub;
+        string sprite = l == PcLook.Waiting ? "lock" : l == PcLook.Done ? "check" : l == PcLook.Missed ? "cross" : icon;
+        Icon.sprite = sprite != null ? T.Icon(sprite) : null;
+        Icon.color = l == PcLook.Done ? T.Go : l == PcLook.Missed ? T.Danger : fg;
+        Icon.gameObject.SetActive(Icon.sprite != null);
+        Button.interactable = l == PcLook.Normal || l == PcLook.Ready;
     }
 }
 
@@ -316,8 +336,7 @@ public class PcHelp
     public static PcHelp Build(RectTransform slot, HudContext ctx, string seat)
     {
         var h = new PcHelp { seat = seat };
-        h.Card = PilotCommsKit.Card(slot, "HelpSwap", "filter", () => ctx.SendDual("swap_filter", seat), big: true);
-        UiKit.Fill(h.Card.Root);
+        h.Card = PilotCommsKit.BigButton(slot, "HelpSwap", "filter", () => ctx.SendDual("swap_filter", seat));
         return h;
     }
 
@@ -340,31 +359,26 @@ public class PcHelp
         return true;
     }
 
-    public void Refresh(bool glow)
+    /// <summary>描く。「いま押す物」なら true</summary>
+    public bool Refresh(bool now)
     {
         Card.Set(PcLook.Ready, PilotCommsKit.Words.Help, feedback ?? PilotCommsKit.Words.HelpNote);
-        Card.SetGlow(glow || partnerFirst);
+        bool on = now || partnerFirst;
+        Card.SetNow(on);
+        return on;
     }
 }
 
 public static class PilotCommsKit
 {
-    // ------------------------------------------------------------------ 大きさ（UiTokens に移す候補）
-    public const float Gap = T.S1;                         // カードどうしの間
-    public const float InfoW = T.PrimaryMinW / 2f + T.S2;  // 燃料・電力のカードの幅（176）
-    public const float ActionW = T.PrimaryMinW + T.S3;     // 大ボタンの幅（344）
-    public const float PadX = T.S2, PadY = T.S1 / 2f;      // カードの内側（下の段は高さが約 100 しかないので上下は詰める。大ボタンは上下 0）
-    public const float KnobW = T.Hit - T.S3, KnobH = T.S4; // つまみ（72×32。文字は Nunito 22）
-    public const float KnobPad = T.S1 / 2f;                // つまみの丸と溝のすき間
-    public const float GlowW = T.SelfRing;                 // 光らせる輪の太さ
-    public const float GlowMin = 0.35f, GlowHz = 1.2f;     // 輪の不透明度の下限と、1秒に何回明滅するか
+    // ------------------------------------------------------------------ 大きさ（UiTokens・SeatLook から）
+    public const float NoteSpacing = -20f;                 // 大ボタンの2行目の行間（TMP の em/100。2行をピル 96 に入れる）
     public const float FeedbackSec = 2.5f;                 // 同時押しの結果（waiting・swapped など）を出しておく秒（BurnCheck・LpKit と同じ）
 
     // ------------------------------------------------------------------ 文言（両方の席で使うもの）
     public static class Words
     {
-        public const string On = "ON", Off = "OFF";
-        public const string Ignite = "IGNITE";
+        public const string Ignite = "Ignite";
         public const string OpensIn = "Opens in {0}";
         public const string PressWithComms = "Press with ■ Comms";
         public const string PressWithPilot = "Press with ▲ Pilot";
@@ -372,138 +386,78 @@ public static class PilotCommsKit
         public const string PracticeIgnite = "Practice: press once";
         public const string Needs = "Needs {0}";
         public const string Sep = " · ";
-        public const string MissFix = "▲ fix course";
-        public const string MissFace = "▲ face BURN";
-        public const string MissNav = "■ NAV ON";
+        public const string MissFix = "▲ Fix course";
+        public const string MissFace = "▲ face Burn";
+        public const string MissNav = "■ Nav on";
         public const string MissRouteB = "◆ route B";
         public const string MissFuel = "more fuel";
-        public const string BurnDone = "BURN DONE";
-        public const string NextShield = "Next: ▲ face SHIELD";
-        public const string NextNav = "Next: keep ■ NAV ON";
+        public const string BurnDone = "Burn done";
+        public const string NextShield = "Next: ▲ face Shield";
+        public const string NextNav = "Next: keep ■ Nav on";
         public const string ReadyReentry = "Ready for re-entry";
-        public const string BurnMissed = "BURN MISSED";
+        public const string BurnMissed = "Burn missed";
         public const string WindowClosed = "Window closed: long way home";
         public const string PracticeTry = "Practice: tap any button";
         public const string PracticeDone = "Practice done!";
+        public const string NoValue = "--";              // 練習の間（state が無い）の数のチップ
         // CO2 フィルター交換の手伝い（Life Support と同時押し。文言は #83 の PlannerPanel と同じ）
-        public const string Help = "HELP SWAP", HelpNote = "CO2 filter, with ● Life Support";
+        public const string Help = "Help swap", HelpNote = "CO2 filter, with ● Life Support";
         public const string PressWaiting = "waiting for partner", PressNow = "press now!";
         public const string PressTogether = "swapped!", PressFailed = "missed, try again";
-        public const string StirTitle = "STAND BY";
+        public const string StirTitle = "Stand by";
         public const string StirNote = "● Life Support is stirring the O2 tank";
     }
 
     // ------------------------------------------------------------------ 並べ方
-    /// <summary>席のパネルの1段（SeatPanel の row の中に1つ）。子は高さいっぱい、幅は各自の Width</summary>
-    public static RectTransform Line(RectTransform row)
+    /// <summary>大ボタンの置き場（中の候補を1つだけ見せる）。盆の右端（SeatLook.Spacer の後ろ）に置く</summary>
+    public static RectTransform Slot(RectTransform strip)
     {
-        var r = UiKit.Row(row, Gap, TextAnchor.MiddleLeft);
-        r.name = "Line";
-        r.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
-        Ui.Size(r, flexW: 1f, flexH: 1f);
+        var r = Ui.Rect("Action", strip);
+        UiKit.Fixed(r, SeatLook.ActionW, T.Hit);
         return r;
     }
 
-    /// <summary>大ボタンの置き場（中の候補を1つだけ見せる）</summary>
-    public static RectTransform Slot(RectTransform line)
-    {
-        var r = Ui.Rect("Action", line);
-        Width(r, ActionW, 0f);
-        return r;
-    }
-
-    public static void Width(Component c, float w, float flex)
-    {
-        var le = Ui.Size(c);
-        le.minWidth = w; le.preferredWidth = w; le.flexibleWidth = flex;
-    }
-
-    /// <summary>列全体を囲む橙の輪（練習の案内 #84 が「この列を試して」と光らせる）。列の後ろに敷く</summary>
-    public static Image GroupGlow(RectTransform group)
-    {
-        var g = UiKit.Round(group, T.RadiusM + GlowW, T.Accent, "Glow");
-        UiKit.Fill(g.rectTransform, -GlowW); UiKit.Ignore(g);
-        g.transform.SetAsFirstSibling();
-        g.enabled = false;
-        return g;
-    }
-
-    // ------------------------------------------------------------------ カード
-    /// <param name="icon">null ならアイコンなし（表示だけの狭いカード）</param>
-    /// <param name="onClick">null なら表示だけのカード</param>
-    /// <param name="knob">ON/OFF のつまみを題の右に付ける</param>
-    /// <param name="big">大ボタン（角丸 40、題は Baloo 32）</param>
-    public static PcCard Card(Transform p, string name, string icon, Action onClick, bool knob = false, bool big = false)
+    // ------------------------------------------------------------------ 大ボタン
+    /// <param name="knob">ON/OFF のつまみを題の右に付ける（SEND DATA）</param>
+    public static PcCard BigButton(RectTransform slot, string name, string icon, Action onClick, bool knob = false)
     {
         var c = new PcCard { icon = icon };
-        float radius = big ? T.RadiusL : T.RadiusM;
-        c.Root = Ui.Rect(name, p);
-        if (onClick != null) c.Root.gameObject.AddComponent<Image>().color = T.Clear;   // 押せる所＝カード全体
+        c.Root = Ui.Rect(name, slot); UiKit.Fill(c.Root);
+        var hit = c.Root.gameObject.AddComponent<Image>(); hit.color = T.Clear;   // 押せる所＝置き場いっぱい（96）
+        c.Body = Ui.Rect("Body", c.Root); UiKit.MiddleBand(c.Body, SeatLook.MainH);
+        c.Face = SeatFace.Pill(c.Body, SeatLook.MainH);
 
-        c.Glow = UiKit.Round(c.Root, radius + GlowW, T.Accent, "Glow"); UiKit.Fill(c.Glow.rectTransform, -GlowW);
-        c.Glow.enabled = false;
-        var sh = UiKit.Round(c.Root, radius, T.Shadow, "Shadow"); UiKit.Fill(sh.rectTransform);
-        sh.rectTransform.offsetMin = sh.rectTransform.offsetMax = new Vector2(0f, -T.ShadowY);
-
-        c.Body = Ui.Rect("Body", c.Root); UiKit.Fill(c.Body);
-        c.Face = UiKit.Round(c.Body, radius, T.Panel, "Face"); UiKit.Fill(c.Face.rectTransform); UiKit.Ignore(c.Face);
-        var row = c.Body.gameObject.AddComponent<HorizontalLayoutGroup>();
-        int px = Mathf.RoundToInt(PadX), py = big ? 0 : Mathf.RoundToInt(PadY);
-        row.padding = new RectOffset(px, px, py, py);
-        row.spacing = T.S1; row.childAlignment = TextAnchor.MiddleLeft;
-        row.childControlWidth = row.childControlHeight = true;
-        row.childForceExpandWidth = row.childForceExpandHeight = false;
-
-        if (icon != null) c.Icon = UiKit.Icon(c.Body, icon, T.IconM, T.Ink);
-        var col = UiKit.Col(c.Body, 0f, TextAnchor.MiddleLeft, 0f, 0f, true);
-        Ui.Size(col, flexW: 1f, flexH: 1f);
+        var row = UiKit.Row(c.Body, T.S2, TextAnchor.MiddleLeft, T.S3, 0f); UiKit.Fill(row);
+        c.Icon = UiKit.Icon(row, icon, T.IconM, T.Text);
+        var col = UiKit.Col(row, 0f, TextAnchor.MiddleLeft, 0f, 0f, true);
+        Ui.Size(col, flexW: 1f);
         var top = UiKit.Row(col, T.S1, TextAnchor.MiddleLeft);
-        c.Title = UiKit.Text(top, "", big ? TextStyle.Sub : TextStyle.Tag, T.Ink, TextAlignmentOptions.MidlineLeft);
+        c.Title = UiKit.Text(top, "", TextStyle.Choice, T.Text, TextAlignmentOptions.MidlineLeft);
+        SeatLook.Tight(c.Title);
         Ui.Size(c.Title, flexW: 1f);
-        if (knob) c.Knob = Knob(top);
-        c.Note = UiKit.Text(col, "", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+        if (knob) c.Knob = SeatLook.Knob(top);
+        c.Note = UiKit.Text(col, "", TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft, false);
         c.Note.textWrappingMode = TextWrappingModes.Normal;   // 2行まで折り返す（文言は短く）
+        c.Note.lineSpacing = NoteSpacing;
 
-        if (onClick != null)
-        {
-            c.Button = c.Root.gameObject.AddComponent<Button>();
-            c.Button.targetGraphic = c.Face;
-            c.Button.navigation = new Navigation { mode = Navigation.Mode.None };
-            var cb = c.Button.colors;
-            cb.normalColor = cb.selectedColor = cb.disabledColor = Color.white;
-            cb.highlightedColor = T.TintHover; cb.pressedColor = T.TintPressed; cb.fadeDuration = T.TintFade;
-            c.Button.colors = cb;
-            c.Button.onClick.AddListener(() => onClick());
-            c.Root.gameObject.AddComponent<UiPress>().Init(c.Body, c.Button);
-        }
+        c.Button = SeatLook.Press(c.Root, c.Face.Face, onClick);
         c.SetLook(PcLook.Normal);
         return c;
     }
 
-    static PcKnob Knob(Transform p)
-    {
-        var k = new PcKnob();
-        k.Root = Ui.Rect("Knob", p);
-        UiKit.Fixed(k.Root, KnobW, KnobH);
-        k.Track = UiKit.Pill(k.Root, T.Line, KnobH, "Track"); UiKit.Fill(k.Track.rectTransform);
-        var dot = UiKit.Pill(k.Root, T.Panel, KnobH - KnobPad * 2f, "Dot");
-        k.Dot = dot.rectTransform; k.Dot.sizeDelta = Vector2.one * (KnobH - KnobPad * 2f);
-        k.Label = UiKit.Text(k.Root, Words.Off, TextStyle.Label, T.Ink, TextAlignmentOptions.Center);
-        var lr = k.Label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one;
-        k.Set(false);
-        return k;
-    }
-
-    /// <summary>stir（M04）の間の Pilot・Comms & Power：待つだけ、と1枚で伝える</summary>
+    /// <summary>stir（M04）の間の Pilot・Comms & Power：待つだけ、と1つで伝える（台に時計＋題＋文）</summary>
     public static void StirNote(RectTransform row)
     {
-        var line = Line(row);
-        var c = Card(line, "StandBy", "clock", null);
-        Width(c.Root, ActionW * 2f, 0f);
-        c.Set(PcLook.Normal, Words.StirTitle, Words.StirNote);
+        var strip = SeatLook.Strip(row);
+        var r = UiKit.Row(strip.Rect, SeatLook.Gap, TextAnchor.MiddleLeft);
+        UiKit.Disc(r, "clock", T.Text, T.RowDiscD);
+        var col = UiKit.Col(r, 0f, TextAnchor.MiddleLeft);
+        SeatLook.Tight(UiKit.Text(col, Words.StirTitle, TextStyle.RowName, T.Text, TextAlignmentOptions.MidlineLeft));
+        UiKit.Text(col, Words.StirNote, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
+        strip.Rect.gameObject.AddComponent<SeatStripFit>().strip = strip;   // stir の間は Tick で触る部品が無いので、自分で合わせる
     }
 
-    /// <summary>練習（M03）の間の、燃料・電力のカードの2行目</summary>
+    /// <summary>練習（M03）の間の、見出しの2行目</summary>
     public static string PracticeNote(HudContext ctx, string seat) => ctx.Model.Practiced.Contains(seat) ? Words.PracticeDone : Words.PracticeTry;
 
     // ------------------------------------------------------------------ 点火（Pilot と Comms & Power で同じ）
@@ -525,7 +479,7 @@ public static class PilotCommsKit
 
     public static bool IgniteReady(GameState s) => WindowOpen(s) && IgniteMissing(s).Count == 0;
 
-    /// <summary>点火のカードを描く。押せるのは噴射窓の中で足りない物が無いときだけ（練習の間は押せる）</summary>
+    /// <summary>点火のボタンを描く。押せるのは噴射窓の中で足りない物が無いときだけ（練習の間は押せる）</summary>
     public static void RefreshIgnite(PcCard card, GameState s, HudContext ctx, string seat)
     {
         bool solo = ctx.SoloPair("ignite") != null;
@@ -577,13 +531,11 @@ public static class PilotCommsKit
     /// <summary>parameters.json の値を文字に。無ければ "?"</summary>
     public static string P(string key) => GameParams.TryGet(key, out var v) ? Num(v) : "?";
     public static string F(string fmt, params object[] a) => string.Format(Inv, fmt, a);
+}
 
-    /// <summary>輪の明るさを揺らす（Tick から毎フレーム）</summary>
-    public static void Pulse(Image ring, float now)
-    {
-        if (ring == null || !ring.enabled) return;
-        float k = 0.5f + 0.5f * Mathf.Sin(now * Mathf.PI * 2f * GlowHz);
-        var c = T.Accent; c.a = Mathf.Lerp(GlowMin, 1f, k);
-        ring.color = c;
-    }
+/// <summary>Tick を受けない帯（stir の間の待つだけの表示）を、毎フレーム画面に合わせる</summary>
+public class SeatStripFit : MonoBehaviour
+{
+    internal SeatStrip strip;
+    void LateUpdate() => strip?.Fit();
 }
