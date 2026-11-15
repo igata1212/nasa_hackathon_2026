@@ -7,6 +7,8 @@
 //   ・下の帯（CabinHud が作る紺の四角）をクリームの盆に替える（SeatLook.Tray。CabinHud を触らないので、ここで紺を透明にして盆を敷く）
 //   ・タブは傾いた名前タグ（blob_pill、高さ 48、白文字 26、−6°）。選んでいる席＝席の色の面、ほかの席＝bgDeep の面に席の色の丸（席＝色＋形）
 //   ・名前タグの真ん中が盆の上端に乗る（【12】の名前タグが吹き出しの角にかぶさる作り）
+// #216（less is more）：名前タグは今の席だけ。兼任のほかの席は、名前タグのすぐ右に形だけの丸（席の色に ▲■●◆、押せる範囲 96）。
+//   盆のボタンの上に出る品名の札（Send data など）が席のタブにかぶらないように、詰めて左に寄せる。席を替えたら名前タグが1回弾む
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +16,11 @@ using T = UiTokens;
 
 public class SeatTabBar : HudPart
 {
+    const float DotD = T.NameTagH;          // #216 形だけの丸の直径（名前タグと同じ高さ）
+    const float DotW = DotD + T.S1;         // #216 丸1つが row で取る幅。row の間 S2 と合わせて丸の間隔 72：押せる範囲 96 がとなりの丸の縁までで止まる
+
     RectTransform row;
+    string lastActive;                      // #216 前に作ったときの席（替わったら名前タグを弾ませる）
     /// <summary>今あるタブの数</summary>
     public int Count => row != null ? row.childCount : 0;
 
@@ -28,15 +34,44 @@ public class SeatTabBar : HudPart
     public void Rebuild()
     {
         Clear(row);
+        // #216：今の席の名前タグを先に、ほかの席は形だけの丸を後ろに（row の子は席の数のまま。Count が席の数になる）
+        string active = Ctx.ActiveSeat;
+        RectTransform tag = null;
+        foreach (var s in Ctx.Model.MySeats)
+            if (s == active) tag = NameTag(row, s, true, null);
         foreach (var s in Ctx.Model.MySeats)
         {
+            if (s == active) continue;
             string seat = s;
-            NameTag(row, seat, seat == Ctx.ActiveSeat, () => Ctx.SelectSeat(seat));
+            if (tag == null) NameTag(row, seat, false, () => Ctx.SelectSeat(seat));   // 今の席が自分の席に無いとき（念のため今まで通り）
+            else Dot(row, seat, () => Ctx.SelectSeat(seat));
         }
+        if (tag != null && lastActive != null && lastActive != active) UiSelect.Pick(tag);   // #216 席を替えた：1.0 → 1.12 → 1.0（0.25 秒）
+        lastActive = active;
+    }
+
+    /// <summary>#216 ほかの席：席の色の丸に形だけ（名前なし）。押せる範囲は 96×96（丸の下の端から上へ。下は席のパネルなので広げない）</summary>
+    static void Dot(Transform p, string seat, System.Action select)
+    {
+        var r = Ui.Rect("Tab_" + seat, p);
+        var le = Ui.Size(r, w: DotW, h: T.NameTagH); le.minWidth = DotW; le.minHeight = T.NameTagH; le.flexibleWidth = 0f;
+
+        var hit = Ui.Rect("Hit", r);
+        hit.anchorMin = hit.anchorMax = new Vector2(0.5f, 0f); hit.pivot = new Vector2(0.5f, 0f);
+        hit.sizeDelta = new Vector2(T.Hit, T.Hit); hit.anchoredPosition = Vector2.zero;
+        var hi = hit.gameObject.AddComponent<Image>(); hi.color = T.Clear;
+
+        var badge = UiKit.SeatBadge(r, seat, DotD);
+        badge.Root.anchorMin = badge.Root.anchorMax = badge.Root.pivot = new Vector2(0.5f, 0.5f);
+        badge.Root.anchoredPosition = Vector2.zero;
+        badge.Circle.raycastTarget = false; badge.Ring.raycastTarget = false; badge.Shape.raycastTarget = false;
+
+        var b = SeatLook.Press(r, badge.Circle, select);
+        b.transition = Selectable.Transition.None;
     }
 
     /// <summary>名前タグ1つ（row の子は1つだけ。Count が席の数になる）。押せる範囲は上へ T.Hit まで広げる（下は席のパネルなので広げない）</summary>
-    static void NameTag(Transform p, string seat, bool on, System.Action select)
+    static RectTransform NameTag(Transform p, string seat, bool on, System.Action select)
     {
         var r = UiKit.Row(p, T.S1, TextAnchor.MiddleCenter, T.S2, 0f);
         r.name = "Tab_" + seat;
@@ -54,6 +89,7 @@ public class SeatTabBar : HudPart
 
         var b = SeatLook.Press(r, face, on ? null : select, squish: false);   // UiSquish は傾きを 0 に戻すので付けない
         b.transition = Selectable.Transition.None;
+        return r;
     }
 
     /// <summary>Seats.Title（PILOT・LIFE SUPPORT …）を語の頭だけ大文字に（ガイドライン 2章「大文字は使わない」。席の名前は固有名詞）</summary>
