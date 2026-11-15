@@ -1,13 +1,15 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森の会話の吹き出し【12】【02】）
 // 案内の吹き出し（#153。タイトルと部屋で、ヒューストンが「次に何をするか」を1つだけ話す）。
-// panel の角丸 40・影 6、左上に傾いた名前タグ（go に白文字、comms のアイコン）、しっぽは下か左（指す物の方）。
+// #190：blob_bubble（下の辺が波打つ形）、影・しっぽなし（【12】【02】）。左上に名前タグ（Houston の blob_pill、右上がりに 6°、高さの 4 割をかぶせる）。
+//   文は台詞の大きさ 36・行間 1.5・茶。吹き出しの大きさは呼ぶ側（TitleLook）が決めるので、入らないときは 22 まで自動で縮める。
 // 文は Say() で替える。替わるたびに小さく弾み、1文字ずつ出る（TitleLook.TypeCps）。開いたときは delay 秒あとにぽんと出る。
-// #71 の共通の吹き出し（UiKitHud の Bubble）ができたら、作る所（Create）をそれに替える。外から使うのは Create と Say だけ
+// 外から使うのは Create と Say だけ（Tail は前の呼び方のまま受ける。しっぽは描かず、弾むときの中心にだけ使う）
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using T = UiTokens;
 using L = TitleLook;
+using S = HoustonStyle;
 
 public class UiHintBubble : MonoBehaviour
 {
@@ -20,7 +22,7 @@ public class UiHintBubble : MonoBehaviour
     bool first;
 
     /// <param name="w">幅</param><param name="h">高さ</param>
-    /// <param name="tailAt">しっぽの位置（Down：左からの px。Left：使わない＝縦の中央）</param>
+    /// <param name="tailAt">指す物の位置（Down：左からの px。Left：使わない＝縦の中央）。弾むときの中心にする</param>
     /// <param name="delay">画面が開いてから出るまでの秒数</param>
     public static UiHintBubble Create(Transform p, float w, float h, Tail tail, float tailAt, float delay)
     {
@@ -30,57 +32,53 @@ public class UiHintBubble : MonoBehaviour
         var b = root.gameObject.AddComponent<UiHintBubble>();
         b.delay = delay;
 
-        // 弾むときの中心はしっぽの先（指す物から出てくるように見える）
+        // 弾むときの中心は指す物の側（指す物から出てくるように見える）
         b.body = Ui.Rect("Body", root); UiKit.Fill(b.body);
         Vector2 tip = tail == Tail.Down ? new Vector2(tailAt, 0f) : new Vector2(0f, h * 0.5f);
         b.body.pivot = new Vector2(tip.x / w, tip.y / h);
         b.body.anchoredPosition = Vector2.zero;
         b.body.offsetMin = Vector2.zero; b.body.offsetMax = Vector2.zero;
 
-        // 影（しっぽ・面）→ しっぽ → 面 の順に重ねる。しっぽの半分は面の下に隠れて三角に見える
-        var tailShadow = TailShape(b.body, tip, T.Shadow, "TailShadow");
-        tailShadow.anchoredPosition += Vector2.down * T.ShadowY;
-        UiKit.Surface(b.body, T.RadiusL, T.Panel);
-        var tailFace = TailShape(b.body, tip, T.Panel, "Tail");
-        tailFace.SetSiblingIndex(tailShadow.GetSiblingIndex() + 2);   // 影の面の上、面の下
+        // 面：blob_bubble（影・しっぽなし）。上下の縁（96＋96）が高さに入るように縮める
+        var face = UiKit.Blob(b.body, T.BlobBubble, T.Panel, T.BubbleCornerX, "Face"); UiKit.Fill(face.rectTransform);
+        var s = face.sprite;
+        if (s != null && face.type == Image.Type.Sliced && s.border.y + s.border.w > 0f)
+            face.pixelsPerUnitMultiplier = 1f / Mathf.Min(1f, h * S.BubbleFit / (s.border.y + s.border.w));
 
-        b.text = UiKit.Text(b.body, "", TextStyle.Body, T.Ink, TextAlignmentOptions.Left, false);
+        // 文：台詞 36・行間 1.5・茶。内側は吹き出しの大きさに合わせて縮める（大きい吹き出しでは 72／36）。上は名前タグの下まで空ける
+        b.text = UiKit.Text(b.body, "", TextStyle.Talk, T.Text, TextAlignmentOptions.MidlineLeft, false);
         b.text.textWrappingMode = TextWrappingModes.Normal;
         b.text.richText = true;
-        b.text.lineSpacing = 0f;
+        var fi = b.text.font.faceInfo;
+        b.text.lineSpacing = Mathf.Max(0f, (T.TalkLineHeight - fi.lineHeight / fi.pointSize) * 100f);
+        b.text.enableAutoSizing = true; b.text.fontSizeMin = T.TextLabel; b.text.fontSizeMax = T.TextTalk;
+        b.text.overflowMode = TextOverflowModes.Ellipsis;
+        float padX = Mathf.Min(T.BubblePadX, w * 0.06f), padY = Mathf.Min(T.BubblePadY, h * 0.15f);
+        float padTop = Mathf.Max(padY, T.NameTagH * S.TagOverlap + T.S1);   // 名前タグのかぶる分の下から
         var tr = b.text.rectTransform; UiKit.Fill(tr);
-        tr.offsetMin = new Vector2(L.BubblePadX, L.BubblePadY); tr.offsetMax = new Vector2(-L.BubblePadX, -L.BubblePadY);
+        tr.offsetMin = new Vector2(padX, padY); tr.offsetMax = new Vector2(-padX, -padTop);
 
-        SpeakerTag(b.body, h);
+        SpeakerTag(b.body);
         b.Hide();
         return b;
     }
 
-    static RectTransform TailShape(RectTransform parent, Vector2 tip, Color c, string name)
+    /// <summary>左上の名前タグ（HoustonBubble と同じ作り：blob_pill、右上がり 6°、高さの 4 割をかぶせる【12】）</summary>
+    static void SpeakerTag(RectTransform parent)
     {
-        var img = UiKit.Round(parent, L.BubbleTailRadius, c, name);
-        var r = img.rectTransform;
-        r.anchorMin = r.anchorMax = Vector2.zero; r.pivot = new Vector2(0.5f, 0.5f);
-        r.sizeDelta = new Vector2(L.BubbleTail, L.BubbleTail);
-        r.anchoredPosition = tip;
-        r.localRotation = Quaternion.Euler(0f, 0f, 45f);
-        return r;
-    }
-
-    static void SpeakerTag(RectTransform parent, float h)
-    {
-        var tag = UiKit.Row(parent, T.S1, TextAnchor.MiddleCenter, T.S2);
+        var tag = UiKit.Row(parent, T.S1, TextAnchor.MiddleCenter, S.TagPadX);
         tag.name = "Speaker";
         tag.anchorMin = tag.anchorMax = new Vector2(0f, 1f);
-        tag.pivot = new Vector2(0f, 0.5f);                   // 名前タグの中心の線を、吹き出しの上の縁に合わせる（半分かぶせる）
-        tag.anchoredPosition = new Vector2(L.SpeakerInsetX, 0f);
-        tag.localRotation = Quaternion.Euler(0f, 0f, L.SpeakerTilt);
+        tag.pivot = new Vector2(0f, 0.5f);
+        tag.anchoredPosition = new Vector2(L.SpeakerInsetX, T.NameTagH * (0.5f - S.TagOverlap));
+        tag.localRotation = Quaternion.Euler(0f, 0f, S.TagTilt);
         var fit = tag.gameObject.AddComponent<ContentSizeFitter>();
         fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        var face = UiKit.Pill(tag, T.Go, T.TagH, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
+        var face = UiKit.Blob(tag, T.BlobPill, S.TagColor(""), T.NameTagH * 0.5f, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
         UiKit.Icon(tag, L.SpeakerIcon, T.IconS, T.Panel);
-        UiKit.Text(tag, L.Speaker, TextStyle.Tag, T.Panel);
-        var le = Ui.Size(tag, h: T.TagH); le.minHeight = T.TagH;
+        var name = UiKit.Text(tag, S.Name, TextStyle.Hint, T.Panel);
+        name.font = T.FontStrong;
+        var le = Ui.Size(tag, h: T.NameTagH); le.minHeight = T.NameTagH;
     }
 
     /// <summary>話す文（リッチテキスト可。TitleLook.Rich を通した物）。同じ文なら何もしない</summary>

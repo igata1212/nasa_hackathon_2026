@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#75 吹き出しにした・ブリーフィング・声の口）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 載せ先と flow を渡せる）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#75 吹き出しにした・ブリーフィング・声の口）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 載せ先と flow を渡せる）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 数字を accent に・Skip をヒントのピルに）
 // ヒューストン（地上の管制室の先生）の台詞の吹き出し。いつ・何を・どこに出すかを決める（見た目は Houston/HoustonBubble.cs、
 // 文言・置き場所・時間は Houston/HoustonStyle.cs、台詞の下ごしらえは Houston/HoustonScript.cs、声は Houston/HoustonVoice.cs）。
 //   ・台詞は1本ずつ。新しい台詞が来たら古いものを捨てる。表示中のほうが優先度が高い（milestone ＞ critical ＞ high）ときだけ残す（#127）
@@ -6,7 +6,7 @@
 //   ・名前タグの横に「Mission Control on Earth」（地球の管制室だと一目で分かるように）。最初の1回だけ「…: they guide you by radio」
 //   ・通信途絶中は NO SIGNAL（月の裏側なら「月が電波をさえぎっている」）、通信 OFF なら COMMS OFF（■ Comms & Power の席に ON を頼む）
 //   ・声なしの警告（event kind=warning）は吹き出しの上の赤い帯に文字だけ
-//   ・ブリーフィング（PlayBriefing）：台詞の列を1つずつ出し、押すと次へ。SKIP あり。その間に来たサーバーの台詞（M01 など）は待たせ、終わってから出す
+//   ・ブリーフィング（PlayBriefing）：台詞の列を1つずつ出し、押すと次へ。画面の右下に Skip（ヒントのピル）。その間に来たサーバーの台詞（M01 など）は待たせ、終わってから出す
 //   ・置き場所は段階で変える（船内は下の真ん中、設計は左下、エンディングは右の列（SCORE に重ねない）、レポートは右下）
 // GameFlow から見える形は前と同じ：コンストラクタ・Root・Dock・Warn・Push・Clear・SetLink・Tick。足したもの：Push(id,…)・PlayBriefing・SkipBriefing・Next・読み取り
 // #146：声なしの警告（Warn）は GameFlow から呼ばない（危機の帯 CrisisBanner に寄せた。帯は1本）。Warn は残してある
@@ -203,7 +203,7 @@ public class HoustonBox
     }
 
     // ================================================================== ブリーフィング（#152 の前提知識）
-    /// <summary>台詞の列を1つずつ出す。押すと次、SKIP で終わり。終わったら（飛ばしても）onDone。台詞が無ければ何も出さずにすぐ onDone</summary>
+    /// <summary>台詞の列を1つずつ出す。押すと次、Skip で終わり。終わったら（飛ばしても）onDone。台詞が無ければ何も出さずにすぐ onDone</summary>
     public void PlayBriefing(IList<HoustonLine> lines, Action onDone)
     {
         if (briefing != null) FinishBriefing();
@@ -279,7 +279,7 @@ public class HoustonBox
             string foot = brief ? S.TapNext + "   " + (bIndex + 1) + " / " + briefing.Count
                                 : pages.Count > 1 ? (page + 1) + " / " + pages.Count : "";
             view.ShowLine(S.SpeakerName(cur.speaker), S.IsHouston(cur.speaker), S.TagColor(cur.priority), introUntil > 0f || brief,
-                          HoustonScript.Mark(p, S.Highlight), p, S.SeatsIn(cur.text), more, foot);
+                          HoustonScript.Mark(p, S.Highlight, S.NumberColor), p, S.SeatsIn(cur.text), more, foot);
         }
         else if (lost) view.ShowLink(noSignal, noSignal ? (FarSide ? S.NoSignalFarSide : S.NoSignalOther) : S.CommsOffHint);
         else view.ShowNothing();
