@@ -1,6 +1,7 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 SCORE を整数に・出来事の文を短く）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 SCORE を整数に・出来事の文を短く）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 大文字をやめる・台とカードの色）
 // エンディング（#85）と事後レポート（#86）の文言・アイコン・並びの表。直すときはこのファイルだけ見ればよい（Fable の採点・Taiga の文言）。
-// 調子：帰還の演出（ReturnStage の SPLASHDOWN!・LostStage の Mission lost）と合わせる。ED-C は責めず静かに、「もう一度考えよう」で終える（赤は使わない）。
+// 調子：帰還の演出（ReturnStage の SPLASHDOWN!・LostStage の Mission lost）と合わせる。ED-C は責めず静かに、「もう一度考えよう」で終える（赤は使わない。帯は plum）。
+// #190：大文字だけの言葉は使わない（ui-guidelines 原則 12。文の頭と固有名詞だけ大文字。例外は頭字語とルートの A/B）。
 // 画面の文字は英語。フォントに無い字（— や ・）は使わない（Baloo 2・Nunito の Static に焼いたのは ASCII と °₂→✓×▲●■◆▶ だけ）。
 // {0} などは string.Format で埋める。アイコンの名前は Art/UI/Icons のファイル名。
 using System;
@@ -14,15 +15,15 @@ public static class EndingCopy
     // ================================================================== 結末ごとの見出し
     public class Style
     {
-        public string Kicker, Title, Short, Icon;
-        public Color Face, OnFace;   // 見出しの左の丸（と、レポートの結末のチップ）の面と、その上の色
+        public string Title, Short, Icon;
+        public Color Face;   // エンディングの見出しの帯と、レポートの結末の札の面（文字と絵は panel）
     }
 
     public static readonly Dictionary<string, Style> Endings = new Dictionary<string, Style>
     {
-        ["ED-A"] = new Style { Kicker = "SPLASHDOWN!", Title = "WELCOME HOME", Short = "WELCOME HOME", Icon = "check", Face = T.Go, OnFace = T.Panel },
-        ["ED-B"] = new Style { Kicker = "SPLASHDOWN!", Title = "HOME, JUST BARELY", Short = "JUST BARELY", Icon = "caution", Face = T.Accent, OnFace = T.Ink },
-        ["ED-C"] = new Style { Kicker = "MISSION LOST", Title = "LET'S TRY AGAIN", Short = "MISSION LOST", Icon = "earth", Face = T.Ink, OnFace = T.Panel },
+        ["ED-A"] = new Style { Title = "Welcome home!", Short = "Welcome home", Icon = "check", Face = T.Go },
+        ["ED-B"] = new Style { Title = "Home, just barely", Short = "Just barely", Icon = "caution", Face = T.Accent },
+        ["ED-C"] = new Style { Title = "Let's try again", Short = "Mission lost", Icon = "earth", Face = T.Plum },   // 静かに：赤にしない
     };
 
     public static Style For(string ending) => ending != null && Endings.TryGetValue(ending, out var s) ? s : Endings["ED-C"];
@@ -44,7 +45,9 @@ public static class EndingCopy
     public const string O2Text = "O2";
 
     public static string ResourceName(string res) =>
-        res == Oxygen ? "OXYGEN" : res == Power ? "POWER" : res == Temp ? "TEMPERATURE" : "FUEL";
+        res == Oxygen ? "Oxygen" : res == Power ? "Power" : res == Temp ? "Temperature" : "Fuel";
+    /// <summary>カードの色（【11】の色違いのカード。隣どうしを同じ色にしない。状態の色 go・accent は状態の台に使うので避ける）</summary>
+    public static Color ResourceFace(string res) => res == Oxygen ? T.Ink : res == Power ? T.Plum : T.Text;
     public static string ResourceIcon(string res) =>
         res == Power ? "power" : res == Temp ? "temperature" : res == Fuel ? "fuel" : null;   // 酸素は O2 の文字の丸
     public static string ResourceUnit(string res) => res == Temp ? "°C" : "%";
@@ -52,11 +55,11 @@ public static class EndingCopy
         res == Oxygen ? "end_oxygen_min" : res == Power ? "end_power_min" : res == Temp ? "end_temp_min" : "";
 
     // 状態の1行。{0} = 要る量（生還ライン、単位つき）
-    public const string StatusOk = "OK  (need {0})";
-    public const string StatusLow = "TOO LOW  (need {0})";
+    public const string StatusOk = "OK (need {0})";
+    public const string StatusLow = "Too low (need {0})";
     public const string StatusOkNoLine = "OK";
-    public const string StatusRanOut = "RAN OUT";
-    public const string StatusLeft = "STILL LEFT";
+    public const string StatusRanOut = "Ran out";
+    public const string StatusLeft = "Still left";
 
     // ================================================================== 判定が厳しくなった理由（strict_reason）。{0} = 厳しくする幅
     public static string StrictText(string reason, bool survived)
@@ -71,41 +74,39 @@ public static class EndingCopy
     }
 
     // ================================================================== ボタン・名前タグ
-    public const string HoustonTag = "HOUSTON";
-    public const string ScoreLabel = "SCORE";
-    public const string SeeReport = "SEE THE REPORT";
+    public const string HoustonTag = "Houston";
+    public const string ScoreIcon = "score", ScoreUnit = "pts";   // 得点の数のチップ（トロフィーの台、右下に pts の札。【09】）
+    public const string SeeReport = "See the report!";
     public const string SeeReportIcon = "enter";
-    public const string FlyAgain = "REDESIGN AND FLY AGAIN";
+    public const string FlyAgain = "Fly again!";   // again：設計は前回のまま、全員が設計へ（ui-guidelines 3章）
     public const string FlyAgainIcon = "rocket";
 
     // ================================================================== 事後レポート：見出し
-    public const string ReportTitle = "MISSION REPORT";
-    public const string GoalsTitle = "GOALS", GoalsIcon = "check";
-    public const string ScoreTitle = "SCORE", ScoreIcon = "score";
-    public const string MomentsTitle = "TIMELINE", MomentsIcon = "clock";
+    public const string ReportTitle = "Mission report", ReportIcon = "rocket";
+    public const string GoalsTitle = "Goals", GoalsIcon = "check";
+    public const string ScoreTitle = "Score";
+    public const string MomentsTitle = "Timeline", MomentsIcon = "clock";
+    // パネルの見出しの台の色（隣どうしを同じ色にしない。go・accent は行の ✓/✗ に使うので避ける）
+    public static readonly Color GoalsFace = T.Text, ScoreFace = T.Plum, MomentsFace = T.Ink;
 
     // ================================================================== 事後レポート：要件4つ（SPEC 8章。キーは result.requirements）
+    // #190：材料の行（【11】「名前 ---- 0 / 2」）にしたので、名前は短く、数は「いま / 要る量・上限」で右に出す
     public class Req
     {
-        public string Key, Label, Hint;      // Hint：✗ のとき横に出す「次はこれ」のアイコン
-        public Func<EndingInfo, string> Detail;   // 名前の下の細かい数字（null なら出さない）
-        public bool DetailWhenPass;               // ✓ のときも数字を出すか（パネルの高さが足りないので、出すのは科学だけ）
+        public string Key, Label, Hint;      // Hint：✗ のとき右に出す「次はこれ」のアイコン
+        public Func<EndingInfo, string> Value;   // 右の数（null なら出さない）
     }
 
     public static readonly Req[] Reqs =
     {
-        new Req { Key = "req1_crew_alive", Label = "Bring the crew home", Hint = "power", Detail = null },
-        new Req { Key = "req2_science", Label = "Bring back science", Hint = "camera", DetailWhenPass = true,
-                  Detail = i => Of("{0} science", i.Science, "need", EndingParams.Get("req_science_min")) },
-        new Req { Key = "req3_mass", Label = "Light enough to launch", Hint = "mass",
-                  Detail = i => Of("Mass {0}", i.Mass, "max", i.MassLimit) },
-        new Req { Key = "req4_budget", Label = "Within the budget", Hint = "cost",
-                  Detail = i => Of("Cost {0}", i.Cost, "max", i.Budget) },
+        new Req { Key = "req1_crew_alive", Label = "Crew home", Hint = "power", Value = null },
+        new Req { Key = "req2_science", Label = "Science", Hint = "camera", Value = i => Of(i.Science, EndingParams.Get("req_science_min")) },
+        new Req { Key = "req3_mass", Label = "Mass", Hint = "mass", Value = i => Of(i.Mass, i.MassLimit) },
+        new Req { Key = "req4_budget", Label = "Budget", Hint = "cost", Value = i => Of(i.Cost, i.Budget) },
     };
 
-    /// <summary>「Mass 111  (max 140)」。上限が分からなければ前半だけ</summary>
-    static string Of(string fmt, float v, string word, float limit) =>
-        string.Format(fmt, Num(v)) + (float.IsNaN(limit) ? "" : "  (" + word + " " + Num(limit) + ")");
+    /// <summary>「111 / 140」。上限が分からなければ前だけ</summary>
+    static string Of(float v, float limit) => Num(v) + (float.IsNaN(limit) ? "" : " / " + Num(limit));
 
     /// <summary>Req 1 が ✗ のときのアイコンは、何が尽きたかで変える</summary>
     public static string CrewHint(string cause) => cause == Oxygen ? "valve" : cause == "" ? "ignition" : "power";
@@ -125,7 +126,7 @@ public static class EndingCopy
     // 1つの決まりは最初の1回だけ出す。Priority の小さい順に MaxMoments 個まで選び、時刻順に並べる。
     public class Moment
     {
-        public string Cmd, Label, Icon;
+        public string Cmd, Label, Icon;   // 台の色はどれも MomentFace
         public string Show;   // Label の {0} に入れる args のキー（大文字にする）。null なら入れない
         public int Priority;
         public Func<Dictionary<string, object>, bool> Match;   // args（と ok）を見る。null なら cmd だけで決める
@@ -162,6 +163,9 @@ public static class EndingCopy
     public const string MomentMissedBurn = "Missed the burn window", MomentMissedBurnIcon = "clock";
     public const string MomentFarSide = "Far side: no signal", MomentFarSideIcon = "comms_lost";
     public const string MomentSignal = "Signal back", MomentSignalIcon = "comms";
+    // 出来事の台の色：操作＝plum、事故・逃した窓＝accent（注意）、時刻の目印＝ink、着水＝go、尽きた＝text（ED-C は静かに。赤にしない）
+    public static readonly Color MomentFace = T.Plum, MomentAlertFace = T.Accent, MomentTimelineFace = T.Ink, MomentSplashFace = T.Go, MomentLostFace = T.Text;
+    public static readonly Color ScoreRowFace = T.Go;   // 内訳の台（0 以下の行は line）
     public const int PriorityFixed = 0, PriorityMissed = 1, PriorityTimeline = 5;   // 時刻の目印は、行が余ったときだけ
 
     // ================================================================== 事後レポート：ヒューストンのまとめ（2行：よかったこと／次に変えること）
@@ -201,7 +205,7 @@ public static class EndingCopy
     }
 
     // ================================================================== 事後レポート：本物のアポロ13号（#89 で増やす。今は #107 で決まった1つだけ）
-    public const string ApolloTag = "REAL APOLLO 13";
+    public const string ApolloTag = "Real Apollo 13";
     public static readonly string[] ApolloFacts =
     {
         // #107（Taiga、2026-11-14）。出典 docs/reference/apollo13-data.md 9章（RB p.149-152、MR p.64）
