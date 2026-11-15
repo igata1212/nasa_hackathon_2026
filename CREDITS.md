@@ -26,7 +26,7 @@ NASA の素材は [NASA Images and Media Usage Guidelines](https://www.nasa.gov/
 
 | 名前 | 作者 | URL | ライセンス | 何に使ったか |
 |---|---|---|---|---|
-| Spacedman | Shane Ivers（Silverman Sound） | https://www.silvermansound.com/free-music/spacedman （ファイル：https://www.silvermansound.com/wp-content/uploads/spacedman.mp3 ） | CC BY 4.0（**表記が必要**。表記文：`Music: Spacedman by Shane Ivers - https://www.silvermansound.com`） | BGM（設計・練習・飛行）。`Music/space_calm_01.mp3`。そのまま |
+| Universe Study | The_Mountain（Pixabay） | https://pixabay.com/music/ （Pixabay ID 141461。曲ページの URL 要確認） | Pixabay Content License（表記は不要。書いておく） | BGM（設計・練習・飛行）。`Music/space_universe_study.mp3`。そのまま |
 | Music Jingles（`STEEL02`・`STEEL04`・`STEEL07`・`STEEL10`・`PIZZI08`・`PIZZI13`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/music-jingles | CC0 1.0 | ジングル（生還・ぎりぎりの生還・失敗・打ち上げ・部屋に人が入った・危機）。`Music/jingle_*.wav`。音量をそろえて WAV にした |
 | Interface Sounds（`click_001`・`switch_004`・`switch_007`・`confirmation_003`・`error_005`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/interface-sounds （取得元：https://github.com/Calinou/kenney-interface-sounds ） | CC0 1.0 | ボタン・スイッチ・成功・エラーの音（`Sfx/ui_*.wav`）。スイッチはモノラルにした |
 | Sci-Fi Sounds（`space_engine_low_000`） | Kenney（www.kenney.nl） | https://kenney.nl/assets/sci-fi-sounds （取得元：https://github.com/Boyquotes/kenney-sci-fi-sounds-for-godot ） | CC0 1.0 | 噴射の音（`Sfx/thruster_burn_loop.wav`）。ループにして音量を下げた |
@@ -50,6 +50,5 @@ NASA の素材は [NASA Images and Media Usage Guidelines](https://www.nasa.gov/
 ## まだ決まっていないこと
 
 - midori のスクリプトのライセンス（チーム内の成果物として使ってよいか、表記のしかた）
-- ゲーム内のクレジット画面（または提出ページ）に **Spacedman の表記文**（CC BY 4.0 で必須）を出す場所。今はゲームのどこにも出ていない
 - ゲーム内のクレジット画面に出す文面。案：「Earth and Moon imagery: NASA Earth Observatory / NASA's Scientific Visualization Studio」「Spacecraft reference models: NASA 3D Resources」
 - 取ってきた元ファイルの置き場所と sha256 は `modeling/source/README.md`
