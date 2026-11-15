@@ -155,7 +155,7 @@ public static class HoustonStyle
 
     /// <summary>名前タグの面の色（critical のときだけ danger）。#190：ふだんはオレンジ（【12】のタグ。iizuka の指示）。
     /// ※ ui-guidelines 3章「名前タグ」は Houston＝go。食い違いは報告済み。戻すならここだけ</summary>
-    public static Color TagColor(string priority) => priority == "critical" ? T.Danger : T.Accent;
+    public static Color TagColor(string priority) => priority == "critical" ? T.Danger : T.Go;   // ui-guidelines 3章：Houston＝go（白い文字とのコントラストも accent より高い）
 
     /// <summary>台詞に出てくる席（だれの仕事か）。Seats.Title を大文字小文字を無視して探す</summary>
     public static List<string> SeatsIn(string text)
