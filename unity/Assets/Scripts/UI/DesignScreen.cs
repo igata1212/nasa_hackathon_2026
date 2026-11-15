@@ -134,7 +134,7 @@ public class DesignScreen
         col.offsetMax = new Vector2(-T.ScreenEdge, -(T.ScreenEdge * 0.5f));
         col.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(0, 0, Mathf.RoundToInt(D.TrayTop), 0);
 
-        var counters = UiKit.Row(col, T.S2, TextAnchor.MiddleCenter);
+        var counters = UiKit.Row(col, T.S4, TextAnchor.MiddleRight);
         var cle = Ui.Size(counters, h: D.CounterH); cle.minHeight = D.CounterH;
         wallet = DesignCounter.Make(counters, "cost", T.Accent, null);
         weight = DesignCounter.Make(counters, "mass", D.Plum, () => SelectTab(DesignCopy.FlightTab, true));   // 重すぎの直し方＝大きいロケット
@@ -229,7 +229,7 @@ public class DesignScreen
     {
         var card = DesignUi.Panel(safe, T.Panel, true, 0f, T.S2 * 0.5f, "LaunchCheck");
         card.anchorMin = card.anchorMax = card.pivot = Vector2.one;
-        card.anchoredPosition = new Vector2(-(T.ScreenEdge + D.RightW + D.ColGap), -T.ScreenEdge);
+        card.anchoredPosition = new Vector2(-(T.ScreenEdge + D.RightW + D.ColGap + T.CursorSize * 0.5f), -T.ScreenEdge);
         card.sizeDelta = new Vector2(D.CheckW, 0f);
         card.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         var head = UiKit.Row(card, T.S1, TextAnchor.MiddleLeft);

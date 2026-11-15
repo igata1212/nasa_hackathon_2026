@@ -45,7 +45,7 @@ public static class TitleLook
 
     // ================================================================== タイトルの入力と選択肢（#190。【05】のパネル＋【10】の選択肢の吹き出し）
     // 左：パネル（名前 → 合言葉を縦に）、右：選択肢の吹き出し（Create a room → Join with a code）。上下の順で対になる
-    public const float FormW = 920;            // パネル＋間＋選択肢の幅（吹き出しも同じ幅）
+    public const float FormW = 760;            // パネル＋間＋選択肢の幅（吹き出しも同じ幅）
     public const float FormGap = 48;           // パネルと選択肢の間（手が左の外に出る分）
     public const float LockOffsetX = 8;        // 押せない Join の右上の鍵の台（UiTokens.CheckD）を、行の右の端からどれだけ外へ
 
@@ -60,11 +60,11 @@ public static class TitleLook
     public const float TagAboveHead = 0.03f;        // しっぽの先を頭の上どれだけに置くか（m。しっぽの分だけ前の UiTokens.TagAboveHead 0.12 より下げる）
 
     // ================================================================== 吹き出しの形
-    public const float BubbleTitleW = FormW;   // タイトル：入力パネル＋選択肢と同じ幅
+    public const float BubbleTitleW = 920;   // タイトル：入力パネル＋選択肢と同じ幅
     // #190：台詞は 36・行間 1.5（UiHintBubble。入らないと自動で縮む）。名前タグが上の縁に 4 割かぶるので、上の内側はその下から
     public const float BubbleTitleH = 176;     // 2行（36 × 1.5 × 2 ＝ 108）＋上下の内側。844×390 でもタイトルが縦に入る高さ
     public const float BubbleTitleTailX = 120; // 弾むときの中心（左から）。名前の欄の上
-    public const float BubbleLobbyW = 800;     // 部屋：合言葉のチップの右。文は1行（一番長い Share the code, … が 36 で約 640）
+    public const float BubbleLobbyW = 760;     // 部屋：合言葉のチップの右。文は1行（一番長い Share the code, … が 36 で約 640）
     public const float BubbleLobbyH = 104;     // 1行（36 × 1.5）＋上下の内側。2行にするとクルーの名前の吹き出しにかぶるので1行にした
     public const float BubblePadX = 32, BubblePadY = 12;
     public const float BubbleTail = 32;        // しっぽ（45° 回した角丸の四角）の一辺
@@ -133,11 +133,11 @@ public static class TitleLook
     public static readonly Vector2 PatternSpeed = new Vector2(10f, 6f);   // px/秒
 
     // またたく星
-    public const int StarCount = 16, StarSeed = 7;
+    public const int StarCount = 10, StarSeed = 7;
     public const float StarMin = 16, StarMax = 34;
     public const float StarHzMin = 0.25f, StarHzMax = 0.6f, StarDim = 0.45f;   // 一番小さいときの大きさ（倍）
-    public static readonly Rect StarArea = new Rect(0.03f, 0.3f, 0.94f, 0.66f);  // 画面の割合（左下が 0,0）
-    public static readonly Color StarColorA = T.Accent;
+    public static readonly Rect StarArea = new Rect(0.03f, 0.55f, 0.94f, 0.41f);  // 画面の割合（左下が 0,0）
+    public static readonly Color StarColorA = T.BgDeep;
     public static readonly Color StarColorB = T.WithAlpha(T.Text, 0.35f);
     public const float SparkleExp = 2.2f;      // 星の形（2 でひし形、大きいほど細い）
 
