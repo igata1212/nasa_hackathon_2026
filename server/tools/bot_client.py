@@ -73,6 +73,7 @@ class Bot:
         self.pid = None
         self.phase = None
         self.log = []
+        self.reconnects = 0
 
     def make_plan(self):
         self.plan = sorted(((t, m) for t, name, args in self.events for m in to_msgs(name, args)),
@@ -82,21 +83,31 @@ class Bot:
         await ws.send(json.dumps(msg))
 
     async def run(self):
-        async with websockets.connect(self.url) as ws:
-            hello = {"name": "bot%d" % self.idx, "bot": True}
-            if self.want_seats:
-                hello["seats"] = self.want_seats
-            if self.room is None and self.idx == 0:
-                await self.send(ws, dict(hello, type="create"))
-            else:
-                if self.room is None:
-                    await self.shared["created"].wait()
-                await self.send(ws, dict(hello, type="join", room=self.room or self.shared["room"]))
-            async for raw in ws:
-                msg = json.loads(raw)
-                self.log.append(msg)
-                if await self.on(ws, msg):
-                    return
+        while True:
+            async with websockets.connect(self.url) as ws:
+                hello = {"name": "bot%d" % self.idx, "bot": True}
+                if self.want_seats:
+                    hello["seats"] = self.want_seats
+                if self.pid is not None:
+                    self.reconnects += 1
+                    await self.send(ws, {"type": "join", "room": self.room or self.shared["room"],
+                                         "player_id": self.pid})
+                elif self.room is None and self.idx == 0:
+                    await self.send(ws, dict(hello, type="create"))
+                else:
+                    if self.room is None:
+                        await self.shared["created"].wait()
+                    await self.send(ws, dict(hello, type="join", room=self.room or self.shared["room"]))
+                try:
+                    async for raw in ws:
+                        msg = json.loads(raw)
+                        self.log.append(msg)
+                        if await self.on(ws, msg):
+                            return
+                except websockets.ConnectionClosed:
+                    pass
+            if self.pid is None:
+                return
 
     async def on(self, ws, msg):
         typ = msg.get("type")
@@ -165,7 +176,8 @@ async def run_bots(url, n=4, case_name="T1", timeout=120):
     """テスト用：n 人ぶんつないで1回遊ぶ"""
     design, events = case(case_name)
     shared = {"created": asyncio.Event()}
-    bots = [Bot(i, url, design, events, n, shared) for i in range(n)]
+    urls = url.split(",")
+    bots = [Bot(i, urls[i % len(urls)], design, events, n, shared) for i in range(n)]
     await asyncio.wait_for(asyncio.gather(*(b.run() for b in bots)), timeout)
     return shared, bots
 
@@ -189,6 +201,7 @@ def main():
     ap.add_argument("--room", help="--seats のとき：入る部屋の合言葉。省略すると部屋を作って合言葉を出す")
     ap.add_argument("--drive", action="store_true",
                     help="--seats のとき：start・設計・打ち上げ・next もボットが送る")
+    ap.add_argument("--timeout", type=float, default=120, help="--bots のとき：全体の制限時間（秒）")
     ap.add_argument("--players", type=int, default=2, help="--drive のとき：この人数そろったら start")
     a = ap.parse_args()
     if a.seats:
@@ -198,7 +211,8 @@ def main():
         except KeyboardInterrupt:
             pass
         return
-    shared, _ = asyncio.run(run_bots(a.url, a.bots, a.case))
+    shared, bots = asyncio.run(run_bots(a.url, a.bots, a.case, a.timeout))
+    print("reconnects: %s" % [b.reconnects for b in bots])
     print(json.dumps(shared["result"], ensure_ascii=False))
     ref = rs.run(*case(a.case))
     print("reference_sim と一致" if shared["result"] == ref else "reference_sim と不一致: %s" % ref)
