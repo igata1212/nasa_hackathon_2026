@@ -66,6 +66,7 @@ public class CabinHud
         Add(new CrisisBanner(), HudSlot.CenterTop);
         burn = Add(new BurnCheck(), HudSlot.CenterMid);
         Add(new ReqTracker(), HudSlot.Right);
+        Add(new GmatGauges(), HudSlot.Overlay);   // #167（Taiga）：NASA GMAT の軌道の値のメーター3つ。左のポップアップ（MapWidget の後に足す：その値を読む）
 
         offlineNote = Ui.Label(root, "", 18, new Color(1, 1, 1, 0.55f), TextAnchor.UpperRight);
         Ui.Anchor(offlineNote.rectTransform, 0.79f, 0.47f, 0.99f, 0.535f);   // 地図の下・オフライン再生の操作（GameFlow の debugBar）の下

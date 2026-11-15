@@ -251,12 +251,17 @@ public class MapWidget : HudPart
         if (bigGroup != null && Detail != null) bigGroup.alpha = Detail.alpha;   // 照明 OFF の暗さ（#87）を大きい地図にも
     }
 
+    /// <summary>今の船の軌道（A／B。噴射の前は A）と、その上の GMAT の経過時間（時間）。地図と同じ値（#167：GmatGauges が読む）。軌道が無ければ null</summary>
+    public GmatRoute ShipRoute { get; private set; }
+    public float ShipH { get; private set; }
+
     void ApplyViews(GameState s)
     {
         if (!hasRoutes) return;
         string route = s != null ? (s.route ?? "") : "";
         var r = route == "b" ? routeB : routeA;   // 噴射の前は A・B が同じ道
         float h = ShipHours(r, s);
+        ShipRoute = r; ShipH = h;   // #167：GMAT のメーター（GmatGauges）が同じ位置を読む
         bool far = s != null && s.inFarside;
         small.Apply(route, far, r, h);
         if (bigOpen) bigView.Apply(route, far, r, h);
