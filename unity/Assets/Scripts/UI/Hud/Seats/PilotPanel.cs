@@ -80,6 +80,7 @@ public class PilotPanel : SeatPanel
         SeatLook.Tight(heading);
         headNote = UiKit.Text(head, "", TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
         SeatLook.ReserveWidth(headNote, K.Words.PracticeTry, K.Words.PracticeDone, K.F(Words.FuelNote, 99));
+        headNote.gameObject.SetActive(false);   // #210 見出しの2行目は出さない（1行にする）
 
         var grid = UiKit.Row(strip.Rect, T.S4 + T.S1, TextAnchor.MiddleCenter);
         grid.name = "Attitude";
@@ -138,9 +139,8 @@ public class PilotPanel : SeatPanel
         string hint = null;
         string now = s != null ? NowTarget(s, out hint) : null;
 
-        // 燃料と見出し（練習の間は state が無いので、2行目は練習の案内）
+        // 燃料（#210 見出しの2行目は出さない。headNote は BuildControls で隠してある）
         fuel.Set(s != null ? K.Whole(s.fuel) : K.Words.NoValue);
-        headNote.text = s == null ? K.PracticeNote(Ctx, Seat) : K.F(Words.FuelNote, K.P("fuel_attitude_change"));
 
         // 向き：今の向きにチェック。札と手は「いま要る向き」があればそこ、無ければ今の向き
         string cur = s != null ? s.attitude : practiceAtt;
@@ -361,7 +361,7 @@ public class PcHelp
     /// <summary>描く。「いま押す物」なら true</summary>
     public bool Refresh(bool now)
     {
-        Card.Set(PcLook.Ready, PilotCommsKit.Words.Help, feedback ?? PilotCommsKit.Words.HelpNote);
+        Card.Set(PcLook.Ready, PilotCommsKit.Words.Help, feedback);   // #210 押す前は1行（結果の文は押した後だけ）
         bool on = now || partnerFirst;
         Card.SetNow(on);
         return on;
@@ -451,8 +451,7 @@ public static class PilotCommsKit
         var r = UiKit.Row(strip.Rect, SeatLook.Gap, TextAnchor.MiddleLeft);
         UiKit.Disc(r, "clock", T.Text, T.RowDiscD);
         var col = UiKit.Col(r, 0f, TextAnchor.MiddleLeft);
-        SeatLook.Tight(UiKit.Text(col, Words.StirTitle, TextStyle.RowName, T.Text, TextAlignmentOptions.MidlineLeft));
-        UiKit.Text(col, Words.StirNote, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
+        SeatLook.Tight(UiKit.Text(col, Words.StirTitle, TextStyle.RowName, T.Text, TextAlignmentOptions.MidlineLeft));   // #210 2行目（StirNote）は出さない
         strip.Rect.gameObject.AddComponent<SeatStripFit>().strip = strip;   // stir の間は Tick で触る部品が無いので、自分で合わせる
     }
 
@@ -483,20 +482,17 @@ public static class PilotCommsKit
     {
         bool solo = ctx.SoloPair("ignite") != null;
         string press = solo ? Words.PressSolo : seat == Seats.Pilot ? Words.PressWithComms : Words.PressWithPilot;
-        if (s == null) { card.Set(PcLook.Ready, Words.Ignite, Words.PracticeIgnite); return; }
+        if (s == null) { card.Set(PcLook.Ready, Words.Ignite, null); return; }   // #210 練習の Ignite は2行目なし
         if (s.strictReason == "missed_burn") { card.Set(PcLook.Missed, Words.BurnMissed, Words.WindowClosed); return; }   // 窓を逃すと server がルート B で帰す（burn_done も true になる）
         if (s.burnDone)
         {
-            string next = seat == Seats.Pilot
-                ? (s.attitude == "heatshield" ? Words.ReadyReentry : Words.NextShield)
-                : (s.Switch("nav") ? Words.ReadyReentry : Words.NextNav);
-            card.Set(PcLook.Done, Words.BurnDone, next);
+            card.Set(PcLook.Done, Words.BurnDone, null);   // #210 2行目（次の向き・Ready for re-entry）は出さない
             return;
         }
         if (s.tBurnClose > 0f && s.t >= s.tBurnClose) { card.Set(PcLook.Missed, Words.BurnMissed, Words.WindowClosed); return; }
         if (s.t < s.tBurnOpen) { card.Set(PcLook.Waiting, Words.Ignite, F(Words.OpensIn, Ui.Mmss(s.tBurnOpen - s.t))); return; }
         var miss = IgniteMissing(s);
-        if (miss.Count > 0) card.Set(PcLook.Waiting, Words.Ignite, F(Words.Needs, string.Join(Words.Sep, miss)));
+        if (miss.Count > 0) card.Set(PcLook.Waiting, Words.Ignite, null);   // #210 足りない物の2行目は出さない
         else card.Set(PcLook.Ready, Words.Ignite, press);
     }
 
