@@ -399,7 +399,7 @@ public class DesignCounter
         var w = new DesignCounter(platFace);
         w.Root = Ui.Rect("Counter_" + icon, p);
         var hit = w.Root.gameObject.AddComponent<Image>(); hit.color = T.Clear;
-        var le = Ui.Size(w.Root, w: 0f, h: D.CounterH, flexW: 1f); le.minHeight = D.CounterH; le.minWidth = 0f;
+        var le = Ui.Size(w.Root, w: 200f, h: D.CounterH, flexW: 0f); le.minHeight = D.CounterH; le.minWidth = 200f;
 
         w.c = UiKit.Counter(w.Root, icon, DesignCopy.Left);
         UiKit.Fill(w.c.Root);

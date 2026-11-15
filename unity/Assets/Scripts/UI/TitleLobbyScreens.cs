@@ -78,6 +78,7 @@ public class TitleScreen
 
         // 押すとすぐ決まる（今までの2つのボタンと同じ動き）。手は次に押す方（合言葉が4桁そろうまで Create、そろうと Join）
         choice = UiKit.Choice(form, new[] { L.ChoiceCreate, L.ChoiceJoin }, i => Go(i == Create), Create);
+        Ui.Size(choice.Root, flexW: 0f);   // 中身の幅で止める（Row の中で伸びてクルーにかぶるのを防ぐ）
         for (int i = 0; i < choice.Rows.Length; i++)
         {
             // 押すと縮んで弾む。押せない Join を押したら首を振って、ヒューストンが理由を話す
@@ -212,7 +213,7 @@ public class LobbyScreen
         // 上：合言葉と人数の数のチップ（【09】。宇宙の上なので面は accent、上にアイコンの台）。下：Start mission!。クルーを隠さないように上下に寄せる
         var main = UiKit.Col(UiKit.SafeArea(view.transform), T.S3, TextAnchor.UpperCenter, T.ScreenEdge, T.ScreenEdge, true);
         UiKit.Fill(main);
-        var head = UiKit.Row(main, T.S3, TextAnchor.MiddleLeft);
+        var head = UiKit.Row(main, T.S4 + T.S2, TextAnchor.MiddleLeft);
         roomCode = UiKit.Counter(head, "room_code", L.RoomUnit, T.Accent);
         roomCode.Disc.Set("room_code", T.Go);                  // 台は面と違う色に（同じ accent だと面に溶ける）
         UiPopIn.Add(roomCode.Root, L.LobbyChipDelay);
