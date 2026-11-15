@@ -1,9 +1,13 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#73 UI ガイドラインの見た目にし、足りない理由が分かるようにした）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 parameters.json は GameParams から）
-// Design（M01・M02）：部品の ± と合計、ロケット・軌道、打ち上げ判定。#93 の決定：手描きの「素材の画面」はこの画面、「使う／使わない」は部品の ±。
-// 割り付け（1600×900）：左＝見出し・4つの要件・部品のカード 2列×4段（左下はヒューストンの吹き出しのために空ける）／右＝重さと費用のゲージ・ロケット・
-//   はじめの電力・酸素・燃料・軌道・判定・READY FOR LAUNCH。入りきらない画面（iPhone の横）では、部品と右の列の中身が縦にずれる。
-// UI は計算・判定をしない：合計・上限・判定（status）はサーバーの design メッセージの totals、打ち上げの結果は launch イベント（GameFlow が Model に入れる）。
-// 部品の質量・費用・個数の範囲は Data/Sim/parts.json、説明の数字は parameters.json（GameParams。#146）。文言は DesignCopy、大きさは DesignTokens
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#73 UI ガイドラインの見た目にし、足りない理由が分かるようにした）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 parameters.json は GameParams から）／ 更新：iizuka（Opus 5.5、2026-11-15、#168 3D の舞台・右の棚・お財布・打ち上げチェック・説明は吹き出し。#190 あつ森の作り）
+// Design（M01・M02）：部品の ON/OFF・±、ロケット・軌道、打ち上げ判定。#93 の決定：手描きの「素材の画面」はこの画面、「使う／使わない」は部品の ON/OFF・±。
+// 割り付け（1600×900。#168、tmp/handoff/168-plan.md）：
+//   全面＝3D の舞台（DesignStage。昼の発射場で回る台に載った宇宙船。部品は船に「ぽん」と付く。FLIGHT ではカメラが引いてロケットの全身）
+//   右の列＝数のチップ（お財布・重さ）→ タブの帯 → 棚（材料の行 最大4本。Flight は選択肢の吹き出し2つ）→ Ready for launch!。その左上＝打ち上げチェック。
+//   左上＝見出しの帯。左下＝ヒューストンの吹き出し。指さしの手は1つ（最後に触った行・選んだ選択肢）。#190（ui-guidelines 1〜3章）の作り
+//   説明の文は画面に常に出さず、ヒューストンの吹き出しで言う（タブを開いたとき・部品が付いたとき。超えた瞬間はサーバーの H01・H02）
+// UI は計算・判定をしない：合計・残り・上限・判定はサーバーの design メッセージの totals（budget_left・mass_left・over_*・science_possible）、
+//   打ち上げの結果は launch イベント（GameFlow が Model に入れる）。部品が船に付く動きも、サーバーの design が届いてから（4人とも同じ動き）。
+// 部品の質量・費用・個数の範囲は Data/Sim/parts.json、説明の数字は parameters.json（GameParams。#146）。文言は DesignCopy、2D の大きさは DesignTokens、3D は DesignLook
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -74,14 +78,19 @@ public class DesignScreen
     public readonly GameObject Root;
     readonly GameFlow f;
     readonly DesignValues values;
-    readonly List<DesignPartCard> cards = new List<DesignPartCard>();
-    readonly List<DesignChoice> rockets = new List<DesignChoice>(), paths = new List<DesignChoice>();
-    readonly List<(DesignStat stat, string text)> supplies = new List<(DesignStat stat, string text)>();
-    readonly DesignGoalChip[] goals = new DesignGoalChip[DesignCopy.Goals.Length];
-    DesignGauge massGauge, costGauge;
-    TextMeshProUGUI massValue, costValue, pathLine;
-    Image verdictFace, verdictIcon;
-    TextMeshProUGUI verdictTitle, verdictHint;
+    readonly DesignStage stage;
+    readonly List<DesignRow> rows = new List<DesignRow>();
+    readonly Dictionary<string, RectTransform> pages = new Dictionary<string, RectTransform>();
+    DesignTabBand tabBand;
+    DesignChoiceBubble rocketPick, pathPick;
+    DesignCounter wallet, weight;
+    DesignCheckRow checkMass, checkCost, checkCrew, checkScience;
+    DesignHand hand;
+    string tab = "", lastTouched = "", lastChoice = "rocket";
+    // 前の design（変わった所だけ吹き出しで言う）
+    readonly Dictionary<string, int> prevParts = new Dictionary<string, int>();
+    string prevTraj, prevRocket, lastSaid;
+    bool prevOverMass, prevOverCost, hadDesign, sciencePossible = true;
     GameObject noGo;
     TextMeshProUGUI noGoReason, noGoDetail, noGoHint;
     bool noGoClosed;
@@ -91,148 +100,144 @@ public class DesignScreen
         this.f = f;
         values = new DesignValues(f.partsJson);
 
-        var bg = Ui.PanelImg(parent, T.Bg, "Design"); Root = bg.gameObject; Ui.Fill(bg.rectTransform);
-        var safe = UiKit.SafeArea(bg.transform);
-        BuildLeft(safe);
-        BuildRight(safe);
-        BuildNoGo(bg.transform);
-    }
+        // 全面：3D の舞台（DesignStage が RenderTexture に描く。できるまでは空の色）。舞台をなぞると台が回る
+        var view = Ui.Rect("Design", parent).gameObject.AddComponent<RawImage>();
+        Root = view.gameObject; Ui.Fill(view.rectTransform);
+        view.color = DesignLook.Sky; view.raycastTarget = true;
 
+        var safe = UiKit.SafeArea(view.transform);
+        BuildTitle(safe);
+        BuildTray(safe);
+        BuildCheck(safe);
+        var handLayer = Ui.Rect("HandLayer", safe); Ui.Fill(handLayer);   // 手はいちばん上（1画面に1つ）
+        hand = DesignHand.Make(handLayer);
+        BuildNoGo(view.transform);
+
+        stage = Root.AddComponent<DesignStage>();
+        stage.Init(view);
+        SelectTab(DesignCopy.Tabs[0].Key, false);
+    }
 
     void Send(Dictionary<string, object> msg) => f.Client?.Send(msg);
 
-    // ================================================================== 左：見出し・要件・部品
-    void BuildLeft(RectTransform safe)
+    // ================================================================== 左上：見出しの帯（【11】）
+    void BuildTitle(RectTransform safe)
     {
-        var left = UiKit.Col(safe, T.S1, TextAnchor.UpperLeft, 0f, 0f, true);
-        left.name = "Left";
-        left.anchorMin = new Vector2(0f, D.HoustonReserve); left.anchorMax = Vector2.one;
-        left.offsetMin = new Vector2(T.ScreenEdge, T.S2);
-        left.offsetMax = new Vector2(-(T.ScreenEdge + D.RightW + D.ColGap), -T.ScreenEdge);
-
-        var title = UiKit.Row(left, T.S3, TextAnchor.MiddleLeft);
-        Ui.Size(title, h: D.TitleRowH);
-        UiKit.Text(title, DesignCopy.Title, TextStyle.Heading, T.Ink, TextAlignmentOptions.MidlineLeft);
-        DesignUi.Text(title, DesignCopy.Subtitle, TextStyle.Body, T.InkSub, TextAlignmentOptions.MidlineLeft, wrap: true);
-
-        var goalRow = UiKit.Row(left, T.S1, TextAnchor.MiddleLeft);
-        Ui.Size(goalRow, h: D.GoalChipH);
-        UiKit.Text(goalRow, DesignCopy.GoalsLabel, TextStyle.Tag, T.InkSub);
-        for (int i = 0; i < goals.Length; i++)
-            goals[i] = DesignGoalChip.Make(goalRow, DesignCopy.Goals[i], values.Fill(DesignCopy.Goals[i].Text));
-
-        UiKit.Space(left, T.S1);
-        var note = UiKit.Row(left, T.S2, TextAnchor.MiddleLeft);
-        Ui.Size(note, h: D.PartLineH);
-        DesignUi.Text(note, DesignCopy.PartsHint, TextStyle.Label, T.Ink, ellipsis: true);
-        UiKit.Text(note, DesignCopy.BodyNote, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineRight);
-        DesignStat.Make(note, "mass", values.Fill("{mass.bus}"), TextStyle.Label, T.IconS, T.InkSub);
-        DesignStat.Make(note, "cost", values.Fill("{cost.bus}"), TextStyle.Label, T.IconS, T.InkSub);
-
-        var list = DesignUi.Scroll(left, D.PartGapY, "Parts");
-        RectTransform row = null;
-        foreach (var copy in PartOrder())
-        {
-            var p = values.Part(copy.Id);
-            if (row == null || row.childCount >= D.PartColumns)
-            {
-                row = UiKit.Row(list, D.PartGapX, TextAnchor.MiddleLeft);
-                Ui.Size(row, h: D.PartRowH);
-            }
-            string id = copy.Id;
-            var card = DesignPartCard.Make(row, copy, values.Fill(copy.Line),
-                values.Fill("{mass." + id + "}"), values.Fill("{cost." + id + "}"), copy.Science == null ? null : values.Fill(copy.Science),
-                J.Int(p, "min"), J.Int(p, "max"), d => Send(Cmd.DesignPart(id, d)));
-            cards.Add(card);
-        }
-        if (row != null) while (row.childCount < D.PartColumns) Ui.Size(UiKit.Space(row, 0f), w: 0f, flexW: 1f);   // 奇数のとき右を空ける
+        var r = DesignRibbon.Make(safe, DesignCopy.Title, D.Plum);
+        r.anchoredPosition = new Vector2(0f, -T.ScreenEdge);
     }
 
-    /// <summary>DesignCopy.Parts の順。parts.json にあって DesignCopy に無い部品は、カタログの名前と benefit で後ろに足す</summary>
-    IEnumerable<DesignPartCopy> PartOrder()
+    // ================================================================== 右の列：数のチップ → タブの帯 → 棚 → 打ち上げ
+    void BuildTray(RectTransform safe)
     {
-        var known = new HashSet<string>();
-        foreach (var c in DesignCopy.Parts)
+        var col = UiKit.Col(safe, T.S1, TextAnchor.UpperCenter, 0f, 0f, true);
+        col.name = "Tray";
+        col.anchorMin = new Vector2(1f, 0f); col.anchorMax = Vector2.one; col.pivot = new Vector2(1f, 0.5f);
+        col.offsetMin = new Vector2(-(T.ScreenEdge + D.RightW), T.ScreenEdge);
+        col.offsetMax = new Vector2(-T.ScreenEdge, -(T.ScreenEdge * 0.5f));
+        col.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(0, 0, Mathf.RoundToInt(D.TrayTop), 0);
+
+        var counters = UiKit.Row(col, T.S2, TextAnchor.MiddleCenter);
+        var cle = Ui.Size(counters, h: D.CounterH); cle.minHeight = D.CounterH;
+        wallet = DesignCounter.Make(counters, "cost", T.Accent, null);
+        weight = DesignCounter.Make(counters, "mass", D.Plum, () => SelectTab(DesignCopy.FlightTab, true));   // 重すぎの直し方＝大きいロケット
+
+        tabBand = DesignTabBand.Make(col, DesignCopy.Tabs, key => SelectTab(key, true));
+
+        // 棚は中身の高さ（行が2本のタブでは短くなり、後ろの舞台が見える）。画面が低いと行が RowStepMinH まで縮む
+        var shelf = DesignUi.Panel(col, T.Panel, false, D.RowGap, D.ShelfPad, "Shelf");
+        foreach (var t in DesignCopy.Tabs)
         {
-            known.Add(c.Id);
-            if (values.Part(c.Id) != null) yield return c;
-        }
-        foreach (var p in values.Parts)
-        {
-            string id = J.Str(p, "id");
-            if (known.Contains(id) || id == "bus" || id.StartsWith("trajectory_") || id.StartsWith("rocket_")) continue;
-            yield return new DesignPartCopy(id, J.Str(p, "name"), "create", J.Str(p, "benefit"));
-        }
-    }
-
-    // ================================================================== 右：重さ・費用・ロケット・はじめの量・軌道・判定・打ち上げ
-    void BuildRight(RectTransform safe)
-    {
-        var right = UiKit.Panel(safe, D.SectionGap, "Check");
-        right.anchorMin = new Vector2(1f, 0f); right.anchorMax = Vector2.one; right.pivot = new Vector2(1f, 0.5f);
-        right.offsetMin = new Vector2(-(T.ScreenEdge + D.RightW), T.ScreenEdge);
-        right.offsetMax = new Vector2(-T.ScreenEdge, -T.ScreenEdge);
-
-        var body = DesignUi.Scroll(right, D.SectionGap, "Body");
-
-        var gauges = UiKit.Row(body, T.S3, TextAnchor.UpperLeft);
-        massGauge = GaugeBlock(gauges, "mass", DesignCopy.MassLabel, out massValue);
-        costGauge = GaugeBlock(gauges, "cost", DesignCopy.CostLabel, out costValue);
-
-        var rr = UiKit.Row(Section(body, "rocket", DesignCopy.RocketLabel), T.S2, TextAnchor.MiddleCenter);
-        foreach (var c in DesignCopy.Rockets) { string k = c.Key; rockets.Add(DesignChoice.Make(rr, c, values.Fill, () => Send(Cmd.DesignRocket(k)))); }
-
-        var sr = UiKit.Row(Section(body, null, DesignCopy.SuppliesLabel), T.S1, TextAnchor.MiddleCenter);
-        foreach (var s in DesignCopy.Supplies)
-        {
-            var chip = UiKit.Row(sr, 0f, TextAnchor.MiddleCenter, T.S1);
-            var le = Ui.Size(chip, w: 0f, h: D.SupplyChipH, flexW: 1f); le.minHeight = D.SupplyChipH;
-            var face = UiKit.Pill(chip, T.Bg, D.SupplyChipH, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
-            supplies.Add((DesignStat.Make(chip, s.Icon, "", TextStyle.Body, T.IconM, T.Ink), s.Text));
+            var page = UiKit.Col(shelf, D.RowGap, TextAnchor.UpperCenter, 0f, 0f, true);
+            page.name = "Page_" + t.Key;
+            pages[t.Key] = page;
+            if (t.Key == DesignCopy.FlightTab) BuildFlight(page);
+            else for (int i = 0; i < t.Parts.Length; i++) AddRow(page, t.Parts[i], D.PlatformColors[i % D.PlatformColors.Length]);
         }
 
-        var path = Section(body, "route", DesignCopy.PathLabel);
-        var pr = UiKit.Row(path, T.S2, TextAnchor.MiddleCenter);
-        foreach (var c in DesignCopy.Paths) { string k = c.Key; paths.Add(DesignChoice.Make(pr, c, values.Fill, () => Send(Cmd.DesignTrajectory(k)))); }
-        pathLine = DesignUi.Text(path, "", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft, D.PartLineH, ellipsis: true);
-
-        // 判定（いまの設計で打ち上げられるか。サーバーの totals.status）
-        var verdict = UiKit.Row(right, T.S2, TextAnchor.MiddleLeft, T.S2, T.S1);
-        verdict.name = "Verdict";
-        var vle = Ui.Size(verdict, h: D.VerdictMinH); vle.minHeight = D.VerdictMinH;
-        verdictFace = UiKit.Round(verdict, T.RadiusM, D.VerdictOkFace, "Face"); UiKit.Fill(verdictFace.rectTransform); UiKit.Ignore(verdictFace);
-        verdictIcon = UiKit.Icon(verdict, "check", T.IconM, T.Go);
-        var vcol = UiKit.Col(verdict, 0f, TextAnchor.MiddleLeft, 0f, 0f, true);
-        var vcle = Ui.Size(vcol, w: 0f, flexW: 1f); vcle.minWidth = 0f;
-        verdictTitle = UiKit.Text(vcol, "", TextStyle.Sub, T.Go, TextAlignmentOptions.MidlineLeft);
-        verdictHint = DesignUi.Text(vcol, "", TextStyle.Label, T.Ink, TextAlignmentOptions.TopLeft, wrap: true);
-
-        UiKit.PrimaryButton(right, DesignCopy.Launch, "rocket", Launch);
+        UiKit.Space(col, 0f, true);
+        UiKit.PrimaryButton(col, DesignCopy.Launch, "rocket", Launch);
     }
 
-    DesignGauge GaugeBlock(Transform p, string icon, string label, out TextMeshProUGUI value)
+    void AddRow(Transform page, string id, Color platform)
     {
-        var col = UiKit.Col(p, 0f, TextAnchor.UpperLeft, 0f, 0f, true);
-        var le = Ui.Size(col, w: 0f, flexW: 1f); le.minWidth = 0f;
-        SectionLabel(col, icon, label);
-        value = UiKit.Text(col, "-", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineLeft);
-        return DesignGauge.Make(col);
+        DesignPartCopy copy = null;
+        foreach (var c in DesignCopy.Parts) if (c.Id == id) copy = c;
+        var p = values.Part(id);
+        if (copy == null || p == null) { Debug.LogWarning("[DesignScreen] 部品が parts.json か DesignCopy に無い: " + id); return; }
+        var row = DesignRow.Make(page, copy, platform,
+            values.Fill("{mass." + id + "}"), values.Fill("{cost." + id + "}"), copy.Science == null ? null : values.Fill(copy.Science),
+            J.Int(p, "min"), J.Int(p, "max"),
+            d => { Touch(id); Send(Cmd.DesignPart(id, d)); },
+            n => { Touch(id); Send(Cmd.DesignPartSet(id, n)); });
+        rows.Add(row);
     }
 
-    static void SectionLabel(Transform p, string icon, string text)
+    void BuildFlight(Transform page)
     {
-        var r = UiKit.Row(p, T.S1, TextAnchor.MiddleLeft);
-        Ui.Size(r, h: D.PartLineH);
-        if (icon != null) UiKit.Icon(r, icon, T.IconS, T.InkSub);
-        UiKit.Text(r, text, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+        rocketPick = DesignChoiceBubble.Make(page, DesignCopy.Rockets, values.Fill, k => { lastChoice = "rocket"; Send(Cmd.DesignRocket(k)); UpdateHand(); });
+        pathPick = DesignChoiceBubble.Make(page, DesignCopy.Paths, values.Fill, k => { lastChoice = "path"; Send(Cmd.DesignTrajectory(k)); UpdateHand(); });
     }
 
-    /// <summary>見出し（アイコン＋補助ラベル）と中身のまとまり。中身は返す Col に足す（見出しとの間は空けない）</summary>
-    static RectTransform Section(Transform p, string icon, string text)
+    void Touch(string id) { lastTouched = id; UpdateHand(); }
+
+    void SelectTab(string key, bool say)
     {
-        var col = UiKit.Col(p, 0f, TextAnchor.UpperLeft, 0f, 0f, true);
-        SectionLabel(col, icon, text);
-        return col;
+        if (key == tab) { if (say) SayTab(key); return; }
+        tab = key;
+        tabBand.Select(key);
+        foreach (var kv in pages) kv.Value.gameObject.SetActive(kv.Key == key);
+        if (stage != null) stage.Wide(key == DesignCopy.FlightTab);
+        if (say) SayTab(key);
+        UpdateHand();
+    }
+
+    /// <summary>手は1つ：Flight では最後に触った選択肢の選んだ行、ほかのタブでは最後に触った行（まだなら1本目）</summary>
+    void UpdateHand()
+    {
+        if (hand == null) return;
+        if (tab == DesignCopy.FlightTab)
+        {
+            var b = lastChoice == "path" ? pathPick : rocketPick;
+            hand.Point(b != null ? b.Select(b.Selected) : null);
+            return;
+        }
+        DesignRow first = null, touched = null;
+        foreach (var r in rows)
+        {
+            if (!r.Root.IsChildOf(pages[tab])) continue;
+            if (first == null) first = r;
+            if (r.Id == lastTouched) touched = r;
+        }
+        var at = touched ?? first;
+        hand.Point(at != null ? at.Root : null);
+    }
+
+    void SayTab(string key)
+    {
+        if (key == DesignCopy.FlightTab && !sciencePossible) { Say("design_no_science", DesignCopy.NoScience, null); return; }   // 打ち上げを押す前に
+        foreach (var t in DesignCopy.Tabs) if (t.Key == key) Say("design_tab_" + key, values.Fill(t.Say), null);
+    }
+
+    // ================================================================== 打ち上げチェック（右の列のすぐ左・上。パネル【05】）
+    void BuildCheck(RectTransform safe)
+    {
+        var card = DesignUi.Panel(safe, T.Panel, true, 0f, T.S2 * 0.5f, "LaunchCheck");
+        card.anchorMin = card.anchorMax = card.pivot = Vector2.one;
+        card.anchoredPosition = new Vector2(-(T.ScreenEdge + D.RightW + D.ColGap), -T.ScreenEdge);
+        card.sizeDelta = new Vector2(D.CheckW, 0f);
+        card.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        var head = UiKit.Row(card, T.S1, TextAnchor.MiddleLeft);
+        Ui.Size(head, h: D.CheckRowH);
+        DesignUi.Platform(head, "rocket", D.CheckTitleIcon, T.Go, out _, out _);
+        DesignUi.Words(head, DesignCopy.CheckTitle, D.TextRow, D.Text);
+        DesignUi.Dots(card, D.BgDeep, false);
+        checkMass = DesignCheckRow.Make(card, DesignCopy.CheckMass.Text);
+        checkCost = DesignCheckRow.Make(card, DesignCopy.CheckCost.Text);
+        DesignUi.Words(card, DesignCopy.InFlightTitle, D.TextTag, D.TextSub, TextAlignmentOptions.MidlineLeft, D.RowPriceH);
+        checkCrew = DesignCheckRow.Make(card, DesignCopy.CheckCrew.Text);
+        checkScience = DesignCheckRow.Make(card, values.Fill(DesignCopy.CheckScience.Text));
+        foreach (var r in new[] { checkMass, checkCost, checkCrew, checkScience }) r.Set(DesignCheckRow.Pending, false);
     }
 
     void Launch()
@@ -241,7 +246,7 @@ public class DesignScreen
         Send(Cmd.Type("launch"));
     }
 
-    // ================================================================== 打ち上げ判定の結果（NO GO）。M02 でだめだったときだけ重ねる
+    // ================================================================== 打ち上げ判定の結果（No go）。M02 でだめだったときだけ重ねる
     void BuildNoGo(Transform parent)
     {
         var scrim = Ui.PanelImg(parent, T.Scrim, "NoGo"); Ui.Fill(scrim.rectTransform);
@@ -250,19 +255,17 @@ public class DesignScreen
         close.transition = Selectable.Transition.None;
         close.onClick.AddListener(CloseNoGo);
 
-        var card = UiKit.Panel(scrim.transform, T.S2, "NoGoCard");
+        var card = DesignUi.Panel(scrim.transform, T.Panel, true, T.S2, T.S3, "NoGoCard");
         UiKit.Center(card, D.OverlayW, 0f);
+        card.GetComponent<VerticalLayoutGroup>().childAlignment = TextAnchor.UpperCenter;
         card.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         var top = UiKit.Row(card, 0f);
-        var badge = UiKit.Pill(top, T.Danger, D.OverlayIconD, "Badge");
-        UiKit.Fixed(badge, D.OverlayIconD, D.OverlayIconD);
-        var icon = UiKit.Icon(badge.transform, "danger", T.IconL, T.Panel);
-        UiKit.Center(icon.rectTransform, T.IconL, T.IconL);
-        UiKit.Text(card, DesignCopy.NoGo, TextStyle.Heading, T.Danger, TextAlignmentOptions.Center);
-        noGoReason = UiKit.Text(card, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.Center);
-        noGoDetail = DesignUi.Text(card, "", TextStyle.Body, T.Ink, TextAlignmentOptions.Center, wrap: true);
-        noGoHint = DesignUi.Text(card, "", TextStyle.Body, T.InkSub, TextAlignmentOptions.Center, wrap: true);
+        DesignUi.Platform(top, "danger", D.OverlayIconD, T.Danger, out _, out _);
+        DesignUi.Words(card, DesignCopy.NoGo, D.TextRibbon, T.Danger, TextAlignmentOptions.Center);
+        noGoReason = DesignUi.Words(card, "", D.TextRow, D.Text, TextAlignmentOptions.Center);
+        noGoDetail = DesignUi.Words(card, "", T.TextBody, D.Text, TextAlignmentOptions.Center, wrap: true);
+        noGoHint = DesignUi.Words(card, "", T.TextBody, D.TextSub, TextAlignmentOptions.Center, wrap: true);
         UiKit.Space(card, T.S1);
         var bottom = UiKit.Row(card, 0f);
         UiKit.PrimaryButton(bottom, DesignCopy.NoGoBack, "settings", CloseNoGo);
@@ -280,32 +283,60 @@ public class DesignScreen
         string rocket = m.Design != null ? J.Str(m.Design, "rocket") : "";
         string traj = m.Design != null ? J.Str(m.Design, "trajectory") : "";
         values.Rocket = ChoiceName(DesignCopy.Rockets, rocket);
+        bool animate = hadDesign && Root.activeInHierarchy && !stage.Fresh;   // 画面を開いた直後の1回は、数え上げ・吹き出し・弾みなしで置く
 
-        var parts = m.Design != null ? J.Obj(m.Design, "parts") : null;
-        foreach (var c in cards) c.Set(J.Int(parts, c.Id));
-        foreach (var c in rockets) c.SetSelected(c.Key == rocket);
-        foreach (var c in paths) c.SetSelected(c.Key == traj);
-        pathLine.text = ChoiceLine(DesignCopy.Paths, traj);
+        var partsObj = m.Design != null ? J.Obj(m.Design, "parts") : null;
+        var parts = new Dictionary<string, int>();
+        if (partsObj != null) foreach (var kv in partsObj) parts[kv.Key] = J.Int(partsObj, kv.Key);
+        foreach (var r in rows) r.Set(parts.TryGetValue(r.Id, out var n) ? n : 0);
+        rocketPick.Select(rocket);
+        pathPick.Select(traj);
 
-        // 判定はサーバーのものだけ。status は質量を先に見るので、両方オーバーでも over_mass だけが来る（totals に over_mass・over_budget の真偽が来れば両方赤くなる）
+        // 判定はサーバーのものだけ。古い記録で over_* が無ければ status から（status は質量を先に見る）
         string status = J.Str(tt, "status");
         bool overMass = Over(tt, "over_mass", status), overCost = Over(tt, "over_budget", status);
         bool massOk = J.Has(tt, "over_mass") ? !overMass : status == "ok" || status == "over_budget";
         bool costOk = J.Has(tt, "over_budget") ? !overCost : status == "ok";
+        sciencePossible = !J.Has(tt, "science_possible") || J.Bool(tt, "science_possible");
 
-        massValue.text = values.Fill(DesignCopy.MassValue);
-        massValue.color = overMass ? T.Danger : T.Ink;
-        massGauge.Set(J.Num(tt, "mass"), J.Num(tt, "mass_limit"), overMass);
-        costValue.text = values.Fill(DesignCopy.CostValue);
-        costValue.color = overCost ? T.Danger : T.Ink;
-        costGauge.Set(J.Num(tt, "cost"), J.Num(tt, "budget"), overCost);
-        foreach (var (stat, text) in supplies) stat.Text.text = values.Fill(text);
+        wallet.Set(J.Has(tt, "budget_left") ? J.Num(tt, "budget_left") : (float?)null, overCost, values.Fill(DesignCopy.CostFallback), animate);
+        weight.Set(J.Has(tt, "mass_left") ? J.Num(tt, "mass_left") : (float?)null, overMass, values.Fill(DesignCopy.MassFallback), animate);
+        checkMass.Set(tt == null ? DesignCheckRow.Pending : overMass ? DesignCheckRow.Bad : massOk ? DesignCheckRow.Ok : DesignCheckRow.Pending, animate);
+        checkCost.Set(tt == null ? DesignCheckRow.Pending : overCost ? DesignCheckRow.Bad : costOk ? DesignCheckRow.Ok : DesignCheckRow.Pending, animate);
+        checkScience.SetText(values.Fill(DesignCopy.CheckScience.Text));
+        checkScience.Set(sciencePossible ? DesignCheckRow.Pending : DesignCheckRow.Warn, animate);
 
-        goals[2].Set(overMass ? -1 : massOk ? 1 : 0);
-        goals[3].Set(overCost ? -1 : costOk ? 1 : 0);
-
-        SetVerdict(tt == null ? "" : status, rocket);
+        stage.Set(parts, rocket, overMass);
+        if (m.Design != null)
+        {
+            if (animate) SayChanges(parts, traj, rocket, overMass, overCost);
+            prevParts.Clear(); foreach (var kv in parts) prevParts[kv.Key] = kv.Value;
+            prevTraj = traj; prevRocket = rocket; prevOverMass = overMass; prevOverCost = overCost;
+            hadDesign = Root.activeInHierarchy;
+        }
+        UpdateHand();
         SetNoGo(m.LaunchStatus, rocket);
+    }
+
+    /// <summary>前の design から変わった所を1つだけ吹き出しで言う（部品が付いた ＞ 軌道を替えた）。
+    /// 超えた瞬間はサーバーが H01・H02（声つき、priority high）を送るので、ここでは言わない（同じ時に出すと上書きし合う）</summary>
+    void SayChanges(Dictionary<string, int> parts, string traj, string rocket, bool overMass, bool overCost)
+    {
+        if (overMass && !prevOverMass || overCost && !prevOverCost) return;
+        foreach (var kv in DesignCopy.PartSay)
+        {
+            int now = parts.TryGetValue(kv.Key, out var a) ? a : 0, before = prevParts.TryGetValue(kv.Key, out var b) ? b : 0;
+            if (now > before) { Say("design_part_" + kv.Key, values.Fill(kv.Value), null); return; }
+        }
+        if (prevTraj != null && traj != prevTraj) Say("design_path_" + traj, values.Fill(ChoiceLine(DesignCopy.Paths, traj)), null);
+    }
+
+    /// <summary>ヒューストンの吹き出しへ。同じ文を続けて出さない</summary>
+    void Say(string id, string text, string priority)
+    {
+        if (string.IsNullOrEmpty(text) || text == lastSaid || HoustonBox.Current == null) return;
+        lastSaid = text;
+        HoustonBox.Current.Push(id, text, priority);
     }
 
     static bool Over(Dictionary<string, object> tt, string flag, string status) => J.Has(tt, flag) ? J.Bool(tt, flag) : status == flag;
@@ -322,22 +353,7 @@ public class DesignScreen
         return "";
     }
 
-    void SetVerdict(string status, string rocket)
-    {
-        bool ok = status == "ok";
-        bool known = ok || status == "over_mass" || status == "over_budget";
-        verdictFace.color = ok || !known ? D.VerdictOkFace : D.VerdictBadFace;
-        verdictIcon.sprite = T.Icon(ok ? "check" : "danger");
-        verdictIcon.color = ok ? T.Go : T.Danger;
-        verdictIcon.gameObject.SetActive(known);
-        verdictTitle.color = ok ? T.Go : T.Danger;
-        verdictTitle.text = ok ? DesignCopy.OkTitle : status == "over_mass" ? DesignCopy.MassTitle : status == "over_budget" ? DesignCopy.BudgetTitle : "";
-        verdictHint.text = ok ? DesignCopy.OkHint
-            : status == "over_mass" ? DesignCopy.Hint(DesignCopy.MassHint, rocket)
-            : status == "over_budget" ? DesignCopy.Hint(DesignCopy.BudgetHint, rocket) : "";
-    }
-
-    /// <summary>launch イベントでだめだったとき（GameFlow が Model.LaunchStatus に入れる。次の design メッセージで "" に戻る）</summary>
+    /// <summary>launch イベントでだめだったとき（GameFlow が Model.LaunchStatus に入れる。次の design メッセージで "" に戻る）。船もぶるっと揺れる</summary>
     void SetNoGo(string launchStatus, string rocket)
     {
         bool bad = launchStatus == "over_mass" || launchStatus == "over_budget";
@@ -347,6 +363,7 @@ public class DesignScreen
         noGoReason.text = values.Fill(mass ? DesignCopy.NoGoMass : DesignCopy.NoGoBudget);
         noGoDetail.text = values.Fill(mass ? DesignCopy.NoGoMassDetail : DesignCopy.NoGoBudgetDetail);
         noGoHint.text = DesignCopy.Hint(mass ? DesignCopy.MassHint : DesignCopy.BudgetHint, rocket);
+        if (!noGo.activeSelf) stage.Shake();
         noGo.SetActive(true);
         noGo.transform.SetAsLastSibling();
     }

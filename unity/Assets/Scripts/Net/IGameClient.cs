@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-15、#168 design の totals の説明・DesignPartSet）
 // ゲームの流れとサーバー（または記録の再生）のつなぎ口。
 // 画面は IGameClient だけを見る。OfflineClient（記録の再生）と WsClient（WebSocket）を差し替えられる。
 // メッセージの形は server/game/room.py に合わせてある（architecture.md の案より細かい）。
@@ -6,7 +6,8 @@
 //   サーバー → クライアント（"type"）
 //     welcome  {room, player_id, seats[], speed}       入室できた
 //     room     {room, phase, players[{id,name,seats[],connected}]}   phase: lobby|design|practice|stir|flight|ending|report
-//     design   {design{parts{id:n},trajectory,rocket}, totals{mass,cost,status,mass_limit,budget,capacity,oxygen,fuel}}
+//     design   {design{parts{id:n},trajectory,rocket}, totals{mass,cost,status,mass_limit,budget,mass_left,budget_left,over_mass,over_budget,science_possible,capacity,oxygen,fuel}}
+//              mass_left・budget_left は上限との差（超過なら負。UI は引き算しない）、over_* は真偽、science_possible は観測機器が1つ以上あるか（#168）
 //     state    {t, state{power,oxygen,fuel,temp,co2,sw{},attitude,...}}   毎秒
 //     event    {kind:houston|launch|practice|press|cmd, ...}   houston は {id,priority,text,text_ja,t}
 //     result   {result{ending,requirements{},score,...}}
@@ -102,6 +103,8 @@ public static class Cmd
 
     public static Dictionary<string, object> Type(string type) => new Dictionary<string, object> { ["type"] = type };
     public static Dictionary<string, object> DesignPart(string part, int delta) => new Dictionary<string, object> { ["type"] = "design", ["part"] = part, ["delta"] = delta };
+    /// <summary>個数をそのまま決める（ON/OFF のトグル。4人が同時に押しても ON は ON のまま。#168）</summary>
+    public static Dictionary<string, object> DesignPartSet(string part, int n) => new Dictionary<string, object> { ["type"] = "design", ["part"] = part, ["n"] = n };
     public static Dictionary<string, object> DesignTrajectory(string t) => new Dictionary<string, object> { ["type"] = "design", ["trajectory"] = t };
     public static Dictionary<string, object> DesignRocket(string r) => new Dictionary<string, object> { ["type"] = "design", ["rocket"] = r };
 }
