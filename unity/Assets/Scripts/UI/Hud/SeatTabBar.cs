@@ -7,7 +7,7 @@
 //   ・下の帯（CabinHud が作る紺の四角）をクリームの盆に替える（SeatLook.Tray。CabinHud を触らないので、ここで紺を透明にして盆を敷く）
 //   ・タブは傾いた名前タグ（blob_pill、高さ 48、白文字 26、−6°）。選んでいる席＝席の色の面、ほかの席＝bgDeep の面に席の色の丸（席＝色＋形）
 //   ・名前タグの真ん中が盆の上端に乗る（【12】の名前タグが吹き出しの角にかぶさる作り）
-// #216（less is more）：名前タグは今の席だけ。兼任のほかの席は、名前タグのすぐ右に形だけの丸（席の色に ▲■●◆、押せる範囲 96）。
+// #216（less is more）：名前タグは今の席だけ。兼任のほかの席は、持っている順の位置に形だけの丸（席の色に ▲■●◆、押せる範囲 96）。
 //   盆のボタンの上に出る品名の札（Send data など）が席のタブにかぶらないように、詰めて左に寄せる。席を替えたら名前タグが1回弾む
 using TMPro;
 using UnityEngine;
@@ -34,16 +34,16 @@ public class SeatTabBar : HudPart
     public void Rebuild()
     {
         Clear(row);
-        // #216：今の席の名前タグを先に、ほかの席は形だけの丸を後ろに（row の子は席の数のまま。Count が席の数になる）
+        // #216：席の順は持っている順のまま（替えても動かない）。今の席は名前タグ、ほかの席は形だけの丸（row の子は席の数のまま。Count が席の数になる）
         string active = Ctx.ActiveSeat;
+        bool hasActive = false;
+        foreach (var s in Ctx.Model.MySeats) if (s == active) hasActive = true;
         RectTransform tag = null;
         foreach (var s in Ctx.Model.MySeats)
-            if (s == active) tag = NameTag(row, s, true, null);
-        foreach (var s in Ctx.Model.MySeats)
         {
-            if (s == active) continue;
             string seat = s;
-            if (tag == null) NameTag(row, seat, false, () => Ctx.SelectSeat(seat));   // 今の席が自分の席に無いとき（念のため今まで通り）
+            if (seat == active) tag = NameTag(row, seat, true, null);
+            else if (!hasActive) NameTag(row, seat, false, () => Ctx.SelectSeat(seat));   // 今の席が自分の席に無いとき（念のため今まで通り）
             else Dot(row, seat, () => Ctx.SelectSeat(seat));
         }
         if (tag != null && lastActive != null && lastActive != active) UiSelect.Pick(tag);   // #216 席を替えた：1.0 → 1.12 → 1.0（0.25 秒）
