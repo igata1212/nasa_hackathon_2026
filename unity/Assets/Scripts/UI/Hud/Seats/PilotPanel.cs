@@ -140,7 +140,10 @@ public class PilotPanel : SeatPanel
         string now = s != null ? NowTarget(s, out hint) : null;
 
         // 燃料（#210 見出しの2行目は出さない。headNote は BuildControls で隠してある）
-        fuel.Set(s != null ? K.Whole(s.fuel) : K.Words.NoValue);
+        // #216 練習の間（state が無い）は "--" を見せない：燃料のチップごと隠し、値が来たら出す
+        bool hasFuel = s != null;
+        if (fuel.Root.gameObject.activeSelf != hasFuel) fuel.Root.gameObject.SetActive(hasFuel);
+        if (hasFuel) fuel.Set(K.Whole(s.fuel));
 
         // 向き：今の向きにチェック。札と手は「いま要る向き」があればそこ、無ければ今の向き
         string cur = s != null ? s.attitude : practiceAtt;
@@ -482,7 +485,7 @@ public static class PilotCommsKit
     {
         bool solo = ctx.SoloPair("ignite") != null;
         string press = solo ? Words.PressSolo : seat == Seats.Pilot ? Words.PressWithComms : Words.PressWithPilot;
-        if (s == null) { card.Set(PcLook.Ready, Words.Ignite, null); return; }   // #210 練習の Ignite は2行目なし
+        if (s == null) { card.Set(PcLook.Normal, Words.Ignite, null); return; }   // #210 練習の Ignite は2行目なし。#216 練習の間は副の見た目（手が指す物と張り合わない）。押せるのは同じ
         if (s.strictReason == "missed_burn") { card.Set(PcLook.Missed, Words.BurnMissed, Words.WindowClosed); return; }   // 窓を逃すと server がルート B で帰す（burn_done も true になる）
         if (s.burnDone)
         {
