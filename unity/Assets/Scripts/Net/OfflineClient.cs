@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-15、#168 設計の ± と n を読む）
 // サーバーなしで「1回遊んだ記録」を再生するクライアント。記録はサーバーの tools/export_timeline.py が書き出す
 // data/sim/timeline_*.json（Unity には Tools/GameFlow/オフライン再生の記録を取り込む で Assets/Data/Sim/ に写す）：
 //   {"meta":{..., "viewer":"<視点の player_id>"}, "messages":[{"at":秒, "to":null|player_id, "msg":{サーバーが送るのと同じ形}}, ...]}
@@ -96,7 +96,8 @@ public class OfflineClient : GameClientBase
         {
             var parts = J.Obj(d, "parts");
             string id = (string)m["part"];
-            int n = J.Int(parts, id) + (m.ContainsKey("delta") ? (int)(double)m["delta"] : 0);
+            // Cmd は int で作る（記録の JSON は double）。どちらでも読めるように Convert で（#168：int を (double) にキャストして落ちていた）
+            int n = m.ContainsKey("n") ? System.Convert.ToInt32(m["n"]) : J.Int(parts, id) + (m.ContainsKey("delta") ? System.Convert.ToInt32(m["delta"]) : 0);
             if (n < 0) n = 0;
             parts[id] = (double)n;     // 上限・下限はサーバーが決める。オフラインでは見た目だけ
         }

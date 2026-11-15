@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で parametersJson を割り当てる）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 briefingJson）
+// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で parametersJson を割り当てる）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 briefingJson） ／ 更新：iizuka（Opus 5.5、2026-11-15、#168 DesignStage.asset も作る）
 // ゲームの流れのシーン Assets/Scenes/Game.unity を組み立てる（#96）。シーンは手で直さず、ここを直して作り直す。
 //   メニュー Tools/GameFlow/シーンを作り直す … LookDev.unity（船内・光・クルー）を開いて Game.unity として別名保存し、GameFlow と EventSystem を足す
 //   LookDev.unity 自体は変えない（別名保存。LookDev の組み立ては Tools/LookDev/シーンを作り直す）
@@ -33,6 +33,7 @@ public static class GameFlowScene
     public static void BuildScene()
     {
         CopyTimelines();
+        DesignStageAssetsMenu.Build();   // 設計の画面の 3D の舞台の参照（Resources/DesignStage.asset。#168）
         var scene = EditorSceneManager.OpenScene(LookDevPath, OpenSceneMode.Single);
 
         var es = new GameObject("EventSystem");

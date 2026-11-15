@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a1d9548af660403794abc8810496bba, type: 3}
+  m_Name: DesignStage
+  m_EditorClassIdentifier: Assembly-CSharp::DesignStageAssets
+  ship: {fileID: 919132149155446097, guid: 15ce069ea17af47a086eb023da0f8a3a, type: 3}
+  rocketSmall: {fileID: 919132149155446097, guid: 22aa1c3916a7e47538630afd07897adc, type: 3}
+  rocketLarge: {fileID: 919132149155446097, guid: 0f7a3364ce92a421783d4c3fe90cf3a6, type: 3}
+  parts:
+  - id: battery
+    prefab: {fileID: 919132149155446097, guid: e6bc59202e85c4112b3e4402769e8557, type: 3}
+  - id: solar_panel
+    prefab: {fileID: 919132149155446097, guid: 3a02acb2610e3487494ca964edfaaefa, type: 3}
+  - id: spare_o2_tank
+    prefab: {fileID: 919132149155446097, guid: d78a77dcb8a5248338afd121ff1d9a6c, type: 3}
+  - id: extra_fuel_tank
+    prefab: {fileID: 919132149155446097, guid: 8b6d815a24fb2475a9420a22111bd0ff, type: 3}
+  - id: camera
+    prefab: {fileID: 919132149155446097, guid: fdb1ecb93e07d47cba4a7aa646787047, type: 3}
+  - id: spectrometer
+    prefab: {fileID: 919132149155446097, guid: 8d5e21de9debe4940a30701c994b4c3a, type: 3}
+  - id: radar
+    prefab: {fileID: 919132149155446097, guid: d5616567454c74a3d925d92c14582be4, type: 3}
+  - id: high_gain_antenna
+    prefab: {fileID: 919132149155446097, guid: bc484c95b341044948b4e16705c71e51, type: 3}
+  surface: {fileID: 2100000, guid: 3f66a2771379944cf85bd8fd8a12aabc, type: 2}
