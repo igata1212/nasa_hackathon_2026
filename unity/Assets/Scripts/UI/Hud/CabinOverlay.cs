@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#87・#88）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#87・#88）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 作る Issue：#87（照明 OFF の見え方）・#88（操作が遅くなる表示）
 //
 // 画面全体に重ねる物。置き場所は HUD のいちばん後ろ（3D の上、ほかの部品の下）。押す所の邪魔をしないように raycastTarget は全部 false
@@ -15,6 +15,8 @@
 //   理由は state とサーバーの閾値（thresholds の temp.slow・co2.slow。届いていなければ parameters.json の temp_slow_c・co2_slow）を比べるだけ
 //   長押しの輪がゆっくり回るのは #71 の HoldButton（Ctx.SlowPct）。霜・もやの縁は入れていない（UrgencyFx の赤い縁と重なるため。余裕があれば）
 // 見た目の値（暗さ・速さ・札の位置）と札の文言は Look・SlowReasons の1か所
+// #190（ui-guidelines 3章「パネル」【05】【01】）：SLOW の札は明るいパネル（UiKit.PanelFace：blob_panel＋内ふち＋横縞、影なし）。理由のアイコンは accent の台（遅い＝注意）。
+//   文字は茶（text・textSoft）、言葉は小文字まじり
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,7 +40,7 @@ public class CabinOverlay : HudPart
         public const float SlowX = 0.01f, SlowY = 0.39f;
         public static readonly Vector2 SlowPivot = new Vector2(0f, 0f);
         public const float SlowBadgeD = T.IconM;        // 直す席のバッジ
-        public const string SlowFormat = "SLOW +{0}%";  // 1行目（{0} = slow_pct）
+        public const string SlowFormat = "Slow +{0}%";  // 1行目（{0} = slow_pct）
     }
 
     /// <summary>遅くなる理由（#88）：key・アイコン・理由の言葉・直す席・直し方。文言は Taiga が決める（今は H16・H18 に合わせた仮）</summary>
@@ -54,7 +56,7 @@ public class CabinOverlay : HudPart
 
     RectTransform slowCard;
     TextMeshProUGUI slowText;
-    Image[] slowIcons;
+    UiIconDisc[] slowIcons;
     RectTransform[] slowRows;
     UiSeatBadge[] slowBadges;
 
@@ -115,19 +117,19 @@ public class CabinOverlay : HudPart
     // ================================================================== #88 操作が遅い
     void BuildSlow(RectTransform root)
     {
-        var card = UiKit.Col(root, T.S1, TextAnchor.UpperLeft, T.S2, T.S2);
+        var card = UiKit.Col(root, T.S1, TextAnchor.UpperLeft, T.S4, T.S4 - T.S1);   // 内側は内ふち 12 を含めて 32（ui-guidelines 2章）
         card.name = "SlowCard";
         card.anchorMin = card.anchorMax = new Vector2(Look.SlowX, Look.SlowY);
         card.pivot = Look.SlowPivot;
         card.anchoredPosition = new Vector2(0f, T.S1);
         var fit = card.gameObject.AddComponent<ContentSizeFitter>();
         fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        UiKit.Surface(card, T.RadiusM, T.Panel);
+        UiKit.PanelFace(card, T.Panel);
 
         var head = UiKit.Row(card, T.S1, TextAnchor.MiddleLeft);
-        slowIcons = new Image[SlowReasons.Length];
-        for (int i = 0; i < SlowReasons.Length; i++) slowIcons[i] = UiKit.Icon(head, SlowReasons[i].icon, T.IconM, T.Ink);
-        slowText = UiKit.Text(head, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineLeft);
+        slowIcons = new UiIconDisc[SlowReasons.Length];
+        for (int i = 0; i < SlowReasons.Length; i++) slowIcons[i] = UiKit.Disc(head, SlowReasons[i].icon, T.Accent, T.IconM);
+        slowText = UiKit.Text(head, "", TextStyle.Choice, T.Text, TextAlignmentOptions.MidlineLeft);
 
         slowRows = new RectTransform[SlowReasons.Length];
         slowBadges = new UiSeatBadge[SlowReasons.Length];
@@ -136,9 +138,9 @@ public class CabinOverlay : HudPart
             var r = SlowReasons[i];
             var row = UiKit.Row(card, T.S1, TextAnchor.MiddleLeft);
             row.name = "Slow_" + r.key;
-            UiKit.Text(row, r.why, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+            UiKit.Text(row, r.why, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
             slowBadges[i] = UiKit.SeatBadge(row, r.seat, Look.SlowBadgeD);
-            UiKit.Text(row, r.fix, TextStyle.Label, T.Ink, TextAlignmentOptions.MidlineLeft);
+            UiKit.Text(row, r.fix, TextStyle.Label, T.Text, TextAlignmentOptions.MidlineLeft);
             slowRows[i] = row;
         }
         slowCard = card;
@@ -157,7 +159,7 @@ public class CabinOverlay : HudPart
         for (int i = 0; i < SlowReasons.Length; i++)
         {
             bool v = on[i] || !any;   // 閾値が届かず理由が分からないときは両方出す（理由の無い SLOW にしない）
-            slowIcons[i].gameObject.SetActive(v);
+            slowIcons[i].Root.gameObject.SetActive(v);
             slowRows[i].gameObject.SetActive(v);
             slowBadges[i].Set(SlowReasons[i].seat, Ctx.Model.MySeats.Contains(SlowReasons[i].seat), false);
         }
