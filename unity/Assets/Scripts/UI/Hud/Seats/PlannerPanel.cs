@@ -126,7 +126,7 @@ public class PlannerPanel : SeatPanel
         // ③ 手伝い（CO2 が高いときだけ出す。盆の右端なので、出ても消えてもほかのボタンの位置は動かない）
         SeatLook.Spacer(strip.Rect);
         help = LpKit.Card(strip.Rect, "Help");
-        helpBtn = LpKit.Button(help.Root, "filter", Txt.Help, Txt.HelpSub, () => Ctx.SendDual("swap_filter", Seat));
+        helpBtn = LpKit.Button(help.Root, "filter", Txt.Help, "", () => Ctx.SendDual("swap_filter", Seat));   // #210 補助の行は押した後の結果だけ（"" で作る）
         foreach (var sub in new[] { LpKit.PressWaiting, LpKit.PressNow, LpKit.PressTogether, LpKit.PressFailed }) helpBtn.Reserve(Txt.Help, sub);
         help.Root.gameObject.SetActive(false);
     }
@@ -240,7 +240,7 @@ public class PlannerPanel : SeatPanel
         help.Set(showHelp, false);
         helpBtn.Set(LpLook.Primary);
         helpBtn.SetNow(showHelp);
-        if (feedback == null) helpBtn.SetText(null, Txt.HelpSub);
+        if (feedback == null) helpBtn.SetText(null, "");   // #210 押す前は1行（null は「変えない」なので "" で消す）
 
         // 手（1画面に1つ）：手伝い ＞ 観測（まだ OFF の機器）＞ ルートを選ぶ（見出し。A と B のどちらかを勧めない）＞ 選んだカード
         if (showHelp) Point(helpBtn.Root, CursorDir.UpLeft, true);

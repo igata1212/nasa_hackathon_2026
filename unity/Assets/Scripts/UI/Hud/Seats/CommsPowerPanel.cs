@@ -196,7 +196,7 @@ public class CommsPowerPanel : SeatPanel
         bool on = s != null && s.transmit;
         send.Knob.Set(on);
         string note;
-        if (s == null) note = Words.SendPractice;
+        if (s == null) note = null;   // #210 練習の Send data は2行目なし
         else
         {
             int n = K.OnBoard(s);
