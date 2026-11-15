@@ -20,6 +20,10 @@ public static class UiAssets
     const string PadPath = "Assets/Art/UI/Lobby/M_LobbyPad.mat";
     static readonly string[] CrewModels = { "Crew_Pilot", "Crew_LifeSupport", "Crew_CommsPower", "Crew_MissionPlanner" };   // Seats.All の順
     static readonly Dictionary<string, int> Borders = new Dictionary<string, int> { { "round16", 16 }, { "round28", 28 }, { "round40", 40 }, { "pill", 63 } };
+    // #190 の形の 9-slice（左・下・右・上。art/ui/README.md の表）
+    static readonly Dictionary<string, Vector4> Borders190 = new Dictionary<string, Vector4> {
+        { "blob_bubble", new Vector4(120, 96, 120, 96) }, { "blob_panel", new Vector4(72, 72, 72, 72) }, { "blob_pill", new Vector4(48, 0, 48, 0) } };
+    static readonly HashSet<string> Repeat = new HashSet<string> { "stripes64", "wave_edge", "bands64" };
     const string Extra = "°₂→✓×▲●■◆▶…";   // ASCII のほかに焼く記号（ガイドライン 5章。… は長い名前を切るとき TMP の Ellipsis が使う）。書体に無いものは Fallback で出る
     const string SeatShapes = "▲●■◆";
 
@@ -30,7 +34,8 @@ public static class UiAssets
         var zen = FontAsset("ZenMaruGothic-Bold", 64, 6, false, SeatShapes, null);
         var baloo = FontAsset("Baloo2-ExtraBold", 80, 8, true, Ascii() + Extra, zen);
         var nunito = FontAsset("Nunito-Bold", 72, 8, true, Ascii() + Extra, zen);
-        BuildTheme(baloo, nunito, zen);
+        var strong = FontAsset("Nunito-ExtraBold", 72, 8, true, Ascii() + Extra, zen);   // #190
+        BuildTheme(baloo, nunito, zen, strong);
         AssetDatabase.SaveAssets();
         Debug.Log("[UiAssets] UI の素材を設定し直した");
     }
@@ -49,14 +54,14 @@ public static class UiAssets
             ti.alphaIsTransparency = true;
             ti.textureCompression = TextureImporterCompression.Uncompressed;
             ti.mipmapEnabled = icon;   // アイコンは 128 → 24〜64 に縮めるのでミップマップを使う
-            ti.wrapMode = name == "stripes64" ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
+            ti.wrapMode = Repeat.Contains(name) ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
             ti.filterMode = FilterMode.Bilinear;
             var s = new TextureImporterSettings();
             ti.ReadTextureSettings(s);
             s.spriteMeshType = SpriteMeshType.FullRect;
             s.spriteGenerateFallbackPhysicsShape = false;
             ti.SetTextureSettings(s);
-            ti.spriteBorder = Borders.TryGetValue(name, out var b) ? new Vector4(b, b, b, b) : Vector4.zero;
+            ti.spriteBorder = Borders190.TryGetValue(name, out var b4) ? b4 : Borders.TryGetValue(name, out var b) ? new Vector4(b, b, b, b) : Vector4.zero;
             ti.SaveAndReimport();
         }
     }
@@ -96,7 +101,7 @@ public static class UiAssets
         return fa;
     }
 
-    static void BuildTheme(TMP_FontAsset heading, TMP_FontAsset body, TMP_FontAsset shapes)
+    static void BuildTheme(TMP_FontAsset heading, TMP_FontAsset body, TMP_FontAsset shapes, TMP_FontAsset strong)
     {
         var theme = AssetDatabase.LoadAssetAtPath<UiTheme>(ThemePath);
         if (theme == null)
@@ -105,9 +110,11 @@ public static class UiAssets
             theme = ScriptableObject.CreateInstance<UiTheme>();
             AssetDatabase.CreateAsset(theme, ThemePath);
         }
-        theme.heading = heading; theme.body = body; theme.shapes = shapes;
+        theme.heading = heading; theme.body = body; theme.shapes = shapes; theme.strong = strong;
         theme.round16 = Sprite("round16"); theme.round28 = Sprite("round28"); theme.round40 = Sprite("round40");
         theme.pill = Sprite("pill"); theme.caretDown = Sprite("caret_down"); theme.stripes = Sprite("stripes64");
+        theme.blobBubble = Sprite("blob_bubble"); theme.blobPanel = Sprite("blob_panel"); theme.blobPill = Sprite("blob_pill"); theme.blobDisc = Sprite("blob_disc");
+        theme.waveEdge = Sprite("wave_edge"); theme.caretSoft = Sprite("caret_soft"); theme.bands64 = Sprite("bands64"); theme.glovePoint = Sprite("glove_point");
         theme.crew = CrewModels.Select(n => AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/Crew/" + n + ".fbx")).ToArray();
         theme.earth = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/Bodies/Body_Earth.fbx");
         theme.pad = PadMaterial();

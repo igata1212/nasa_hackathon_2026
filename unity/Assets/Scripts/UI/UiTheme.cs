@@ -11,9 +11,13 @@ public class UiTheme : ScriptableObject
     public TMP_FontAsset heading;   // Baloo 2 ExtraBold：見出し・ボタン・数字
     public TMP_FontAsset body;      // Nunito Bold：本文・補助ラベル・入力欄
     public TMP_FontAsset shapes;    // Zen Maru Gothic Bold：席の形 ▲●■◆（Baloo に ● が無いので4つともこれでそろえる）。日本語の Fallback も兼ねる
+    public TMP_FontAsset strong;    // Nunito ExtraBold：見出し・ボタン・名前・札・選択肢（#190。UiTokens.FontStrong）
 
     [Header("白い形（Art/UI/Sprites。色は Image の color）")]
     public Sprite round16, round28, round40, pill, caretDown, stripes;
+
+    [Header("#190 あつ森に寄せた形（art/ui/make_sprites.py。UiTokens.Art が欄の名前で引く：blob_panel → blobPanel）")]
+    public Sprite blobBubble, blobPanel, blobPill, blobDisc, waveEdge, caretSoft, bands64, glovePoint;
 
     [Header("アイコン（Art/UI/Icons。名前はファイル名＝概念名）")]
     public Sprite[] icons;
