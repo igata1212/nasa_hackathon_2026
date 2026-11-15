@@ -28,7 +28,7 @@ public class GmatGauges : HudPart
         public const float Dial = 92f;                // メーターの直径
         public const float NeedleW = 5f, NeedleL = 38f, Hub = 14f;
         public const float TickW = 3f, TickL = 9f;
-        public const float Margin = 14f;              // 大きい地図の左の端から
+        public const float Margin = 14f;              // 大きい地図の左の端の外へ
         public const float CenterY = 0.5f;            // パネルのまん中の高さ（大きい地図の割合）
         public const float Sweep = 120f;              // 針の振れ幅（±度。0 が真上）
         public const float NeedleSpeed = 4f;
@@ -160,14 +160,16 @@ public class GmatGauges : HudPart
     // ================================================================== 毎フレーム
     public override void Tick(float now)
     {
-        // #210：大きい地図が開いている間だけ、その左（地図の中）に出す
+        // #210：大きい地図が開いている間だけ、その左（地図の枠の外）に出す
         if (map == null) foreach (var p in Ctx.Parts) if (p is MapWidget m) { map = m; break; }
         bool show = map != null && map.BigOpen && map.BigRect != null;
         if (show && panel.parent != map.BigRect)
         {
             panel.SetParent(map.BigRect, false);
+            // #210 地図の枠の外の左に出す（中に置くと地球・A の札・軌道に重なる）
             panel.anchorMin = panel.anchorMax = new Vector2(0f, Look.CenterY);
-            panel.anchoredPosition = new Vector2(Look.Margin, 0f);
+            panel.pivot = new Vector2(1f, 0.5f);
+            panel.anchoredPosition = new Vector2(-Look.Margin, 0f);
         }
         if (show) panel.SetAsLastSibling();
         if (panel.gameObject.activeSelf != show) panel.gameObject.SetActive(show);
