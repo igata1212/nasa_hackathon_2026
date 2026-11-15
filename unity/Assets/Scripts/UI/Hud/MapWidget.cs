@@ -61,10 +61,11 @@ public class MapWidget : HudPart
     const float SmallMark = 22f, BigMark = 34f;    // 噴射の印
     const float SmallW = 136f, SmallH = 104f;      // #212：右上の小さい地図のボタン（押せる範囲 96 以上）
     const float GrowSec = 0.2f, GrowFrom = 0.12f;   // #212：ボタンからふくらむ時間と、はじめの大きさ
-    const float ScrimAlpha = 0.72f;                 // #212：後ろの暗い幕
+    const float ScrimAlpha = 0.8f;                 // #212：後ろの暗い幕
     const float BodyInset = 8f;                     // #212：全画面のパネルと領域の端のすき間
     // 大きく開いたときの置き場所（土台 CabinHud が無いときだけ使う。ふだんは CabinHud.Layout の MapBig）
-    static readonly Vector4 BigAnchors = new Vector4(0f, 0f, 1f, 0.79f);
+    static readonly Vector4 BigAnchors = new Vector4(0f, 0f, 1f, 1f);
+    static readonly Vector4 PanelBox = new Vector4(0.05f, 0.07f, 0.95f, 0.93f);   // #212：地図のパネル（画面全体に対する割合）
     const float BigHeaderH = T.Hit, BigCompareH = 96f, BigFooterH = 28f;   // #190：見出しは帯（80）、比べるカードは文字2行が入る高さ
 
     // ------------------------------------------------------------------
@@ -72,7 +73,7 @@ public class MapWidget : HudPart
     float hBurn;
     bool hasRoutes;
     MapView small, bigView;
-    RectTransform big, body, gaugeColumn, btnRect;
+    RectTransform big, body, gaugeColumn, btnRect, closeRect;
     CanvasGroup bigGroup, smallGroup;
     Image scrim;
     float grow;                 // #212：0＝閉じている、1＝開いている（0.2 秒で動く）
@@ -151,11 +152,15 @@ public class MapWidget : HudPart
     /// <summary>外から閉じる（同時押し・警報が来たとき。#212）</summary>
     public void CloseBig() => SetBig(false);
 
+    float openT; string openPhase;
+    static bool Crossed(float from, float now, float at) => at > 0f && from < at && now >= at;
+
     void SetBig(bool open)
     {
         if (open == bigOpen) return;
         if (open && big == null) BuildBig();
         bigOpen = open;
+        if (open) { openT = Ctx.State != null ? Ctx.State.t : 0f; openPhase = Ctx.Model.Phase; }
         Ctx.Hud?.SetMapOpen(open);   // 下の盆を隠す・出す
         if (big == null) return;
         if (open)
@@ -190,7 +195,7 @@ public class MapWidget : HudPart
 
     void BuildBig()
     {
-        // 置き場所は CabinHud.Layout の MapBig（上の帯・「いま何をするか」の行の下から画面の下まで。#212）。土台が無いとき（見本など）だけ親の親に割合で置く
+        // #212（ユーザー：「地図もっとでかく。デカくっていうか他のものいらんと思うよ。」）：開いたら地図だけ。画面いっぱいの暗い幕の真ん中に、角丸の大きな地図1枚と、その右上の丸い ×
         var slot = Ctx.Hud != null ? Ctx.Hud.Slot(HudSlot.MapBig) : null;
         if (slot != null) { big = Ui.Rect("MapBig", slot); Ui.Fill(big); }
         else
@@ -199,6 +204,9 @@ public class MapWidget : HudPart
             big = Ui.Rect("MapBig", cabin);
             Ui.Anchor(big, BigAnchors.x, BigAnchors.y, BigAnchors.z, BigAnchors.w);
         }
+        // 上の帯・席の盆・Houston の吹き出しより手前に描く（自前の Canvas。60 の接続表示・61 の札より下）
+        var cv = big.gameObject.AddComponent<Canvas>(); cv.overrideSorting = true; cv.sortingOrder = 40;
+        big.gameObject.AddComponent<GraphicRaycaster>();
         bigGroup = big.gameObject.AddComponent<CanvasGroup>();
         // 暗い幕：押すと閉じる
         scrim = big.gameObject.AddComponent<Image>(); scrim.color = T.WithAlpha(T.Ink, 0f); scrim.raycastTarget = true;
@@ -207,54 +215,23 @@ public class MapWidget : HudPart
         sbtn.navigation = new Navigation { mode = Navigation.Mode.None };
         sbtn.onClick.AddListener(() => SetBig(false));
 
-        // パネル（ボタンの位置からふくらむ）。押しても閉じない（幕を押したときだけ）
-        body = Ui.Rect("Body", big); Ui.Anchor(body, 0, 0, 1, 1, BodyInset, BodyInset, BodyInset, BodyInset);
-        var face = UiKit.PanelFace(body, T.Panel);   // #190：明るいパネル（blob_panel＋内ふち＋横縞、影なし。【05】）
-        face.raycastTarget = true;
+        // 地図のパネル（ボタンの位置からふくらむ）。押しても閉じない（幕と × だけ）
+        body = Ui.Rect("Body", big); Ui.Anchor(body, PanelBox.x, PanelBox.y, PanelBox.z, PanelBox.w);
+        var space = UiKit.Round(body, T.RadiusL, T.Ink, "Space"); UiKit.Fill(space.rectTransform);
+        space.raycastTarget = true;
+        HudStars.Add(space.rectTransform);   // #190：宇宙に小さな星の模様（線の下）
+        bigView = new MapView(body, true);
 
-        float pad = T.S2;
-        // 見出し：左上の帯（#190【11】）＋右に「NASA GMAT」（1回だけ）＋閉じる ×（押せる範囲 96）
-        var head = UiKit.Row(body, T.S2, TextAnchor.MiddleLeft);
-        TopBand(head, pad, BigHeaderH);
-        TimelineKit.Ribbon(head, Words.BigTitle, "route", T.Go, out _);
-        Ui.Size(UiKit.Space(head, 0f), flexW: 1);
-        UiKit.Text(head, Words.SourceShort, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineRight);
-        var close = UiKit.Disc(head, "cross", T.Text, T.Hit);
+        // 右上の丸い ×（押せる範囲 96。パネルの中）
+        var close = UiKit.Disc(body, "cross", T.Text, T.Hit);
+        var cr = close.Root; cr.anchorMin = cr.anchorMax = cr.pivot = new Vector2(1f, 1f); cr.anchoredPosition = new Vector2(-T.S2, -T.S2);
+        UiKit.Ignore(cr);
         close.Face.raycastTarget = true;
-        var cb = close.Root.gameObject.AddComponent<Button>();
+        var cb = cr.gameObject.AddComponent<Button>();
         cb.targetGraphic = close.Face; cb.transition = Selectable.Transition.None;
         cb.navigation = new Navigation { mode = Navigation.Mode.None };
         cb.onClick.AddListener(() => SetBig(false));
-
-        float topY = pad + BigHeaderH + T.S1;
-        float botY = pad + BigFooterH + T.S1 + BigCompareH + T.S1;
-
-        // 左：GMAT のメーター（GmatGauges が自分のパネルをここへ入れる）
-        gaugeColumn = Ui.Rect("GaugeColumn", body);
-        Ui.Anchor(gaugeColumn, 0, 0, 0, 1, pad, botY, -(pad + GmatGauges.ColumnW), topY);
-
-        // 地図（メーターの右）
-        var area = Ui.Rect("Map", body);
-        Ui.Anchor(area, 0, 0, 1, 1, pad + GmatGauges.ColumnW + T.S2, botY, pad, topY);
-        var space = UiKit.Round(area, T.RadiusM, T.Ink, "Space"); UiKit.Fill(space.rectTransform);
-        HudStars.Add(space.rectTransform);   // #190：宇宙に小さな星の模様（線の下）
-        bigView = new MapView(area, true);
-
-        // 比較（A・B のカード）
-        var cmp = Ui.Rect("Compare", body);
-        Ui.Anchor(cmp, 0, 0, 1, 0, pad, 0, pad, 0);
-        cmp.pivot = new Vector2(0.5f, 0f); cmp.sizeDelta = new Vector2(cmp.sizeDelta.x, BigCompareH);
-        cmp.anchoredPosition = new Vector2(cmp.anchoredPosition.x, pad + BigFooterH + T.S1);
-        bigA = Compare.MakeBig(cmp, "a", 0f, 0.5f);
-        bigB = Compare.MakeBig(cmp, "b", 0.5f, 1f);
-
-        // だれが選ぶか（出典は見出しの右に1回だけ）
-        var foot = UiKit.Row(body, T.S1, TextAnchor.MiddleLeft);
-        Ui.Anchor(foot, 0, 0, 1, 0, pad, 0, pad, 0);
-        foot.pivot = new Vector2(0.5f, 0f); foot.sizeDelta = new Vector2(foot.sizeDelta.x, BigFooterH);
-        foot.anchoredPosition = new Vector2(foot.anchoredPosition.x, pad);
-        new TimelineKit.BadgeRow(foot, TimelineKit.MiniBadge).Set(new[] { Seats.Planner }, Ctx.Model.MySeats);
-        UiKit.Text(foot, Words.Picker, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
+        closeRect = cr;
 
         big.gameObject.SetActive(false);
     }
@@ -268,7 +245,12 @@ public class MapWidget : HudPart
     // ------------------------------------------------------------------ 受け取る
     public override void Refresh(GameState s)
     {
-        if (bigOpen && !Ctx.ShowPlannerView) SetBig(false);   // Planner の席が無い人には大きい地図も出さない（#200）
+        if (bigOpen && !Ctx.ShowPlannerView) SetBig(false);
+        // #212：開いている間に、点火の窓が開いた・帰還の突入が始まった・段階が変わったら自動で閉じる（state を見て決める）
+        if (bigOpen && s != null)
+        {
+            if (Crossed(openT, s.t, s.tBurnOpen) || Crossed(openT, s.t, s.RouteReentry(s.route ?? "")) || Ctx.Model.Phase != openPhase) SetBig(false);
+        }   // Planner の席が無い人には大きい地図も出さない（#200）
         if (s != null)
         {
             if (s.t < lastT || !s.burnDone) burnSeenT = -1f;          // 新しいゲーム・まだ点火していない
@@ -282,8 +264,8 @@ public class MapWidget : HudPart
 
     public override void OnEvent(GameEvent e)
     {
-        // #212：同時押しの合図（press）・警報（warning・事故 M05）が来たら自動で閉じる（点火・警報を見逃さない）
-        if (bigOpen && (e.kind == "press" || e.kind == "warning" || (e.kind == "houston" && e.id == "M05"))) SetBig(false);
+        // #212：同時押しの合図（press）・警報（warning）・Houston の新しい台詞（houston）が来たら自動で閉じる（点火・警報を見逃さない）
+        if (bigOpen && (e.kind == "press" || e.kind == "warning" || e.kind == "houston")) SetBig(false);
     }
 
     public override void Tick(float now)
@@ -299,7 +281,7 @@ public class MapWidget : HudPart
     /// <summary>今の船の軌道（A／B。噴射の前は A）と、その上の GMAT の経過時間（時間）。地図と同じ値（#167：GmatGauges が読む）。軌道が無ければ null</summary>
     public bool BigOpen => bigOpen;            // #210：GMAT のメーター（GmatGauges）が、大きい地図の開閉について出入りする
     public RectTransform BigRect => big;
-    public RectTransform GaugeColumn => gaugeColumn;   // #212：大きい地図の左の列（GmatGauges がここへ入る）
+    public RectTransform GaugeColumn => gaugeColumn;   // #212：メーターの列。いまは作らない（null）ので GmatGauges は出ない
     public GmatRoute ShipRoute { get; private set; }
     public float ShipH { get; private set; }
 
