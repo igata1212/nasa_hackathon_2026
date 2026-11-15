@@ -75,6 +75,7 @@ public static class EndingCopy
 
     // ================================================================== ボタン・名前タグ
     public const string HoustonTag = "Houston";
+    public const string TotalLabel = "Total";
     public const string ScoreIcon = "score", ScoreUnit = "pts";   // 得点の数のチップ（トロフィーの台、右下に pts の札。【09】）
     public const string SeeReport = "See the report!";
     public const string SeeReportIcon = "enter";

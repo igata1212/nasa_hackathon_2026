@@ -178,11 +178,11 @@ public class ReturnStage : StoryStage
 
         // 字幕：下の短い字幕 → ヒューストンの帯（下）→ SPLASHDOWN!（上）
         string lowText = "";
-        if (t > 0.25f && t < T1 - 0.2f) lowText = "RE-ENTRY  -  HEAT SHIELD FIRST";
-        else if (t >= TChute && t < TChute + (edA ? 0.5f : 0.8f)) lowText = "MAIN CHUTES OPEN";
+        if (t > 0.25f && t < T1 - 0.2f) lowText = "Re-entry: heat shield first";
+        else if (t >= TChute && t < TChute + (edA ? 0.5f : 0.8f)) lowText = "Main chutes open";
         d.LowCaption(lowText);
         d.HoustonBar(t >= (edA ? TChute + 0.5f : TText + 0.3f) ? d.Line(edA ? "ED-A" : "ED-B") : "");
-        if (t >= TText) d.Caption("SPLASHDOWN!", edA ? "WELCOME HOME, CREW!" : "WELCOME HOME  -  THAT WAS CLOSE!", Ui.Yellow, EaseOutBack(Win(t, TText, TText + 0.35f)));
+        if (t >= TText) d.Caption("Splashdown!", edA ? "Welcome home, crew!" : "Welcome home. That was close!", Ui.Yellow, EaseOutBack(Win(t, TText, TText + 0.35f)));
         else d.Caption("", "");
         Sound(t, edA, heat);
     }

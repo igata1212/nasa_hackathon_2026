@@ -16,11 +16,12 @@ using T = UiTokens;
 // ====================================================================== 寸法
 public static class EndingTokens
 {
-    public const float CardW = 360, CardH = 192;   // 資源のカード（【11】の色違いのカード）。状態の1行「Too low (need 12.5°C)」が入る幅
+    public const float CardW = 320, CardH = 224;   // 資源のカード（【11】の色違いのカード）。状態の1行「Too low (need 12.5°C)」が入る幅
     public const float CardPad = T.S2;             // カードの内側（内側の線 6+2 の内に 8。844×390 で高さが足りるように 24 から詰めた）
     public const float StatusD = T.HintDiscD;      // カードの状態の台（40）
     public const float QuoteCorner = 64;           // ヒューストンの吹き出しの縁（blob_bubble の border 120 を 64 に描く。高さ 120 前後でも上下の縁が収まる）
     public const float QuotePadX = T.S4 + T.S2, QuotePadTop = T.S3, QuotePadBottom = T.S2;   // 吹き出しの内側（台詞 36 の吹き出しは 72・36。高さが 120 しかないので詰めた）
+    public const float WaveTile = 96;              // wave_edge の1枚の幅（波の幅はこの整数倍にして、右端がこぶで終わるようにする）
     public const float WaveH = 24;                 // 見出しの帯の下の波（wave_edge の高さ。半分を帯に重ねる）
     public const float PillH = T.HintH;            // 小さな札（結末・判定が厳しくなった理由。56）
     public const float ApolloH = T.PrimaryH;       // アポロ13号のカードの高さ（主ボタンと並ぶ）
@@ -43,7 +44,7 @@ public static class EndingLayout
     // エンディング（#85）
     public static readonly Vector4 EndTop = new Vector4(0f, 0.80f, 1f, 1f);          // 見出しの帯＋1行（左）／得点の数のチップ（右）
     public static readonly Vector4 EndMid = new Vector4(0f, 0.42f, 1f, 0.79f);       // 資源のカード＋判定が厳しくなった理由
-    public static readonly Vector4 EndHouston = new Vector4(0.15f, 0.215f, 0.85f, 0.395f);
+    public static readonly Vector4 EndHouston = new Vector4(0.175f, 0.20f, 0.825f, 0.405f);
     public static readonly Vector4 EndBottom = new Vector4(0f, 0f, 1f, 0.20f);       // See the report!（右下）
 
     // 事後レポート（#86）
@@ -220,7 +221,16 @@ public class UiEndBanner
     {
         Ribbon.SetText(text);
         Ribbon.Face.color = face;
-        if (Wave != null) Wave.color = face;
+        if (Wave != null)
+        {
+            Wave.color = face;
+            // 波の幅をタイル1枚の整数倍に（右端がこぶの途中で切れない）
+            LayoutRebuilder.ForceRebuildLayoutImmediate(Ribbon.Root);
+            float w = LayoutUtility.GetPreferredWidth(Ribbon.Root) - T.RibbonH;
+            var r = Wave.rectTransform;
+            r.anchorMin = r.anchorMax = new Vector2(0.5f, 0f);
+            r.sizeDelta = new Vector2(Mathf.Max(1, Mathf.Floor(w / EndingTokens.WaveTile)) * EndingTokens.WaveTile, EndingTokens.WaveH);
+        }
         Icon.sprite = icon == null ? null : T.Icon(icon);
         Icon.gameObject.SetActive(Icon.sprite != null);
     }
@@ -345,8 +355,8 @@ public static class EndingWidgets
             b.Wave.type = Image.Type.Tiled;
             UiKit.Ignore(b.Wave);
             var w = b.Wave.rectTransform;
-            w.anchorMin = new Vector2(0f, 0f); w.anchorMax = new Vector2(1f, 0f); w.pivot = new Vector2(0.5f, 0.5f);
-            w.sizeDelta = new Vector2(-T.RibbonH, EndingTokens.WaveH);   // 両端の丸みの内側だけ
+            w.anchorMin = new Vector2(0.5f, 0f); w.anchorMax = new Vector2(0.5f, 0f); w.pivot = new Vector2(0.5f, 0.5f);
+            w.sizeDelta = new Vector2(EndingTokens.WaveTile, EndingTokens.WaveH);   // 幅は Set() でタイルの整数倍にする
             w.anchoredPosition = Vector2.zero;
             w.localScale = new Vector3(1f, -1f, 1f);   // こぶを下に（art/ui/README.md）
             w.SetSiblingIndex(b.Ribbon.Face.transform.GetSiblingIndex() + 1);
@@ -426,7 +436,7 @@ public static class EndingWidgets
         c.Root.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(pad, pad, pad, pad);
 
         var head = UiKit.Row(c.Root, T.S1);
-        ResourceDisc(head, res, face, T.HintDiscD);
+        ResourceDisc(head, res, face, T.IconL);
         UiKit.Text(head, EndingCopy.ResourceName(res), TextStyle.RowName, T.Panel);
         var val = UiKit.Row(c.Root, T.S1, TextAnchor.LowerCenter);
         c.Value = UiKit.Text(val, "", TextStyle.Big, T.Panel);

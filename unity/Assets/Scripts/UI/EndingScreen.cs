@@ -31,7 +31,7 @@ public class EndingScreen
     public EndingScreen(Transform parent, GameFlow f)
     {
         this.f = f;
-        var bg = Ui.PanelImg(parent, T.Bg, "Ending"); Root = bg.gameObject; Ui.Fill(bg.rectTransform);   // 後ろ（船内）を押せないように面で受ける
+        var bg = Ui.PanelImg(parent, T.Bg, "Ending"); Root = bg.gameObject; Ui.Fill(bg.rectTransform); TitleBackdrop.Motifs(bg.rectTransform);   // 後ろ（船内）を押せないように面で受ける
         feed = EndingFeed.For(parent, f);
         feed.Changed += () => { if (Root.activeInHierarchy) Refresh(); };
 
@@ -48,7 +48,7 @@ public class EndingScreen
 
         // 中：資源のカード＋判定が厳しくなった理由
         var mid = EndingWidgets.FillCol(EndingWidgets.Zone(safe, EndingLayout.EndMid, "Middle"), T.S3, TextAnchor.MiddleCenter, T.ScreenEdge, 0f, 0f, false);
-        var cardRow = UiKit.Row(mid, T.S3);
+        var cardRow = UiKit.Row(mid, T.S2);
         foreach (var res in new[] { C.Oxygen, C.Power, C.Temp }) cards[res] = EndingWidgets.ResourceCard(cardRow, res);
         strict = EndingWidgets.Pill(mid, T.Panel, "caution", T.Accent, TextStyle.Body, T.Text);
 

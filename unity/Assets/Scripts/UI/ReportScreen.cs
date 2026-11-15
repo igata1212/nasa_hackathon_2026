@@ -35,7 +35,7 @@ public class ReportScreen
     public ReportScreen(Transform parent, GameFlow f)
     {
         this.f = f;
-        var bg = Ui.PanelImg(parent, T.Bg, "Report"); Root = bg.gameObject; Ui.Fill(bg.rectTransform);
+        var bg = Ui.PanelImg(parent, T.Bg, "Report"); Root = bg.gameObject; Ui.Fill(bg.rectTransform); TitleBackdrop.Motifs(bg.rectTransform);
         feed = EndingFeed.For(parent, f);
         feed.Changed += () => { if (Root.activeInHierarchy) Refresh(); };
 
@@ -67,14 +67,13 @@ public class ReportScreen
 
         // 下：本物のアポロ13号のカード＋合計＋もう一度（右下に手）
         var bottom = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepBottom, "Bottom"), T.S3, TextAnchor.MiddleRight, T.ScreenEdge, 0f, EndingTokens.BottomPad);
-        var card = UiKit.Card(bottom, T.Ink);   // 本当の宇宙の話は紺のカード（【11】の色違いのカード）
-        card.Root.name = "Apollo13";
-        int pad = Mathf.RoundToInt(T.S2);
-        card.Root.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(Mathf.RoundToInt(T.S3), Mathf.RoundToInt(T.S3), pad, pad);
-        var cle = Ui.Size(card.Root, w: 0f, h: EndingTokens.ApolloH, flexW: 1f); cle.minWidth = 0f; cle.minHeight = EndingTokens.ApolloH;
-        var line = UiKit.Row(card.Content, T.S3, TextAnchor.MiddleLeft);
-        UiKit.Tag(line, C.ApolloTag, T.Accent, T.Panel);
-        apollo = EndingWidgets.Wrap(line, "", TextStyle.Label, T.Panel, TextAlignmentOptions.MidlineLeft);
+        var card = UiKit.Row(bottom, T.S3, TextAnchor.MiddleLeft, T.S4);   // 本当の宇宙の話は黄みの豆形（【10】の choice）
+        card.name = "Apollo13";
+        var cle = Ui.Size(card, w: 0f, h: EndingTokens.ApolloH, flexW: 1f); cle.minWidth = 0f; cle.minHeight = EndingTokens.ApolloH;
+        var face = UiKit.Blob(card, T.BlobPill, T.Choice, EndingTokens.ApolloH * 0.5f, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
+        var tag = UiKit.Tag(card, C.ApolloTag, T.Accent, T.Panel);
+        tag.localEulerAngles = new Vector3(0f, 0f, T.CounterUnitTilt);
+        apollo = EndingWidgets.Wrap(card, "", TextStyle.Hint, T.Text, TextAlignmentOptions.MidlineLeft);
         var ale = Ui.Size(apollo, w: 0f, flexW: 1f); ale.minWidth = 0f;
 
         total = UiKit.Counter(bottom, C.ScoreIcon, C.ScoreUnit);
@@ -92,7 +91,15 @@ public class ReportScreen
         var dr = c.Disc.Root;
         dr.anchorMin = dr.anchorMax = new Vector2(0f, 0.5f); dr.pivot = new Vector2(0.5f, 0.5f);
         dr.anchoredPosition = new Vector2(T.S2 + d * 0.5f, 0f);
-        c.Root.GetComponent<HorizontalLayoutGroup>().padding.left = Mathf.RoundToInt(T.S2 * 2f + d);
+        var hl = c.Root.GetComponent<HorizontalLayoutGroup>();
+        hl.padding.left = Mathf.RoundToInt(T.S2 * 2f + d);
+        hl.spacing = T.S1;
+        // 小さな見出し → 点線 → 数（【09】下の合計のピル）
+        var lab = UiKit.Text(c.Root, C.TotalLabel, TextStyle.Label, T.Panel);
+        lab.transform.SetSiblingIndex(0);
+        var dash = UiKit.DashedLine(c.Root, T.WithAlpha(T.Panel, 0.6f));
+        Ui.Size(dash, w: T.S4);
+        dash.transform.SetSiblingIndex(1);
     }
 
     public void Refresh()

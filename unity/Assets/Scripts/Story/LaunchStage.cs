@@ -274,7 +274,7 @@ public class LaunchStage : StoryStage
         else if (t < TSpace - 0.3f)
         {
             Area(d, 1);
-            d.Caption("LIFTOFF!", "", Orange, EaseOutBack(Win(t, TLift, TLift + 0.35f)));
+            d.Caption("Liftoff!", "", Orange, EaseOutBack(Win(t, TLift, TLift + 0.35f)));
         }
         else d.Caption("", "");
     }
@@ -294,7 +294,7 @@ public class LaunchStage : StoryStage
         d.Cam.transform.LookAt(S + new Vector3(1.5f, 1.2f, 20f));
         d.UseSkybox();
         Area(d, 2);
-        if (t > TSpace + 0.3f && t < TEnd - 0.25f) d.Caption("", "TO THE MOON");
+        if (t > TSpace + 0.3f && t < TEnd - 0.25f) d.Caption("", "To the Moon!");
         else d.Caption("", "");
         fireLight.intensity = 0f;
         PlayOnce(padSmoke, false);
