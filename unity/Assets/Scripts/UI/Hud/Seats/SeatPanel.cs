@@ -245,7 +245,7 @@ public static class SeatLook
             var bi = UiKit.Shape(clip, bands, T.PanelBand, 0f, "Tiles");
             bi.type = Image.Type.Tiled;
             var br = bi.rectTransform;   // 上端を縞の周期の切れ目に合わせる（一番上は透明＝panel。波の縁と同じ色でつながる）
-            br.anchorMin = new Vector2(0f, 1f); br.anchorMax = Vector2.one; br.pivot = new Vector2(0.5f, 1f);
+            br.anchorMin = Vector2.zero; br.anchorMax = new Vector2(1f, 0f); br.pivot = new Vector2(0.5f, 0f);
             br.sizeDelta = new Vector2(0f, TileH * 2f); br.anchoredPosition = Vector2.zero;
         }
 

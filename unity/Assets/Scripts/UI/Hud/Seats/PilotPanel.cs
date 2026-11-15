@@ -71,7 +71,6 @@ public class PilotPanel : SeatPanel
 
     protected override void BuildControls(RectTransform row)
     {
-        RootAsDetail();   // 照明 OFF で暗くしてよい（#87 が量を決める）
         string me = Seat;
         strip = SeatLook.Strip(row);
 
@@ -82,7 +81,7 @@ public class PilotPanel : SeatPanel
         headNote = UiKit.Text(head, "", TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft);
         SeatLook.ReserveWidth(headNote, K.Words.PracticeTry, K.Words.PracticeDone, K.F(Words.FuelNote, 99));
 
-        var grid = UiKit.Row(strip.Rect, T.SlotGap, TextAnchor.MiddleCenter);
+        var grid = UiKit.Row(strip.Rect, T.S4 + T.S1, TextAnchor.MiddleCenter);
         grid.name = "Attitude";
         foreach (var a in Attitudes)
         {

@@ -192,7 +192,7 @@ public class UiCursor : MonoBehaviour
         Rect r = Target.rect;
         Vector2 tipLocal = Dir == CursorDir.Right
             ? new Vector2(r.xMin - T.S1, r.center.y)
-            : new Vector2(r.xMax - r.width * 0.2f, r.yMin + r.height * 0.2f);
+            : (r.width <= T.SlotD + 1f ? new Vector2(r.xMax - 12f, r.yMin + T.S4) : new Vector2(r.xMax - r.width * 0.2f, r.yMin + r.height * 0.2f));
         Vector2 to = parent.InverseTransformPoint(Target.TransformPoint(tipLocal));
         if (!placed) { from = to; moveT = 1f; placed = true; }
 
@@ -228,7 +228,7 @@ public class UiItemTag
         t.Root.name = "ItemTag";
         t.Root.anchorMin = t.Root.anchorMax = new Vector2(0.5f, 1f);
         t.Root.pivot = new Vector2(0.5f, 0f);
-        t.Root.anchoredPosition = new Vector2(0f, -T.ItemTagH * 0.25f);
+        t.Root.anchoredPosition = Vector2.zero;
         t.Root.localRotation = Quaternion.Euler(0f, 0f, T.ItemTagTilt);
         UiKit.Ignore(t.Root.gameObject.AddComponent<LayoutElement>());
         var fit = t.Root.gameObject.AddComponent<ContentSizeFitter>();

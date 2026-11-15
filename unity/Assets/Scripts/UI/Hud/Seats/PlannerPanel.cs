@@ -77,7 +77,6 @@ public class PlannerPanel : SeatPanel
     // ------------------------------------------------------------------ 作る
     protected override void BuildControls(RectTransform row)
     {
-        RootAsDetail();
         strip = SeatLook.Strip(row, SeatLook.CursorRoom);   // 先頭の行を右向きの手で指すので、左に手の場所を空ける
 
         // ① 観測：材料の行（1列に2行まで）＋条件の3行
