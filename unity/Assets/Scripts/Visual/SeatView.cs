@@ -40,7 +40,7 @@ public class SeatView : MonoBehaviour
     public bool seatViewOnStart = true;
     [Tooltip("一人称の間、自分のクルーは腕だけ描く（ヘルメットと胴が画面をふさぐので）")] public bool hideOwnCrew = true;
     [Tooltip("計器盤のまん中の真正面から見た、カメラの位置（盤のルートの向きで m。y は床からの高さ、z は手前へ）")] public Vector3 cameraOffset = new Vector3(0f, 1.55f, 1.15f);   // #210 引いて、針5つを上の1行と吹き出しの間に入れる
-    [Tooltip("盤のまん中から、見る点を下げる量（m）")] public float lookDown = 0.10f;   // #210 盤を少し上に
+    [Tooltip("盤のまん中から、見る点を下げる量（m）")] public float lookDown = 0.18f;   // #210 盤を少し上に（吹き出しの上に針5つ）
     public float fieldOfView = 54f;
     [Tooltip("席を替えたとき・切り替えたときに移る速さ（大きいほど速い）")] public float moveSpeed = 6f;
 

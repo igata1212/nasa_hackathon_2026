@@ -23945,7 +23945,7 @@ MonoBehaviour:
   seatViewOnStart: 1
   hideOwnCrew: 1
   cameraOffset: {x: 0, y: 1.55, z: 1.15}
-  lookDown: 0.1
+  lookDown: 0.18
   fieldOfView: 54
   moveSpeed: 6
   closeCabin: 1
