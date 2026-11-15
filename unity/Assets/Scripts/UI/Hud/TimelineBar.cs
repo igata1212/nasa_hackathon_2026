@@ -73,7 +73,7 @@ public class TimelineBar : HudPart
     Image splash;
     TimelineKit.Countdown next;
 
-    const float CompactScreenW = 1000f;   // #216：画面の幅（px）がこれより狭い（844×390 など）と、帯の中の小さい文字を消してアイコンだけにする
+    const float CompactAspect = 2f;   // #216：横長のスマホ（844×390 など。幅÷高さが 2 より大きい）は、帯の中の小さい文字を消してアイコンだけにする。px の幅で見ると高解像度の iPhone（2532 px）で効かないので比で見る
     bool wide = true;                     // #216：いまの bar が全幅か（事故の前は時計のチップだけ）
 
     // #216：全幅の帯と、時計だけの小さなチップ（左上）を切り替える
@@ -241,7 +241,7 @@ public class TimelineBar : HudPart
         float iconW = T.IconS;
         float badgeW = g.Badges.Count > 0 ? T.S1 + g.Badges.Width : 0f;
         string pick = null; bool badges = g.Badges.Count > 0;
-        if (Screen.width < CompactScreenW) texts = NoText;   // #216：狭い画面は区間の文字を消してアイコンだけ
+        if (Screen.height > 0 && (float)Screen.width / Screen.height > CompactAspect) texts = NoText;   // #216：横長のスマホは区間の文字を消してアイコンだけ
         foreach (var tx in texts)
             if (Need(g, tx, iconW, badgeW) <= room) { pick = tx; break; }
         if (pick == null)
