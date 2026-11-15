@@ -225,6 +225,7 @@ public class MapWidget : HudPart
     // ------------------------------------------------------------------ 受け取る
     public override void Refresh(GameState s)
     {
+        if (bigOpen && !Ctx.ShowPlannerView) SetBig(false);   // Planner の席が無い人には大きい地図も出さない（#200）
         if (s != null)
         {
             if (s.t < lastT || !s.burnDone) burnSeenT = -1f;          // 新しいゲーム・まだ点火していない

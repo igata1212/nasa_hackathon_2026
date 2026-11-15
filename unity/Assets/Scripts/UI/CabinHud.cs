@@ -115,6 +115,9 @@ public class CabinHud
     {
         var s = ctx.State;
         UpdateLights(s);
+        bool plan = ctx.ShowPlannerView;   // 地図・タイムラインは Planner の席の人だけ（#157、#200）。席が変わるたびにここで見直す
+        slots[HudSlot.TopCenter].gameObject.SetActive(plan);
+        slots[HudSlot.TopRight].gameObject.SetActive(plan);
         foreach (var p in parts) p.Refresh(s);
         RefreshSeat(s);
     }
