@@ -24,7 +24,8 @@ public class HoustonWindow : MonoBehaviour
     public bool autoTalk = true;
 
     RectTransform panel, frame;
-    Text line, noSignal;
+    Text line;
+    TextMeshProUGUI noSignal;
     TextMeshProUGUI caption;
     RawImage img;
     RenderTexture rt;
@@ -67,18 +68,20 @@ public class HoustonWindow : MonoBehaviour
         foreach (var tx in panel.GetComponentsInChildren<Text>(true))   // 見出し「HOUSTON」の次が台詞（HoustonBox の作り順）
             if (tx.text != "HOUSTON") { line = tx; break; }
 
-        var fbg = Ui.PanelImg(panel, Ui.Orange, "HoustonWindow"); frame = fbg.rectTransform;
+        var fbg = UiKit.Blob(panel, UiTokens.BlobPanel, UiTokens.Panel, UiTokens.S2, "HoustonWindow"); frame = fbg.rectTransform;   // #190：角丸のカード＋明るい内ふち（Fable 採点 b-5・a-4）
         fbg.raycastTarget = false;
-        var ir = Ui.Rect("View", frame); Ui.Fill(ir); ir.offsetMin = new Vector2(3, 3); ir.offsetMax = new Vector2(-3, -3);
+        fbg.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+        frame.localRotation = Quaternion.Euler(0f, 0f, 2f);   // 写真のように少し傾ける（【03】）
+        var ir = Ui.Rect("View", frame); Ui.Fill(ir); ir.offsetMin = new Vector2(6, 6); ir.offsetMax = new Vector2(-6, -6);
         img = ir.gameObject.AddComponent<RawImage>(); img.texture = rt; img.raycastTarget = false;
-        noSignal = Ui.Label(frame, "NO SIGNAL", 22, Ui.Red, TextAnchor.MiddleCenter, FontStyle.Bold);
-        Ui.Fill(noSignal.rectTransform);
+        noSignal = UiKit.Text(frame, HoustonStyle.NoSignalTitle, TextStyle.Label, UiTokens.Panel, TMPro.TextAlignmentOptions.Center, false);   // 画面の言葉。判定は Probe の "NO SIGNAL"（下の Update）
+        UiKit.Fill(noSignal.rectTransform);
         // 下の帯：紺の帯に白の補助ラベル 22（3D の絵の上でも読めるように）。文字は Update で窓の大きさに合わせて替える
         var strip = Ui.PanelImg(frame, UiTokens.WithAlpha(UiTokens.Ink, HoustonStyle.WindowCaptionAlpha), "Caption");
         strip.raycastTarget = false;
         var sr = strip.rectTransform;
         sr.anchorMin = Vector2.zero; sr.anchorMax = new Vector2(1f, 0f); sr.pivot = new Vector2(0.5f, 0f);
-        sr.offsetMin = new Vector2(3f, 3f); sr.offsetMax = new Vector2(-3f, 3f + HoustonStyle.WindowCaptionH);
+        sr.offsetMin = new Vector2(6f, 6f); sr.offsetMax = new Vector2(-6f, 6f + HoustonStyle.WindowCaptionH);
         caption = UiKit.Text(strip.transform, HoustonStyle.WindowTagSmall, TextStyle.Label, UiTokens.Panel, TMPro.TextAlignmentOptions.Center, false);
         UiKit.Fill(caption.rectTransform);
     }
