@@ -28,7 +28,7 @@ public static class UiTokens
     public static readonly Color GoLight = Hex("4DB8AA");   // 主ボタンの縞とふち
     public static readonly Color Plum = Hex("8A6BBE");      // 台・カード・見出しの帯の色違い
     public static readonly Color Mark = WithAlpha(Accent, 0.45f);   // 選んだ選択肢のマーカー・数の色の箱
-    public static readonly Color Rim = WithAlpha(Color.white, 0.55f); // パネルの内ふち
+    public static readonly Color Rim = Color.Lerp(Panel, Color.white, 0.55f); // パネルの内ふち（不透明。半透明だと 3D が透けて光る輪に見える。【05】、Fable 採点 a-3）
     // 船内の計器（ゲージ・地図・タイムラインの帯）だけは暗い面（ui-guidelines 1章の6・2章。Fable 5.2、2026-11-14 のダーク/ライトの判断）。
     //   声（吹き出し）・操作（ボタン・カード）・警告の帯は明るいまま。タイトル・設計・レポートも明るいまま
     public static readonly Color HudFace = WithAlpha(Ink, 0.94f);      // 計器の面（色空間が Linear なので 0.94 でほぼ紺）
@@ -171,7 +171,7 @@ public static class UiTokens
     public const float CrewLift = 0.06f;          // 台の上に浮かせる高さ（CrewFloat で揺れる）
     public const float CrewBob = 0.025f;          // 上下の揺れ幅
     public const float StageFov = 30f;
-    public const float StageCamDistance = 6.6f, StageCamHeight = 1.35f, StageLookHeight = 0.72f;
+    public const float StageCamDistance = 6.6f, StageCamHeight = 1.35f, StageLookHeight = 0.82f;   // 0.82：部屋の左上の札と名前の吹き出しを離す（Fable 採点 a-8）
     public const float StageAspect = 16f / 9f;    // これより縦長の画面では、4人が入るようにカメラを引く
     public const float TagAboveHead = 0.12f;      // 名前のタグを頭の上どれだけに置くか
     public const float PadGlowSelf = 2.4f, PadGlowOther = 0.6f, PadGlowOpen = 0.05f;   // 台の光（Emission の強さ）

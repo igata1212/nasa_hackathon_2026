@@ -477,10 +477,11 @@ public static class UiKit
         float left = T.S2;
         if (icon != null)
         {
-            var ic = Icon(body, icon, T.IconM, T.TextSoft).rectTransform;
+            // 単色の線のアイコンを置かず、色つきの台に載せる（原則 10、【01】【11】。名前＝go、合言葉＝accent。Fable 採点 a-7）
+            var ic = Disc(body, icon, icon == "room_code" ? T.Accent : T.Go, T.RowDiscD).Root;
             ic.anchorMin = ic.anchorMax = ic.pivot = new Vector2(0f, 0.5f);
-            ic.sizeDelta = new Vector2(T.IconM, T.IconM); ic.anchoredPosition = new Vector2(T.S2, 0f);
-            left += T.IconM + T.S2;
+            ic.anchoredPosition = new Vector2(T.S2, 0f);
+            left += T.RowDiscD + T.S2;
         }
         var area = Ui.Rect("TextArea", body); Fill(area);
         area.offsetMin = new Vector2(left, 0f); area.offsetMax = new Vector2(-T.S2, 0f);
@@ -823,7 +824,7 @@ public class UiChoice
     public void SetEnabled(int i, bool on)
     {
         Buttons[i].interactable = on;
-        Labels[i].color = on ? UiTokens.Text : UiTokens.Line;
+        Labels[i].color = on ? UiTokens.Text : UiTokens.WithAlpha(UiTokens.TextSoft, 0.6f);   // 押せない行も読める濃さ（3章、Fable 採点 a-2）
     }
 }
 
