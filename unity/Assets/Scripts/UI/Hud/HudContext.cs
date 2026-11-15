@@ -26,6 +26,9 @@ public class HudContext
     public float SlowPct => State != null ? State.slowPct : 0f;
     /// <summary>記録の再生中（操作は送っても無視される）</summary>
     public bool Offline => Flow.Client is OfflineClient;
+    /// <summary>軌道の地図・タイムライン・ルートの比較を出すか。Mission Planner の席を持つ人だけ（SPEC 6章「席ごとに見えるもの」、#157）。
+    /// 兼任なら持っている席で決まる。記録の再生（オフライン）は視点が1席だけなので全部出す（#200）</summary>
+    public bool ShowPlannerView => Offline || Model.MySeats.Contains(Seats.Planner);
     /// <summary>席タブで選んでいる席（自分の席のどれか）。席がまだ無ければ null</summary>
     public string ActiveSeat { get; internal set; }
     /// <summary>照明 OFF か（state の sw.lights）</summary>
