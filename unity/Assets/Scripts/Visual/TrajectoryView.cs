@@ -29,8 +29,8 @@ public class TrajectoryView : MonoBehaviour
     public Transform ship;                 // Ship_Stack。+Z が進行方向
     public Transform earth, moon;
 
-    public static readonly Color ColorA = new Color(1f, 0.784f, 0.341f);    // #FFC857
-    public static readonly Color ColorB = new Color(0.486f, 0.776f, 1f);    // #7CC6FF
+    public static readonly Color ColorA = new Color(0.302f, 0.722f, 0.667f);  // #4DB8AA（GoLight。A＝go、2D の地図・ルートのカードと同じ。#190）
+    public static readonly Color ColorB = new Color(0.651f, 0.545f, 0.839f);  // #A68BD6（Plum を暗い宇宙で見えるよう明るく。B＝plum。#190）
     public static readonly Color ColorNone = new Color(0.984f, 0.969f, 0.933f);   // #FBF7EE
     const float EarthRealKm = 6378.14f, MoonRealKm = 1737.4f;
 
