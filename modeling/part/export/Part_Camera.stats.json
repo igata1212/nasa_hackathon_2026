@@ -1,0 +1,85 @@
+{
+ "name": "Part_Camera",
+ "tris": 1102,
+ "min": [
+  -0.2,
+  -0.2,
+  0.0
+ ],
+ "max": [
+  0.2,
+  0.2,
+  0.615
+ ],
+ "size": [
+  0.4,
+  0.4,
+  0.615
+ ],
+ "objects": {
+  "Part_Camera": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_Camera.Barrel": {
+   "origin": [
+    0.0,
+    0.0,
+    0.44
+   ],
+   "tris": 188
+  },
+  "Part_Camera.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.2
+   ],
+   "tris": 108
+  },
+  "Part_Camera.Glint": {
+   "origin": [
+    -0.04,
+    -0.035,
+    0.595
+   ],
+   "tris": 48
+  },
+  "Part_Camera.Lens": {
+   "origin": [
+    0.0,
+    0.0,
+    0.52
+   ],
+   "tris": 126
+  },
+  "Part_Camera.Plinth": {
+   "origin": [
+    0.0,
+    0.0,
+    0.03
+   ],
+   "tris": 108
+  },
+  "Part_Camera.Rim": {
+   "origin": [
+    0.0,
+    0.0,
+    0.545
+   ],
+   "tris": 384
+  },
+  "Part_Camera.Shutter": {
+   "origin": [
+    0.12,
+    -0.12,
+    0.36
+   ],
+   "tris": 140
+  }
+ }
+}

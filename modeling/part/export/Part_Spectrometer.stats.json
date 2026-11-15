@@ -1,0 +1,61 @@
+{
+ "name": "Part_Spectrometer",
+ "tris": 644,
+ "min": [
+  -0.24,
+  -0.24,
+  0.0
+ ],
+ "max": [
+  0.24,
+  0.24,
+  0.63
+ ],
+ "size": [
+  0.48,
+  0.48,
+  0.63
+ ],
+ "objects": {
+  "Part_Spectrometer": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_Spectrometer.Band": {
+   "origin": [
+    0.0,
+    0.0,
+    0.2364
+   ],
+   "tris": 188
+  },
+  "Part_Spectrometer.Body": {
+   "origin": [
+    0.0,
+    0.0,
+    0.27
+   ],
+   "tris": 188
+  },
+  "Part_Spectrometer.Plinth": {
+   "origin": [
+    0.0,
+    0.0,
+    0.03
+   ],
+   "tris": 188
+  },
+  "Part_Spectrometer.Prism": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 80
+  }
+ }
+}
