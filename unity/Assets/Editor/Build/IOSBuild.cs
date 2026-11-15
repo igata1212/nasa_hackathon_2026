@@ -18,6 +18,7 @@ public static class IOSBuild
     const string OutDir = "Builds/iOS";
     const string Scene = "Assets/Scenes/Game.unity";
     const string BundleId = "com.enryonasa.missionreturn";
+    const string IconPath = "Assets/Art/AppIcon/AppIcon_1024.png";   // 仮のアイコン（クルーのレンダーから切り出し。#224）
     const string LocalNetworkText = "Connects to the Mission Return game server on your local network.";
 
     [MenuItem("Tools/Build/iOS (Xcode project)")]
@@ -53,6 +54,13 @@ public static class IOSBuild
         PlayerSettings.iOS.sdkVersion = iOSSdkVersion.DeviceSDK;
         PlayerSettings.iOS.targetOSVersionString = "15.0";
         PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;   // LAN の ws://（TLS なし）
+        // TestFlight に上げるたびに増やす番号。IOS_BUILD_NUMBER があればそれを使う（#224）
+        var buildNumber = System.Environment.GetEnvironmentVariable("IOS_BUILD_NUMBER");
+        if (!string.IsNullOrEmpty(buildNumber)) PlayerSettings.iOS.buildNumber = buildNumber;
+        // アイコン（1024 の App Store 用もここから作られる。無いとアップロードで弾かれる）
+        AssetDatabase.ImportAsset(IconPath);
+        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
+        if (icon != null) PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown, new[] { icon });
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
         PlayerSettings.allowedAutorotateToPortrait = false;
         PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
@@ -72,6 +80,7 @@ public static class IOSBuild
         plist.ReadFromFile(plistPath);
         var root = plist.root;
         root.SetString("NSLocalNetworkUsageDescription", LocalNetworkText);
+        root.SetBoolean("ITSAppUsesNonExemptEncryption", false);   // 標準の暗号（https/wss）だけ。TestFlight の輸出の質問を省く
         var ats = root["NSAppTransportSecurity"] as PlistElementDict ?? root.CreateDict("NSAppTransportSecurity");
         ats.SetBoolean("NSAllowsArbitraryLoads", true);
         ats.SetBoolean("NSAllowsLocalNetworking", true);
