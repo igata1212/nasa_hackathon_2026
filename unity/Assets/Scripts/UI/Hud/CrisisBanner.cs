@@ -212,6 +212,9 @@ public class CrisisBanner : HudPart
     /// <summary>帯が危険（赤）か。段階 2・3、または critical の声なしの警告</summary>
     bool Danger(int level, bool warn) => level >= 2 || (warn && warnPriority == "critical");
 
+    /// <summary>危機の帯が出ているか（BurnCheck がカードの位置をずらすのに使う）</summary>
+    public bool Showing => band != null && band.Root != null && band.Root.gameObject.activeSelf;
+
     bool BurnCardShown()
     {
         if (burn == null) foreach (var p in Ctx.Parts) if (p is BurnCheck b) { burn = b; break; }

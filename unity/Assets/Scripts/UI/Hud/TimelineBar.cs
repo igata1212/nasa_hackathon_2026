@@ -58,7 +58,7 @@ public class TimelineBar : HudPart
     const float TrackInsetY = 8f;        // 帯の上下のすき間（帯の高さ = slot − 2×(BarInsetY＋これ)）
     const float TrackH = 40f;            // 帯の角丸を決める高さ（実際の高さは slot の高さから決まる）
     const float NowW = 4f, NowOver = 6f; // 「いま」の縦線（ゲージの生還ラインと同じ形：幅 4、上下に 6 はみ出す）
-    const float NowKnob = 14f;           // 縦線の上の丸
+    const float NowKnob = 18f;           // 縦線の上の丸
 
     class Seg
     {
@@ -109,8 +109,8 @@ public class TimelineBar : HudPart
         Ui.Anchor(past, 0, 0, 0, 1);
 
         nowLine = Ui.Rect("Now", track);
-        nowLine.anchorMin = new Vector2(0f, 0f); nowLine.anchorMax = new Vector2(0f, 1f); nowLine.pivot = new Vector2(0.5f, 0.5f);
-        nowLine.offsetMin = new Vector2(-NowW * 0.5f, -NowOver); nowLine.offsetMax = new Vector2(NowW * 0.5f, NowOver);
+        nowLine.anchorMin = new Vector2(0f, 1f); nowLine.anchorMax = new Vector2(0f, 1f); nowLine.pivot = new Vector2(0.5f, 0.5f);
+        nowLine.offsetMin = new Vector2(-NowW * 0.5f, -10f); nowLine.offsetMax = new Vector2(NowW * 0.5f, NowOver);
         nowLine.gameObject.AddComponent<Image>().color = T.HudText;
         var knob = UiKit.Pill(nowLine, T.HudText, NowKnob, "Knob").rectTransform;
         knob.anchorMin = knob.anchorMax = new Vector2(0.5f, 1f); knob.sizeDelta = new Vector2(NowKnob, NowKnob); knob.anchoredPosition = Vector2.zero;
@@ -181,8 +181,8 @@ public class TimelineBar : HudPart
         }
         else
         {
-            SetSeg(reA, s.tReentryA, s.tSplashdownA, end, T.Panel, T.TextSoft, IfIcon, Words.IfA, NoSeats, mine);
-            SetSeg(reB, s.tReentryB, s.tSplashdownB, end, T.Panel, T.TextSoft, IfIcon, Words.IfB, NoSeats, mine);
+            SetSeg(reA, s.tReentryA, s.tSplashdownA, end, T.HudSeg, T.Panel, IfIcon, Words.IfA, NoSeats, mine);
+            SetSeg(reB, s.tReentryB, s.tSplashdownB, end, T.HudSeg, T.Panel, IfIcon, Words.IfB, NoSeats, mine);
         }
 
         // 着水（地球）・通った所・いま
@@ -192,7 +192,7 @@ public class TimelineBar : HudPart
         float xn = Mathf.Clamp01(s.t / end);
         past.anchorMax = new Vector2(xn, 1f);
         past.gameObject.SetActive(xn > 0f);
-        nowLine.anchorMin = new Vector2(xn, 0f); nowLine.anchorMax = new Vector2(xn, 1f);
+        nowLine.anchorMin = new Vector2(xn, 1f); nowLine.anchorMax = new Vector2(xn, 1f);
 
         RefreshNext(s, mine);
     }

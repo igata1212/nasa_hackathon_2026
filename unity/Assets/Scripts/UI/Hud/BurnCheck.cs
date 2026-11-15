@@ -108,6 +108,13 @@ public class BurnCheck : HudPart
     /// <summary>カードが出ているか。出ている間、危機の帯（CrisisBanner）は注意（オレンジ）を隠す（#189：点火・再突入で4つ重なった）</summary>
     public bool Showing => panel != null && panel.gameObject.activeSelf;
 
+    CrisisBanner crisis;
+    bool BannerShown()
+    {
+        if (crisis == null) foreach (var p in Ctx.Parts) if (p is CrisisBanner c) { crisis = c; break; }
+        return crisis != null && crisis.Showing;
+    }
+
     class TodoRow { public RectTransform Root; public UiRow Row; public UiSeatBadge Badge; public RectTransform You; }
     class DoneChip { public RectTransform Root; public UiIconDisc Disc; public TimelineKit.BadgeRow Badge; public TextMeshProUGUI Text; }
 
@@ -407,6 +414,7 @@ public class BurnCheck : HudPart
         if (rt != null) { result.text = rt; result.color = rc; }
 
         panel.gameObject.SetActive(mode != Mode.None || signal || rt != null);
+        panel.anchoredPosition = new Vector2(0f, (BannerShown() || Ctx.State == null) ? -(T.S3 + 72f) : 0f);   // 帯が出る間だけ帯の下へ（#190 採点 b）
     }
 
     void SetTodo(TodoRow r, Item it, GameState s, List<string> mine)

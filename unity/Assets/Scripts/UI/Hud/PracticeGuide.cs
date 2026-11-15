@@ -303,6 +303,7 @@ public class PracticeGuide : HudPart
             default: l1 = string.Format(Words.StirWait, life); l2 = Words.StirWaitSub; break;
         }
         line1.text = l1; line2.text = l2;
+        line2.gameObject.SetActive(!string.IsNullOrEmpty(l2));
 
         caret.gameObject.SetActive(caret.sprite != null && (v == View.Try || v == View.StirDo));
         tapTo = v == View.NiceNext || v == View.NextManual || v == View.StirGo ? other : null;
