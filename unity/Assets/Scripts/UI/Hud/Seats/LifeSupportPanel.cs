@@ -158,9 +158,10 @@ public class LifeSupportPanel : SeatPanel
             valves[i].Set(shut ? LpLook.Off : LpLook.Secondary, !shut);
             valves[i].SetMark(shut ? "check" : null);
         }
-        hint.text = !flight ? Txt.HintPractice
+        hint.text = !flight ? ""   // #210 練習の間は案内の文を出さない（空なら場所も取らない）
             : leaking ? (closed.Count == 0 ? Txt.HintFind : Txt.HintWrong)
             : drained && s.leakOpen ? Txt.HintEmpty : Txt.HintStopped;
+        hint.gameObject.SetActive(hint.text.Length > 0);
 
         // ② フィルター：CO2 が注意の値（thresholds.co2.warn）を超えたら主ボタンにする。残りが 0 なら押せない
         int left = flight ? s.filters : Mathf.RoundToInt(GameParams.Get("co2_filters"));
@@ -178,7 +179,7 @@ public class LifeSupportPanel : SeatPanel
         if (feedback == null) swap.SetText(Txt.Swap, none ? Txt.SwapNone : SwapSub);
 
         // 手（1画面に1つ）：漏れている間はタンクの案内の文（どちらのタンクも指さない、#101）＞ フィルター
-        if (tankFocus) Point(hint.rectTransform, CursorDir.Right, true);
+        if (tankFocus) Point(hint.gameObject.activeSelf ? hint.rectTransform : tankCard.Root, CursorDir.Right, true);   // #210 文が隠れている（練習）ときはタンクのかたまりを指す
         else if (filterFocus && !none) Point(swap.Root, CursorDir.UpLeft, true);
         else Point(null, CursorDir.UpLeft);
     }
