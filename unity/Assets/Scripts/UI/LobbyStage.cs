@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#153）
+// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#153）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 名前の吹き出しのしっぽの先を頭に）
 // 部屋の画面の 3D（#72）：4人のクルー（船室と同じモデル）を手前に横一列で立たせ、足元に光る台、後ろに地球を置く。
 // 船室から遠く（UiTokens.StageOrigin）に組み、専用のカメラで RenderTexture に描いて、部屋の画面の RawImage に出す。
 // 部屋の画面の Root に付けるので、画面が出ている間だけ描く（GameFlow は変えない）。名前のタグ（2D）は頭の上に毎フレーム合わせる
@@ -255,8 +255,8 @@ public class LobbyStage : MonoBehaviour
         {
             Vector3 above;
             if (crew[i] != null && crew[i].activeInHierarchy)
-                above = crew[i].transform.position + Vector3.up * (crewTop * holders[i].localScale.y + T.TagAboveHead);
-            else above = root.TransformPoint(new Vector3(X(i), T.CrewLift + crewTop + T.TagAboveHead, 0f));
+                above = crew[i].transform.position + Vector3.up * (crewTop * holders[i].localScale.y + L.TagAboveHead);
+            else above = root.TransformPoint(new Vector3(X(i), T.CrewLift + crewTop + L.TagAboveHead, 0f));
             var p = cam.WorldToViewportPoint(above);
             tags[i].anchorMin = tags[i].anchorMax = new Vector2(p.x, p.y);
             tags[i].anchoredPosition = Vector2.zero;
