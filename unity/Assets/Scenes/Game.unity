@@ -23943,8 +23943,9 @@ MonoBehaviour:
     screen: {fileID: 2114374759}
     side: -1
   seatViewOnStart: 1
-  cameraOffset: {x: 0, y: 1.55, z: 0.9}
-  lookDown: 0
+  hideOwnCrew: 1
+  cameraOffset: {x: 0, y: 1.55, z: 1.15}
+  lookDown: 0.1
   fieldOfView: 54
   moveSpeed: 6
   closeCabin: 1
@@ -23952,9 +23953,10 @@ MonoBehaviour:
   - {fileID: 1455503240}
   - {fileID: 639677167}
   - {fileID: 694763557}
-  canvasSize: {x: 480, y: 300}
-  screenWidthMeters: 0.8
-  gaugeWidth: 0.62
+  alarmLightRange: 1.2
+  needleSpeed: 4
+  dialFontSize: 34
+  dialIconSize: 30
   impactScale: 1.8
   holdScale: 1.3
 --- !u!4 &1832633147
