@@ -62,6 +62,7 @@ public class MapWidget : HudPart
     const float SmallW = 136f, SmallH = 104f;      // #212：右上の小さい地図のボタン（押せる範囲 96 以上）
     const float GrowSec = 0.2f, GrowFrom = 0.12f;   // #212：ボタンからふくらむ時間と、はじめの大きさ
     const float ScrimAlpha = 0.8f;                 // #212：後ろの暗い幕
+    const float PulseSec = 0.4f, PulseScale = 1.3f; // #216：開ききったら船の印が1回脈打つ（1 → 1.3 → 1）
     const float BodyInset = 8f;                     // #212：全画面のパネルと領域の端のすき間
     // 大きく開いたときの置き場所（土台 CabinHud が無いときだけ使う。ふだんは CabinHud.Layout の MapBig）
     static readonly Vector4 BigAnchors = new Vector4(0f, 0f, 1f, 1f);
@@ -79,6 +80,7 @@ public class MapWidget : HudPart
     float grow;                 // #212：0＝閉じている、1＝開いている（0.2 秒で動く）
     Vector2 growFrom;           // #212：ふくらみはじめる点（小さい地図の中心。パネルの中心からのずれ）
     bool bigOpen;
+    float pulse = -1f;          // #216：船の印の脈の進み 0〜1（-1 は打っていない）
     float burnSeenT = -1f, lastT = -1f;
     Compare bigA, bigB;
 
@@ -177,7 +179,23 @@ public class MapWidget : HudPart
     void AnimateBig()
     {
         float target = bigOpen ? 1f : 0f;
-        if (grow != target) grow = Mathf.MoveTowards(grow, target, Time.unscaledDeltaTime / GrowSec);
+        if (grow != target)
+        {
+            grow = Mathf.MoveTowards(grow, target, Time.unscaledDeltaTime / GrowSec);
+            if (bigOpen && grow >= 1f) pulse = 0f;   // #216：ふくらみ終わったら脈を打つ
+        }
+        if (!bigOpen) pulse = -1f;
+        if (bigView != null)
+        {
+            float ps = 1f;
+            if (pulse >= 0f)
+            {
+                pulse = Mathf.Min(1f, pulse + UiEase.Dt / PulseSec);
+                ps = 1f + (PulseScale - 1f) * UiEase.Bump(pulse);
+                if (pulse >= 1f) pulse = -1f;
+            }
+            bigView.ShipScale(ps);
+        }
         if (big != null)
         {
             float e = UiEase.OutCubic(grow);
@@ -700,6 +718,13 @@ public class MapWidget : HudPart
             var ahead = At(r, h + dh) - At(r, h - dh);
             if (ahead.sqrMagnitude > 1e-6f)
                 shipIcon.localEulerAngles = new Vector3(0f, 0f, Mathf.Atan2(ahead.y, ahead.x) * Mathf.Rad2Deg - 45f);   // rocket のアイコンは右上（45°）を向いている
+        }
+
+        /// <summary>#216：船の印の大きさ（開いた時の脈）。同じ値なら触らない</summary>
+        public void ShipScale(float s)
+        {
+            if (ship == null || Mathf.Approximately(ship.localScale.x, s)) return;
+            ship.localScale = new Vector3(s, s, 1f);
         }
 
         static void Fade(Image tag, TextMeshProUGUI letter, string id, bool on)

@@ -10,6 +10,7 @@
 //      一人称の間は、画面の上の左のゲージ（StatusPanel）を出さない（盤で読む）
 //   ⑤ 一人称の間、手前の壁と屋根を出して船室を閉じる（狭く感じさせる）。警報ランプの赤い光は届く範囲を縮める（顔の近くで画面を赤く塗りつぶさないように）
 //   ⑥ 揺れを強くする（UrgencyFx の値に倍率を掛ける。事故の一発を大きく、続く揺れは少しだけ：針が読めなくならないように）
+//   #216 手触り：針はばねで少し行き過ぎて着き、オレンジの帯の中では小さく震える。席を替えるとカメラが隣の盤へ滑って少し行き過ぎて止まる
 // 置き場所・画角・倍率は下の SerializeField（見た目だけの値）。シーンへの組み込みは Editor/SeatMonitor/SeatMonitorScene.cs（手で置かない）。
 // 値は判定しない（UI は判定をしない）：サーバーの値を割合にして針を回すだけ。危ない側はメーターのオレンジの帯で見せる。
 // GameFlow・CabinHud・HoustonWindow には、読むための口を1つずつ足しただけ（Cabin／ActiveSeat／Texture・hideOverlay）。
@@ -43,6 +44,8 @@ public class SeatView : MonoBehaviour
     [Tooltip("盤のまん中から、見る点を下げる量（m）")] public float lookDown = 0.18f;   // #210 盤を少し上に（吹き出しの上に針5つ）
     public float fieldOfView = 54f;
     [Tooltip("席を替えたとき・切り替えたときに移る速さ（大きいほど速い）")] public float moveSpeed = 6f;
+    [Tooltip("#216 席を替えたとき、隣の盤へ滑る時間（秒）。0 以下なら上の moveSpeed で追う")] public float switchSec = 0.35f;
+    [Tooltip("#216 滑って少し行き過ぎる強さ（EaseOutBack の s。0 で行き過ぎない。1.2 で約5%）")] public float switchOvershoot = 1.2f;
 
     [Header("船室を閉じる（狭く感じさせる）")]
     [Tooltip("一人称の間、見下ろしのために外してある手前の壁と屋根を出して、船室を閉じる")] public bool closeCabin = true;
@@ -50,7 +53,11 @@ public class SeatView : MonoBehaviour
     [Tooltip("一人称の間の、警報ランプの赤い光（Alarm Light）の届く範囲（m）")] public float alarmLightRange = 1.2f;
 
     [Header("メーター")]
-    [Tooltip("針が動く速さ（大きいほど速い）")] public float needleSpeed = 4f;
+    [Tooltip("針が動く速さ（大きいほど速い）。#216 needleSettle が 0 以下のときだけ使う")] public float needleSpeed = 4f;
+    [Tooltip("#216 針がばねで値に着くまでの時間（秒）。0 以下なら前の動き（needleSpeed）")] public float needleSettle = 0.4f;
+    [Tooltip("#216 針のばねの減衰（1 で行き過ぎない。小さいほど行き過ぎる。0.65 で約7%）")] [Range(0.3f, 1f)] public float needleDamping = 0.65f;
+    [Tooltip("#216 値がオレンジの帯の中のとき、針が震える幅（度）。0 で震えない")] public float needleTremble = 1.5f;
+    [Tooltip("#216 震える速さ（Hz）")] public float trembleHz = 14f;
     public float dialFontSize = 34f;
     public float dialIconSize = 30f;
 
@@ -69,6 +76,9 @@ public class SeatView : MonoBehaviour
         ("Temp", "temperature", null, "temp_start"), ("Co2", "co2", null, "co2_start"), ("Fuel", "fuel", null, "fuel_start"),
     };
     const float Sweep = 120f, Co2Scale = 100f;
+    // #216：オレンジの帯（build_seat_monitor.py の DIALS：端から 70°。CO2 だけ高い側）と、針の止め（振り切れの少し外）
+    const float BandDeg = 70f, StopDeg = 3f;
+    static readonly bool[] HighBad = { false, false, false, true, false };
     const float DialPx = 200f, DialMeters = 0.20f;          // メーターの Canvas（px）と、その大きさ（m）
     const float ScreenPxW = 240f, ScreenPxH = 150f, ScreenMeters = 0.24f;
 
@@ -79,6 +89,7 @@ public class SeatView : MonoBehaviour
         public Transform[] needles = new Transform[Meters.Length];
         public TextMeshProUGUI[] values = new TextMeshProUGUI[Meters.Length];
         public float[] angle = new float[Meters.Length];
+        public float[] vel = new float[Meters.Length];  // #216：針のばねの速さ（度/秒）
         public Renderer[] lamps = new Renderer[3];      // 緑・黄・赤
         public GameObject face;
     }
@@ -295,14 +306,37 @@ public class SeatView : MonoBehaviour
         }
 
         float k = 1f - Mathf.Exp(-needleSpeed * Time.unscaledDeltaTime);
+        // #216：針はばね（少し行き過ぎて戻る）。止まったフレームで暴れないよう、時間を細かく割って進める
+        float dt = UiEase.Dt;
+        bool spring = needleSettle > 0f;
+        float z = Mathf.Clamp(needleDamping, 0.05f, 1f), w = spring ? 4f / (z * needleSettle) : 0f;
+        int steps = Mathf.Max(1, Mathf.CeilToInt(dt * 120f));
+        float h = dt / steps, lim = Sweep + StopDeg, ph = UiEase.Now * trembleHz * 2f * Mathf.PI;
         foreach (var p in panels)
             for (int i = 0; i < Meters.Length; i++)
             {
                 float target = -Sweep + 2f * Sweep * frac[i];
-                p.angle[i] = Mathf.Lerp(p.angle[i], target, k);
-                if (p.needles[i] != null) p.needles[i].localRotation = Quaternion.Euler(0f, 0f, p.angle[i]);
+                if (spring)
+                {
+                    float a = p.angle[i], v = p.vel[i];
+                    for (int n = 0; n < steps; n++) { v += (w * w * (target - a) - 2f * z * w * v) * h; a += v * h; }
+                    if (a > lim) { a = lim; if (v > 0f) v = 0f; } else if (a < -lim) { a = -lim; if (v < 0f) v = 0f; }   // 止めに当たる（下の数字の所へ回り込まない）
+                    p.angle[i] = a; p.vel[i] = v;
+                }
+                else p.angle[i] = Mathf.Lerp(p.angle[i], target, k);
+                float shown = p.angle[i];
+                // #216：値がオレンジの帯の中なら、針が小さく速く震える（数字があるときだけ）
+                if (needleTremble > 0f && InBand(i) && !string.IsNullOrEmpty(text[i]))
+                    shown += needleTremble * (0.7f * Mathf.Sin(ph + i * 1.7f) + 0.3f * Mathf.Sin(ph * 1.73f + i * 2.9f));
+                if (p.needles[i] != null) p.needles[i].localRotation = Quaternion.Euler(0f, 0f, shown);
                 if (p.values[i] != null && p.values[i].text != text[i]) p.values[i].text = text[i];
             }
+    }
+
+    bool InBand(int i)
+    {
+        float band = BandDeg / (2f * Sweep);
+        return HighBad[i] ? frac[i] > 1f - band : frac[i] < band;
     }
 
     void Set(int i, float v, float max, string s)
@@ -346,6 +380,17 @@ public class SeatView : MonoBehaviour
     }
 
     // ------------------------------------------------------------------ カメラ（一人称：盤を正面に見る）
+    SeatRef camSeat;                 // #216：カメラが今向いている席（替わったら滑る）
+    float switchT = -1f, swFov;      // #216：滑っている間 0〜1（-1 は滑っていない）
+    Vector3 swPos; Quaternion swRot;
+
+    /// <summary>#216：少し行き過ぎてから戻る（s＝強さ。UiEase.OutBack の強さを変えられる版）</summary>
+    static float OutBack(float p, float s)
+    {
+        float q = Mathf.Clamp01(p) - 1f;
+        return 1f + (s + 1f) * q * q * q + s * q * q;
+    }
+
     void UpdateCamera(SeatRef seat, bool on)
     {
         if (cam == null || !haveWide) return;
@@ -368,8 +413,28 @@ public class SeatView : MonoBehaviour
             rot = Quaternion.LookRotation(look - pos, Vector3.up);
             fov = fieldOfView;
         }
-        float k = 1f - Mathf.Exp(-moveSpeed * Time.unscaledDeltaTime);
         var t = cam.transform;
+        // #216：一人称のまま席が替わったら、隣の盤へ決まった時間で滑って少し行き過ぎて止まる（入る・出るときは今までどおり追う）
+        if (on)
+        {
+            if (camSeat != null && seat != camSeat && switchSec > 0f)
+            {
+                swPos = t.position; swRot = t.rotation; swFov = cam.fieldOfView; switchT = 0f;
+            }
+            camSeat = seat;
+        }
+        else { camSeat = null; switchT = -1f; }
+        if (switchT >= 0f)
+        {
+            switchT = Mathf.Min(1f, switchT + UiEase.Dt / switchSec);
+            float e = OutBack(switchT, switchOvershoot);
+            t.position = Vector3.LerpUnclamped(swPos, pos, e);
+            t.rotation = Quaternion.SlerpUnclamped(swRot, rot, e);
+            cam.fieldOfView = Mathf.LerpUnclamped(swFov, fov, e);
+            if (switchT >= 1f) switchT = -1f;
+            return;
+        }
+        float k = 1f - Mathf.Exp(-moveSpeed * Time.unscaledDeltaTime);
         t.position = Vector3.Lerp(t.position, pos, k);
         t.rotation = Quaternion.Slerp(t.rotation, rot, k);
         cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, fov, k);
