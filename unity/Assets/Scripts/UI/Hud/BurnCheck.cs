@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud・GameFlow から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#79）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 Showing）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud・GameFlow から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#79）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 Showing）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 作る Issue：#79（同時押しの合図と点火・再突入の準備チェック）
 //
 // 真ん中のパネル（slot の上端から下へ伸びる）。出すのは次の3つだけで、どれも無いときはパネルごと隠す。
@@ -11,6 +11,9 @@
 // 「相手が押し始めた」はサーバーが送らない（押し始めのイベントが無い）ので、届いた waiting からしか出せない。3-2-1 をサーバーの時刻でそろえるのは未決定（SPEC 12章3）
 // 点火のボタン自体は席のパネル（#80・#82。Ctx.SendDual("ignite", seat)）。CabinHud.ShowPress／ClearPress から Show・Clear も呼ばれる
 // Detail：なし（照明 OFF でも暗くしない）
+// #190（ui-guidelines 3章「パネル」「見出しの帯」「材料の行」【05】【11】【09】）：パネルは UiKit.Panel（blob_panel＋内ふち＋横縞、影なし）。見出しは左上の帯（Ribbon）に台つきのアイコン。
+//   準備の項目は材料の行（UiKit.Row。【11】）：まだ＝accent の台に項目のアイコン＋名前＋点線＋右に担当の席と You、できた＝go の台にチェックの小さなピル（bg）を1列。
+//   残り秒のチップは明るい面の数のチップの色（text）。言葉は小文字まじり（原則 12）。手（指さし）は出さない（船内の手は席のパネルが使う。1画面に1つ）
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -24,53 +27,52 @@ public class BurnCheck : HudPart
     static class Words
     {
         // 見出し
-        public const string BurnSoon = "GET READY TO BURN";
-        public const string BurnNow = "BURN NOW!";
-        public const string ReentrySoon = "GET READY FOR RE-ENTRY";
-        public const string ReentryCheck = "HEAT SHIELD CHECK";
-        public const string SwapFilter = "SWAP THE AIR FILTER";
-        public const string Ignite = "FIRE THE ENGINE";
+        public const string BurnSoon = "Get ready to burn";
+        public const string BurnNow = "Burn now!";
+        public const string ReentrySoon = "Get ready for re-entry";
+        public const string ReentryCheck = "Heat shield check";
+        public const string SwapFilter = "Swap the air filter";
+        public const string Ignite = "Fire the engine";
         // 見出しの横のチップ
         public const string OpensIn = "opens in {0}";
         public const string Left = "{0} left";
         public const string StartsIn = "starts in {0}";
         public const string CheckIn = "check in {0}";
-        // 準備の項目（できた／まだ）
-        public const string NavOk = "NAV ON", NavTodo = "Turn NAV on";
-        public const string FacingOk = "FACING BURN", FacingTodo = "Turn the ship to BURN";
-        public const string CourseOk = "COURSE FIXED", CourseTodo = "Do the CORRECTION BURN";
-        public const string FuelOk = "FUEL OK", FuelTodo = "Not enough fuel (needs {0})";
-        public const string RouteOk = "ROUTE {0}", RouteAuto = "No route yet (auto)";
-        public const string ShieldOk = "SHIELD FORWARD", ShieldTodo = "Turn to HEAT SHIELD";
-        public const string You = "YOU";
-        public const string AllSet = "Count 3-2-1, then press IGNITE together!";
+        // 準備の項目（できた／まだ）。席のパネルのボタンの名前（Nav・Burn・Heat shield・Ignite）は先頭だけ大文字（#190）
+        public const string NavOk = "Nav on", NavTodo = "Turn Nav on";
+        public const string FacingOk = "Facing Burn", FacingTodo = "Turn the ship to Burn";
+        public const string CourseOk = "Course fixed", CourseTodo = "Do the correction burn";
+        public const string FuelOk = "Fuel OK", FuelTodo = "Not enough fuel (needs {0})";
+        public const string RouteOk = "Route {0}", RouteAuto = "No route yet (auto)";
+        public const string ShieldOk = "Shield forward", ShieldTodo = "Turn to Heat shield";
+        public const string You = "You";
+        public const string AllSet = "Count 3-2-1, then press Ignite together!";
         // 同時押し
-        public const string PressTogether = "PRESS TOGETHER";
-        public const string Together = "TOGETHER!";
-        public const string Missed = "MISSED";
+        public const string PressTogether = "Press together";
+        public const string Together = "Together!";
+        public const string Missed = "Missed";
         public const string Pressed = "pressed";
-        public const string YourTurn = "YOU: PRESS NOW!";
+        public const string YourTurn = "You: press now!";
         public const string Waiting = "waiting...";
         public const string WaitHint = "Partner, press now!";
         public const string MissedHint = "Too far apart. Count 3-2-1, then press.";
         public const string MissedFuel = "Too far apart: -{0} fuel. Count 3-2-1, then press.";
         // 結果
-        public const string Fired = "ENGINE FIRED! Heading home.";
-        public const string NotReady = "NOT READY: finish the list, then press again.";
-        public const string FilterDone = "AIR FILTER SWAPPED!";
-        public const string NoFilter = "NO SPARE FILTERS LEFT";
-        public const string ReentryReady = "READY! The heat shield protects you.";
-        public const string ReentryNotReady = "NOT READY: a bumpy ride home.";
-        public const string BurnMissed = "BURN WINDOW MISSED: going home the slow way (B).";
+        public const string Fired = "Engine fired! Heading home.";
+        public const string NotReady = "Not ready: finish the list, then press again.";
+        public const string FilterDone = "Air filter swapped!";
+        public const string NoFilter = "No spare filters left";
+        public const string ReentryReady = "Ready! The heat shield protects you.";
+        public const string ReentryNotReady = "Not ready: a bumpy ride home.";
+        public const string BurnMissed = "Burn window missed: going home the slow way (B).";
     }
 
     // ------------------------------------------------------------------ 見た目・時間（UiTokens に無いもの。#71 の UiKitHud ができたらそちらへ）
     const float ShowSeconds = 2.5f;     // 同時押しの結果・コマンドの結果を出しておく秒（実時間。前は GameFlow.ClearPressLater）
     const float WaitExtra = 1.0f;       // waiting のあと何も来なくても消すまでの余り（実時間）
     const float ResultGameS = 4f;       // 再突入のチェック・噴射窓を逃した結果を出しておく秒（ゲームの秒）
-    const float TodoH = 56f;            // まだの項目の行の高さ
-    const float TodoBadge = 44f;        // まだの項目の席バッジ
-    const float TodoIcon = 32f;         // まだの項目の ✗
+    const float TodoBadge = 44f;        // まだの項目の席バッジ（材料の行 64 に入る大きさ）
+    const float DoneDisc = 32f;         // できた項目の小さなピルの中の台
     const int TodoPool = 4, DonePool = 5;
 
     // ------------------------------------------------------------------ 準備の項目（並び = 出す順）
@@ -82,14 +84,16 @@ public class BurnCheck : HudPart
         public Func<GameState, string> Done, Todo;
         public bool Optional;                        // まだでも「まだの項目」に入れない（ルートは選ばなければサーバーが決める）
         public string DoneIcon = "check";
+        public string Icon = "check";               // #190：材料の行の台のアイコン（ui-guidelines 4章）
     }
 
     List<Item> burnItems, reentryItems;
 
     // 部品
     RectTransform panel, header, todoCol, doneRow, readyRow, signalRow;
-    Image headerIcon;
-    TextMeshProUGUI title, ready, sigTitle, sigHint, result;
+    UiRibbon title;
+    UiIconDisc headerDisc;
+    TextMeshProUGUI ready, sigTitle, sigHint, result;
     TimelineKit.Countdown chip;
     TimelineKit.BadgeRow readyBadges;
     TimelineKit.DualBadge left, right;
@@ -104,8 +108,8 @@ public class BurnCheck : HudPart
     /// <summary>カードが出ているか。出ている間、危機の帯（CrisisBanner）は注意（オレンジ）を隠す（#189：点火・再突入で4つ重なった）</summary>
     public bool Showing => panel != null && panel.gameObject.activeSelf;
 
-    class TodoRow { public RectTransform Root; public UiSeatBadge Badge; public RectTransform You; public TextMeshProUGUI Text; }
-    class DoneChip { public RectTransform Root; public Image Icon; public TimelineKit.BadgeRow Badge; public TextMeshProUGUI Text; }
+    class TodoRow { public RectTransform Root; public UiRow Row; public UiSeatBadge Badge; public RectTransform You; }
+    class DoneChip { public RectTransform Root; public UiIconDisc Disc; public TimelineKit.BadgeRow Badge; public TextMeshProUGUI Text; }
 
     protected override void Build(RectTransform root)
     {
@@ -117,10 +121,9 @@ public class BurnCheck : HudPart
         panel.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         header = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft);
-        headerIcon = UiKit.Icon(header, "ignition", T.IconM, T.Ink);
-        title = UiKit.Text(header, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineLeft);
-        Ui.Size(title, flexW: 1);
-        chip = TimelineKit.Countdown.Make(header, false);
+        title = TimelineKit.Ribbon(header, "", "ignition", T.Accent, out headerDisc);   // #190：見出しは左上の帯【11】
+        Ui.Size(UiKit.Space(header, 0f), flexW: 1);
+        chip = TimelineKit.Countdown.Make(header, false, T.Text);   // 明るいパネルの上の数のチップは text の面（【09】）
 
         todoCol = UiKit.Col(panel, T.S1, TextAnchor.UpperLeft, 0f, 0f, true);
         for (int i = 0; i < TodoPool; i++) todos.Add(MakeTodo(todoCol));
@@ -129,14 +132,14 @@ public class BurnCheck : HudPart
 
         readyRow = UiKit.Row(panel, T.S2, TextAnchor.MiddleCenter);
         readyBadges = new TimelineKit.BadgeRow(readyRow, T.TagH);
-        ready = UiKit.Text(readyRow, Words.AllSet, TextStyle.Body, T.Ink);
+        ready = UiKit.Text(readyRow, Words.AllSet, TextStyle.Body, T.Text);
         ready.textWrappingMode = TextWrappingModes.Normal; Ui.Size(ready, flexW: 1);
 
         signalRow = UiKit.Row(panel, T.S4, TextAnchor.MiddleCenter);
         left = TimelineKit.DualBadge.Make(signalRow);
         var mid = UiKit.Col(signalRow, T.S1, TextAnchor.MiddleCenter);
-        sigTitle = UiKit.Text(mid, "", TextStyle.Sub, T.Ink);
-        sigHint = UiKit.Text(mid, "", TextStyle.Label, T.InkSub);
+        sigTitle = UiKit.Text(mid, "", TextStyle.Choice, T.Text);
+        sigHint = UiKit.Text(mid, "", TextStyle.Label, T.TextSoft);
         right = TimelineKit.DualBadge.Make(signalRow);
 
         result = UiKit.Text(panel, "", TextStyle.Body, T.Go);
@@ -149,20 +152,20 @@ public class BurnCheck : HudPart
     {
         burnItems = new List<Item>
         {
-            new Item { Seat = Seats.Comms, Ok = s => s.Switch("nav"), Done = _ => Words.NavOk, Todo = _ => Words.NavTodo },
-            new Item { Seat = Seats.Pilot, Ok = s => s.attitude == "burn", Done = _ => Words.FacingOk, Todo = _ => Words.FacingTodo },
+            new Item { Seat = Seats.Comms, Icon = "switch", Ok = s => s.Switch("nav"), Done = _ => Words.NavOk, Todo = _ => Words.NavTodo },
+            new Item { Seat = Seats.Pilot, Icon = "attitude", Ok = s => s.attitude == "burn", Done = _ => Words.FacingOk, Todo = _ => Words.FacingTodo },
             // 軌道修正は観測向き軌道のときだけ要る（自由帰還なら最初から correction_done）
-            new Item { Seat = Seats.Pilot, Show = s => Trajectory() == "science" || !s.correctionDone, Ok = s => s.correctionDone,
+            new Item { Seat = Seats.Pilot, Icon = "ignition", Show = s => Trajectory() == "science" || !s.correctionDone, Ok = s => s.correctionDone,
                        Done = _ => Words.CourseOk, Todo = _ => Words.CourseTodo },
-            new Item { Seat = Seats.Planner, Optional = true, Ok = s => !string.IsNullOrEmpty(s.route),
+            new Item { Seat = Seats.Planner, Icon = "route", Optional = true, Ok = s => !string.IsNullOrEmpty(s.route),
                        Done = s => string.IsNullOrEmpty(s.route) ? Words.RouteAuto : string.Format(Words.RouteOk, s.route.ToUpper()), Todo = _ => Words.RouteAuto },
-            new Item { Seat = null, Ok = s => s.fuel >= FuelNeed(s), Done = _ => Words.FuelOk,
+            new Item { Seat = null, Icon = "fuel", Ok = s => s.fuel >= FuelNeed(s), Done = _ => Words.FuelOk,
                        Todo = s => string.Format(Words.FuelTodo, Mathf.CeilToInt(FuelNeed(s))) },
         };
         reentryItems = new List<Item>
         {
-            new Item { Seat = Seats.Pilot, Ok = s => s.attitude == "heatshield", Done = _ => Words.ShieldOk, Todo = _ => Words.ShieldTodo },
-            new Item { Seat = Seats.Comms, Ok = s => s.Switch("nav"), Done = _ => Words.NavOk, Todo = _ => Words.NavTodo },
+            new Item { Seat = Seats.Pilot, Icon = "heat_shield", Ok = s => s.attitude == "heatshield", Done = _ => Words.ShieldOk, Todo = _ => Words.ShieldTodo },
+            new Item { Seat = Seats.Comms, Icon = "switch", Ok = s => s.Switch("nav"), Done = _ => Words.NavOk, Todo = _ => Words.NavTodo },
         };
     }
 
@@ -181,26 +184,28 @@ public class BurnCheck : HudPart
     static float ReadyS(GameState s) =>
         J.Has(s.thresholds, "reentry_ready_s") ? J.Num(s.thresholds, "reentry_ready_s") : GameParams.Get("reentry_ready_s");
 
+    /// <summary>まだの項目：材料の行（【11】）。accent の台に項目のアイコン＋名前＋点線＋右に担当の席と You</summary>
     TodoRow MakeTodo(Transform p)
     {
         var r = new TodoRow();
-        r.Root = UiKit.Chip(p, T.Accent, TodoH, "Todo");
-        r.Root.GetComponent<HorizontalLayoutGroup>().childAlignment = TextAnchor.MiddleLeft;
-        UiKit.Icon(r.Root, "cross", TodoIcon, T.Ink);
-        r.Badge = UiKit.SeatBadge(r.Root, Seats.Pilot, TodoBadge);
-        r.You = UiKit.Tag(r.Root, Words.You, T.Ink, T.Panel);
-        r.Text = UiKit.Text(r.Root, "", TextStyle.Body, T.Ink, TextAlignmentOptions.MidlineLeft);
+        r.Row = UiKit.Row(p, "check", "", null, T.Accent);
+        r.Root = r.Row.Root;
+        r.Root.name = "Todo";
+        r.Badge = UiKit.SeatBadge(r.Row.Right, Seats.Pilot, TodoBadge);
+        r.You = UiKit.Tag(r.Row.Right, Words.You, T.Text, T.Panel);
         return r;
     }
 
+    /// <summary>できた項目：bg の小さなピル（go の台にチェック＋担当の席＋名前。パネルの横縞 panelBand の上でも見えるよう bg）。1列に並べる</summary>
     DoneChip MakeDone(Transform p)
     {
         var c = new DoneChip();
         c.Root = UiKit.Chip(p, T.Bg, T.TagH, "Done");
-        c.Root.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset((int)T.S2, (int)T.S2, 0, 0);
-        c.Icon = UiKit.Icon(c.Root, "check", T.IconS, T.Go);
+        c.Root.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset((int)T.S1, (int)T.S2, 0, 0);
+        c.Root.GetComponent<HorizontalLayoutGroup>().spacing = T.S1;
+        c.Disc = UiKit.Disc(c.Root, "check", T.Go, DoneDisc);
         c.Badge = new TimelineKit.BadgeRow(c.Root, TimelineKit.MiniBadge);
-        c.Text = UiKit.Text(c.Root, "", TextStyle.Label, T.InkSub);
+        c.Text = UiKit.Text(c.Root, "", TextStyle.Label, T.TextSoft);
         return c;
     }
 
@@ -239,7 +244,7 @@ public class BurnCheck : HudPart
             bool otherMine = ob.Seat != null ? mine.Contains(ob.Seat) : mine.Exists(x => x != Seats.Life);
             pb.SetLook(TimelineKit.PressLook.Pressing, Words.Pressed, real);
             ob.SetLook(otherMine ? TimelineKit.PressLook.YourTurn : TimelineKit.PressLook.Waiting, otherMine ? Words.YourTurn : Words.Waiting, real);
-            sigTitle.text = Words.PressTogether; sigTitle.color = T.Ink;
+            sigTitle.text = Words.PressTogether; sigTitle.color = T.Text;
             sigHint.text = otherMine ? "" : Words.WaitHint;
             sigUntil = now + real + WaitExtra;
         }
@@ -337,25 +342,25 @@ public class BurnCheck : HudPart
         if (mode == Mode.Burn)
         {
             inWindow = s.t >= s.tBurnOpen;
-            TimelineKit.SetIcon(headerIcon, "ignition");
-            title.text = inWindow ? Words.BurnNow : Words.BurnSoon;
+            headerDisc.Set("ignition", T.Accent);
+            title.SetText(inWindow ? Words.BurnNow : Words.BurnSoon);
             // 残り秒はタイムラインの帯（TimelineBar）と同じ式
             if (inWindow) chip.Set("timer", Words.Left, s.tBurnClose - s.t, true, null, mine);
             else chip.Set("timer", Words.OpensIn, s.tBurnOpen - s.t, false, null, mine);
         }
         else if (mode == Mode.Reentry)
         {
-            TimelineKit.SetIcon(headerIcon, "heat_shield");
+            headerDisc.Set("heat_shield", T.Go);
             bool started = s.t >= s.tReentry;
-            title.text = started ? Words.ReentryCheck : Words.ReentrySoon;
+            title.SetText(started ? Words.ReentryCheck : Words.ReentrySoon);
             if (started) chip.Set("timer", Words.CheckIn, readyAt - s.t, true, null, mine);
             else chip.Set("timer", Words.StartsIn, s.tReentry - s.t, false, null, mine);
         }
         else if (signal)
         {
             bool swap = sigCmd == "swap_filter";
-            TimelineKit.SetIcon(headerIcon, swap ? "filter" : "ignition");
-            title.text = swap ? Words.SwapFilter : Words.Ignite;
+            headerDisc.Set(swap ? "filter" : "ignition", swap ? T.Go : T.Accent);
+            title.SetText(swap ? Words.SwapFilter : Words.Ignite);
         }
 
         // 準備の項目：まだのものは大きく（担当の席と YOU）、できたものは小さく1列
@@ -406,17 +411,17 @@ public class BurnCheck : HudPart
 
     void SetTodo(TodoRow r, Item it, GameState s, List<string> mine)
     {
+        r.Row.Disc.Set(it.Icon, T.Accent);   // まだ＝注意の色の台（状態は色＋アイコン）
+        r.Row.Name.text = it.Todo(s);
         r.Badge.Root.gameObject.SetActive(it.Seat != null);
         if (it.Seat != null) r.Badge.Set(it.Seat, mine.Contains(it.Seat), false);
         r.You.gameObject.SetActive(it.Seat != null && mine.Contains(it.Seat));
-        r.Text.text = it.Todo(s);
     }
 
     void SetDone(DoneChip c, Item it, GameState s, bool ok, List<string> mine)
     {
         // 任意の項目（ルート）がまだのときは、✓ ではなくその項目のアイコンを薄く
-        TimelineKit.SetIcon(c.Icon, ok ? it.DoneIcon : "route");
-        c.Icon.color = ok ? T.Go : T.InkSub;
+        c.Disc.Set(ok ? it.DoneIcon : "route", ok ? T.Go : T.Line);
         c.Badge.Set(it.Seat != null ? new[] { it.Seat } : null, mine);
         c.Text.text = it.Done(s);
     }

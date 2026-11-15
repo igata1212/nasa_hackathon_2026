@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#77）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 BURN NOW・HOME if A）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#77）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 BURN NOW・HOME if A）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる：面を blob_panel＋星の模様、チップを blob_pill＋アイコンの台、大文字をやめる）
 // 作る Issue：#77（タイムラインの帯とカウントダウン）
 //
 // 上の帯：左に時計（T+）、真ん中に1本の帯（月の裏側＝通信途絶・観測の窓／噴射窓／再突入 A・B／着水）と「いま」の縦線、
@@ -8,6 +8,8 @@
 // 事故の前（練習・かき混ぜ）は state が無いので、帯とチップを隠して段階の一言だけ出す。
 // Detail：時計と帯（照明 OFF で暗くしてよい）。右のチップは暗くしない（残り秒は照明 OFF でも読めるように）
 // 下の TimelineKit は #77・#78・#79 で使う小さな部品（#71 の UiKitHud ができたら中身を差し替える。呼ぶ側は変えない）
+// #190（ui-guidelines 1章「船内の計器は濃紺のまま」【06】【01】【07】）：面の色（HudFace）は変えず、形を blob_panel に、小さな星の模様を hudText の 6% で敷く（HudStars）。影なし。
+//   アイコンは色つきの台（UiKit.Disc）に。帯の区間とゲージは前の版の形のまま（あつ森に同じ物の基準が無い）
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -20,26 +22,26 @@ public class TimelineBar : HudPart
     static class Words
     {
         public const string Clock = "T+ {0}";
-        public const string Practice = "PRACTICE";
-        public const string Stir = "GET READY";
+        public const string Practice = "Practice";
+        public const string Stir = "Get ready";
         // 帯の中（長い順。入らなければ次の短いもの、最後はアイコンだけ）
-        public static readonly string[] FarSide = { "FAR SIDE (no radio)", "NO RADIO", "" };
-        public static readonly string[] BurnWindow = { "BURN WINDOW", "BURN", "" };
-        public static readonly string[] BurnDone = { "BURN DONE", "DONE", "" };
-        public static readonly string[] BurnMissed = { "MISSED", "" };
-        public static readonly string[] Reentry = { "RE-ENTRY", "" };
+        public static readonly string[] FarSide = { "Far side (no radio)", "No radio", "" };
+        public static readonly string[] BurnWindow = { "Burn window", "Burn", "" };
+        public static readonly string[] BurnDone = { "Burn done", "Done", "" };
+        public static readonly string[] BurnMissed = { "Missed", "" };
+        public static readonly string[] Reentry = { "Re-entry", "" };
         // #189（Fable）：ルートを選ぶ前の A・B は「どちらなら、いつ家に着くか」。アイコンも盾ではなく地球（右のチップの HOME! と同じ）。
         //   1600×900 では区間が約 106 px なので、ふつうは2つめの「if A」が出る（地球＋if A で「A なら家」と読める）
-        public static readonly string[] IfA = { "HOME if A", "if A", "A", "" };
-        public static readonly string[] IfB = { "HOME if B", "if B", "B", "" };
+        public static readonly string[] IfA = { "Home if A", "if A", "A", "" };
+        public static readonly string[] IfB = { "Home if B", "if B", "B", "" };
         // 右のチップ（次まで／窓の中の残り）
-        public const string NextFarSide = "FAR SIDE in {0}";
-        public const string InFarSide = "NO RADIO · {0} left";
-        public const string NextBurn = "BURN WINDOW in {0}";
-        public const string InBurn = "BURN NOW";   // #189：残り秒は点火の準備のカード（BurnCheck）だけ（2か所に出さない）。残り 10 秒で赤く弾むのはそのまま
-        public const string NextReentry = "RE-ENTRY in {0}";
-        public const string NextSplash = "SPLASHDOWN in {0}";
-        public const string Home = "HOME!";
+        public const string NextFarSide = "Far side in {0}";
+        public const string InFarSide = "No radio · {0} left";
+        public const string NextBurn = "Burn window in {0}";
+        public const string InBurn = "Burn now!";   // #189：残り秒は点火の準備のカード（BurnCheck）だけ（2か所に出さない）。残り 10 秒で赤く弾むのはそのまま
+        public const string NextReentry = "Re-entry in {0}";
+        public const string NextSplash = "Splashdown in {0}";
+        public const string Home = "Home!";
     }
 
     // 出来事ごとに動く席（帯の印とチップのバッジ）
@@ -80,7 +82,7 @@ public class TimelineBar : HudPart
         // 照明 OFF で暗くしてよいもの：面・時計・帯
         var detail = Ui.Rect("Detail", bar); UiKit.Fill(detail);
         Detail = detail.gameObject.AddComponent<CanvasGroup>();
-        UiKit.Surface(detail, TrackH, T.HudFace);   // 計器は暗い面
+        TimelineKit.GaugeFace(detail, TrackH);   // 計器は暗い面（#190：blob_panel＋星の模様。色は HudFace のまま）
 
         clock = UiKit.Text(detail, "", TextStyle.Number, T.HudText, TextAlignmentOptions.MidlineLeft);
         var cr = clock.rectTransform;
@@ -179,8 +181,8 @@ public class TimelineBar : HudPart
         }
         else
         {
-            SetSeg(reA, s.tReentryA, s.tSplashdownA, end, T.Panel, T.InkSub, IfIcon, Words.IfA, NoSeats, mine);
-            SetSeg(reB, s.tReentryB, s.tSplashdownB, end, T.Panel, T.InkSub, IfIcon, Words.IfB, NoSeats, mine);
+            SetSeg(reA, s.tReentryA, s.tSplashdownA, end, T.Panel, T.TextSoft, IfIcon, Words.IfA, NoSeats, mine);
+            SetSeg(reB, s.tReentryB, s.tSplashdownB, end, T.Panel, T.TextSoft, IfIcon, Words.IfB, NoSeats, mine);
         }
 
         // 着水（地球）・通った所・いま
@@ -258,6 +260,26 @@ public static class TimelineKit
     public const float MiniBadge = 28f;       // 帯・チップの中の小さい席バッジ（帯の高さに合わせた。3章の席バッジは 56）
     public const float BadgeGap = 4f;         // 小さい席バッジの間
     public const float DualRing = 8f;         // 同時押しの合図の輪の幅（3章）
+    public const float ChipDiscD = 44f;       // チップの中のアイコンの台（#190。高さ 64 のチップに入る大きさ）
+    public const float StarAlpha = 0.06f;     // 計器の星の模様（hudText の 6%。ui-guidelines 1章）
+
+    /// <summary>計器の面（#190）：blob_panel の HudFace（色は変えない）＋小さな星の模様。影なし。root いっぱいに敷く（レイアウトの外）。面を返す</summary>
+    public static Image GaugeFace(RectTransform root, float radius)
+    {
+        var f = UiKit.Blob(root, T.BlobPanel, T.HudFace, radius, "Face"); UiKit.Fill(f.rectTransform); UiKit.Ignore(f);
+        HudStars.Add(root);
+        return f;
+    }
+
+    /// <summary>見出しの帯（UiKit.Ribbon）の文字の前に、アイコンの台を入れる（#190。【11】の帯＋【01】の台）</summary>
+    public static UiRibbon Ribbon(Transform p, string text, string icon, Color disc, out UiIconDisc d, Color? face = null)
+    {
+        var rb = UiKit.Ribbon(p, text, face);
+        rb.Root.GetComponent<HorizontalLayoutGroup>().spacing = T.S2;
+        d = UiKit.Disc(rb.Root, icon, disc, T.RowDiscD);
+        d.Root.SetSiblingIndex(rb.Label.transform.GetSiblingIndex());   // 文字の前
+        return rb;
+    }
 
     /// <summary>アイコンを名前で替える（同じなら何もしない）。見つからなければ隠す</summary>
     public static void SetIcon(Image img, string name)
@@ -312,24 +334,31 @@ public static class TimelineKit
     }
 
     // ================================================================== カウントダウンのチップ
-    /// <summary>ピル（ink の面）に timer などのアイコン＋文言（分:秒入り）＋席バッジ。残り UrgentS 秒で danger にして弾む</summary>
+    /// <summary>blob_pill（暗い面の上は ink、明るい面の上は text）に、アイコンの台（go）＋文言（分:秒入り）＋席バッジ。残り UrgentS 秒で danger にして弾む（台は panel に赤い絵）</summary>
     public class Countdown
     {
         public RectTransform Root;
-        Image face, icon;
+        Image face;
+        UiIconDisc disc;
+        string iconName;
+        Color faceOn;
         TextMeshProUGUI text;
         BadgeRow badges;
         int lastSec = int.MinValue;
         float bounceAt = -1f;
 
         /// <param name="free">レイアウトの外に置くなら true（幅を中身に合わせる）。HorizontalLayoutGroup の中なら false</param>
-        public static Countdown Make(Transform p, bool free)
+        /// <param name="onFace">チップの面（#190：明るいパネルの上は T.Text＝数のチップの面。既定は計器の上の ink）</param>
+        public static Countdown Make(Transform p, bool free, Color? onFace = null)
         {
-            var c = new Countdown();
-            c.Root = UiKit.Chip(p, T.Ink, CountdownH, "Countdown");
-            c.face = c.Root.Find("Face").GetComponent<Image>();
-            c.icon = UiKit.Icon(c.Root, "timer", CountdownIcon, T.Panel);
-            c.text = UiKit.Text(c.Root, "", TextStyle.Sub, T.Panel);
+            var c = new Countdown { faceOn = onFace ?? T.Ink };
+            c.Root = UiKit.Row(p, T.S2, TextAnchor.MiddleCenter, T.S2);
+            c.Root.name = "Countdown";
+            var le = Ui.Size(c.Root, h: CountdownH); le.minHeight = CountdownH;
+            c.face = UiKit.Blob(c.Root, T.BlobPill, c.faceOn, CountdownH * 0.5f, "Face"); UiKit.Fill(c.face.rectTransform); UiKit.Ignore(c.face);
+            c.disc = UiKit.Disc(c.Root, "timer", T.Go, ChipDiscD);
+            c.iconName = "timer";
+            c.text = UiKit.Text(c.Root, "", TextStyle.Choice, T.Panel);
             c.badges = new BadgeRow(c.Root, MiniBadge);
             if (free)
             {
@@ -343,10 +372,13 @@ public static class TimelineKit
         /// <param name="canUrgent">残りが少ないとき danger にしてよいか（窓が閉じるまでの残りなど）</param>
         public void Set(string iconName, string fmt, float secs, bool canUrgent, IList<string> seats, ICollection<string> mine)
         {
-            SetIcon(icon, iconName ?? "timer");
-            text.text = Format(fmt, secs);
+            string name = iconName ?? "timer";
             bool urgent = canUrgent && secs >= 0f && secs <= UrgentS;
-            face.color = urgent ? T.Danger : T.Ink;
+            if (name != this.iconName) { this.iconName = name; disc.Set(name, T.Go); }
+            disc.Face.color = urgent ? T.Panel : T.Go;
+            disc.Icon.color = urgent ? T.Danger : T.Panel;
+            text.text = Format(fmt, secs);
+            face.color = urgent ? T.Danger : faceOn;
             badges.Set(seats, mine);
             int sec = Mathf.CeilToInt(secs);
             if (urgent && sec != lastSec) bounceAt = Time.unscaledTime;
@@ -370,7 +402,8 @@ public static class TimelineKit
     {
         public RectTransform Root;
         RectTransform pulse;
-        Image ringBg, ring, mark, anyFace, anyIcon;
+        Image ringBg, ring, mark, anyIcon;
+        RectTransform anyRoot;
         UiSeatBadge badge;
         TextMeshProUGUI label;
         PressLook look;
@@ -392,10 +425,11 @@ public static class TimelineKit
             var holder = Ui.Rect("Badge", b.pulse); UiKit.Center(holder, d, d);
             b.badge = UiKit.SeatBadge(holder, Seats.Pilot, d);
             UiKit.Center(b.badge.Root, d, d);
-            b.anyFace = UiKit.Pill(holder, T.Panel, d, "Any"); UiKit.Fill(b.anyFace.rectTransform);
-            b.anyIcon = UiKit.Icon(b.anyFace.transform, "crew", T.IconL * 0.75f, T.Ink); UiKit.Center(b.anyIcon.rectTransform, T.IconL * 0.75f, T.IconL * 0.75f);
+            var any = UiKit.Disc(holder, "crew", T.Text, d);   // だれでも1人：人のアイコンを text の台に（#190【01】）
+            b.anyRoot = any.Root; UiKit.Center(b.anyRoot, d, d);
+            b.anyIcon = any.Icon;
             b.mark = UiKit.Icon(holder, "check", T.IconL, T.Panel); UiKit.Center(b.mark.rectTransform, T.IconL, T.IconL);
-            b.label = UiKit.Text(b.Root, "", TextStyle.Label, T.InkSub);
+            b.label = UiKit.Text(b.Root, "", TextStyle.Label, T.TextSoft);
             b.SetSeat(Seats.Pilot, false);
             b.SetLook(PressLook.Idle, "", 0f);
             return b;
@@ -407,7 +441,7 @@ public static class TimelineKit
             Seat = seat;
             bool any = seat == null;
             badge.Root.gameObject.SetActive(!any);
-            anyFace.gameObject.SetActive(any);
+            anyRoot.gameObject.SetActive(any);
             if (!any) badge.Set(seat, mine, false);
         }
 
@@ -421,8 +455,8 @@ public static class TimelineKit
             SetIcon(mark, l == PressLook.Missed ? "cross" : "check");
             if (!badge.Root.gameObject.activeSelf) anyIcon.gameObject.SetActive(!mark.gameObject.activeSelf);
             else badge.Shape.gameObject.SetActive(!mark.gameObject.activeSelf);
-            mark.color = badge.Root.gameObject.activeSelf ? T.OnSeat(Seat) : T.Ink;
-            label.color = l == PressLook.YourTurn ? T.Ink : T.InkSub;
+            mark.color = badge.Root.gameObject.activeSelf ? T.OnSeat(Seat) : T.Panel;   // だれでも1人の台（text）の上は白
+            label.color = l == PressLook.YourTurn ? T.Text : T.TextSoft;
             pulse.localScale = Vector3.one;
         }
 
@@ -432,5 +466,63 @@ public static class TimelineKit
             float s = look == PressLook.YourTurn ? 1f + 0.06f * Mathf.Abs(Mathf.Sin((now - fillFrom) * Mathf.PI * 3f)) : 1f;
             pulse.localScale = Vector3.one * s;
         }
+    }
+}
+
+/// <summary>
+/// 計器の面の小さな星の模様（#190。ui-guidelines 1章「船内の計器」：hudText の 6% で敷く。【07】の淡い地模様の作り）。
+/// 画像を使わず、4つの角の星を頂点で描く。rect に合わせて敷き直す（大きさが変わると Unity が描き直す）。並びは決まった乱数で、毎回同じ
+/// </summary>
+public class HudStars : MaskableGraphic
+{
+    public float cell = 56f;     // 1つの星の区画（px）
+    public float inset = 20f;    // 面の縁から離す（blob_panel の丸い角からはみ出さない）
+    public float minR = 4f, maxR = 7f;   // 星の大きさ（中心から先まで）
+    public float pinch = 0.32f;  // 星のくびれ（先の長さに対する、間の長さ）
+
+    /// <summary>root いっぱいに星を敷く（レイアウトの外。押せない）</summary>
+    public static HudStars Add(RectTransform root)
+    {
+        var r = Ui.Rect("Stars", root);
+        var s = r.gameObject.AddComponent<HudStars>();
+        s.color = UiTokens.WithAlpha(UiTokens.HudText, TimelineKit.StarAlpha);
+        s.raycastTarget = false;
+        UiKit.Fill(r); UiKit.Ignore(s);
+        return s;
+    }
+
+    static float Hash(int x, int y, int k)
+    {
+        uint h = (uint)(x * 73856093) ^ (uint)(y * 19349663) ^ (uint)(k * 83492791);
+        h ^= h >> 13; h *= 0x5bd1e995; h ^= h >> 15;
+        return (h & 0xFFFF) / 65535f;
+    }
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        vh.Clear();
+        var r = GetPixelAdjustedRect();
+        float w = r.width - inset * 2f, h = r.height - inset * 2f;
+        if (w <= 0f || h <= 0f) return;
+        int nx = Mathf.Max(1, Mathf.FloorToInt(w / cell)), ny = Mathf.Max(1, Mathf.FloorToInt(h / cell));
+        float cw = w / nx, ch = h / ny;
+        Color32 c = color;
+        for (int j = 0; j < ny; j++)
+            for (int i = 0; i < nx; i++)
+            {
+                if (Hash(i, j, 0) < 0.35f) continue;   // 3つに1つは空ける（並びが格子に見えないように）
+                float rad = Mathf.Lerp(minR, maxR, Hash(i, j, 1));
+                float px = r.xMin + inset + cw * (i + Mathf.Lerp(0.2f, 0.8f, Hash(i, j, 2)));
+                float py = r.yMin + inset + ch * (j + Mathf.Lerp(0.2f, 0.8f, Hash(i, j, 3)));
+                int c0 = vh.currentVertCount;
+                vh.AddVert(new Vector3(px, py), c, Vector2.zero);
+                for (int k = 0; k < 8; k++)
+                {
+                    float a = k * Mathf.PI * 0.25f + Mathf.PI * 0.5f;
+                    float len = k % 2 == 0 ? rad : rad * pinch;
+                    vh.AddVert(new Vector3(px + Mathf.Cos(a) * len, py + Mathf.Sin(a) * len), c, Vector2.zero);
+                }
+                for (int k = 0; k < 8; k++) vh.AddTriangle(c0, c0 + 1 + k, c0 + 1 + (k + 1) % 8);
+            }
     }
 }

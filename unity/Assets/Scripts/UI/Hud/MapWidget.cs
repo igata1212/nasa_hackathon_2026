@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#78）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#78）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 作る Issue：#78（軌道の地図：GMAT の帰還ルート A / B と現在地）
 //
 // 右上の小さい地図（押すと真ん中に大きく開く。もう一度押すと閉じる。表示だけでコマンドは送らない）。
@@ -12,6 +12,10 @@
 // 下の比較：A・B それぞれの「家まで何分」（state の t_splashdown_a/b − t、#148）と噴射に使う燃料（parameters.json の fuel_burn_a／b）
 // ルートのデータが無ければ、前のように TrajectoryView を描いた RenderTexture を出す（それも無ければ一言）
 // Detail：小さい地図の全部（照明 OFF で暗くしてよい）。大きい地図は Detail の明るさをまねる
+// #190（ui-guidelines 1章「船内の計器は濃紺のまま」【06】【01】【07】【09】【11】）：小さい地図は HudFace のまま blob_panel＋星の模様（TimelineKit.GaugeFace）、影なし。
+//   A・B の家までの時間は数のチップ（blob_pill。【09】）、地図の上の A・B の札・噴射の印・船は blob_disc の台。大きい地図は明るいパネル（UiKit.PanelFace）、見出しは帯（Ribbon）、
+//   閉じるはヒントのピル、比べるのは色違いのカード（UiKit.Card。【11】。選んだ方は 1.12 倍＋チェック、決まったら他方を line）。
+//   ルート B の色は accent（注意の色）をやめ、Planner のカード（ui-guidelines 3章：A＝go、B＝plum）にそろえて plum
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -23,25 +27,25 @@ public class MapWidget : HudPart
     // ------------------------------------------------------------------ 文言（Fable の採点で直すときはここだけ。{0} は 分:秒 か数）
     static class Words
     {
-        public const string Title = "MAP";
-        public const string BigTitle = "TWO WAYS HOME";
-        public const string Close = "TAP TO CLOSE";
+        public const string Title = "Map";
+        public const string BigTitle = "Two ways home";
+        public const string Close = "Close";
         public const string SourceShort = "NASA GMAT";
         public const string HomeInShort = "{0}";   // 小さい地図の下（A・B の札の横に 分:秒 だけ。#146：home in を付けると2つが重なった）
         public const string Source = "Orbit lines: calculated with NASA GMAT";
         public const string Picker = "Mission Planner picks the route";
-        public const string Earth = "EARTH", Moon = "MOON", NoRadio = "FAR SIDE (no radio)", BurnHere = "BURN HERE";
+        public const string Earth = "Earth", Moon = "Moon", NoRadio = "Far side (no radio)", BurnHere = "Burn here";
         public const string HomeIn = "home in {0}";
         public const string HomeUnknown = "";
-        public const string Faster = "FASTER", Slower = "SLOWER";
+        public const string Faster = "Faster", Slower = "Slower";
         public const string Fuel = "burn uses {0} fuel";
-        public const string Chosen = "CHOSEN";
-        public const string NoMap = "MAP NOT LOADED";
+        public const string Chosen = "Chosen";
+        public const string NoMap = "Map not loaded";
     }
 
     // ------------------------------------------------------------------ 見た目（UiTokens に無いもの。#71 の UiKitHud／UiTokens ができたらそちらへ）
-    static Color RouteColor(string r) => r == "a" ? T.Go : T.Accent;   // 席の4色は使わない（ui-guidelines 2章）
-    static Color RouteFg(string r) => r == "a" ? T.Panel : T.Ink;      // ルートの色の上の文字
+    static Color RouteColor(string r) => r == "a" ? T.Go : T.Plum;     // 席の4色は使わない（ui-guidelines 2章）。#190：B は plum（Planner のカードと同じ。accent は注意の色）
+    static Color RouteFg(string r) => T.Panel;                         // ルートの色の上の文字（go・plum の上は白）
     static readonly Color OutColor = T.WithAlpha(T.Panel, 0.85f);      // 往路（A・B 共通）
     static readonly Color Haze = T.WithAlpha(T.Panel, 0.14f);          // 月の裏側の帯
     static readonly Color HazeOn = T.WithAlpha(T.Panel, 0.32f);        // 月の裏側にいる間
@@ -57,9 +61,10 @@ public class MapWidget : HudPart
     const float SmallTag = 28f, BigTag = 40f;      // A・B の札
     const float SmallMark = 22f, BigMark = 34f;    // 噴射の印
     const float SmallCompareH = 40f;
+    const float SmallChipH = 36f, SmallLetterD = 28f;   // #190：A・B の時間の数のチップ（blob_pill）と、中の A・B の台
     // 大きく開いたときの置き場所（土台 CabinHud が無いときだけ使う。ふだんは CabinHud.Layout の MapBig）
     static readonly Vector4 BigAnchors = new Vector4(0.21f, 0.23f, 0.79f, 0.92f);
-    const float BigHeaderH = 56f, BigCompareH = 80f, BigFooterH = 30f;
+    const float BigHeaderH = T.RibbonH, BigCompareH = 104f, BigFooterH = 30f;   // #190：見出しは帯（80）、比べるカードは文字2行が入る高さ
 
     // ------------------------------------------------------------------
     GmatRoute routeA, routeB;
@@ -82,7 +87,7 @@ public class MapWidget : HudPart
         if (hasRoutes) hBurn = KnotH(routeA, "burn", Mathf.Lerp(routeA.hours[0], routeA.hours[routeA.hours.Length - 1], 0.5f));
 
         // 小さい地図（カード全体が押せる）
-        var face = UiKit.Surface(root, T.RadiusM, T.HudFace);   // 計器は暗い面
+        var face = TimelineKit.GaugeFace(root, T.RadiusL);   // 計器は暗い面（#190：blob_panel＋星の模様。色は HudFace のまま）
         face.raycastTarget = true;
         var btn = root.gameObject.AddComponent<Button>();
         btn.targetGraphic = face; btn.transition = Selectable.Transition.None;
@@ -91,7 +96,7 @@ public class MapWidget : HudPart
 
         var area = Ui.Rect("Map", root);
         Ui.Anchor(area, 0, 0, 1, 1, T.S1, SmallCompareH + T.S1, T.S1, T.S1);
-        UiKit.Fill(UiKit.Round(area, T.RadiusS, T.Ink, "Space").rectTransform);
+        UiKit.Fill(UiKit.Round(area, T.RadiusS, T.Clear, "Space").rectTransform);   // #190：宇宙は面（HudFace）と星の模様をそのまま見せる（0番は地図の線の下の目印）
         if (hasRoutes) small = new MapView(area, false);
         else Fallback(area);
         var cap = FreeText(area, Words.Title, TextStyle.Label, Caption, new Vector2(0f, 1f), new Vector2(T.S1, -T.S1 * 0.5f));
@@ -101,10 +106,10 @@ public class MapWidget : HudPart
         src.alignment = TextAlignmentOptions.TopRight;
 
         // 下：A・B の家までの時間
-        var row = UiKit.Row(root, T.S2, TextAnchor.MiddleCenter);
+        var row = UiKit.Row(root, T.S1, TextAnchor.MiddleCenter);
         Ui.Anchor(row, 0, 0, 1, 0, T.S1, 0, T.S1, 0);
         row.pivot = new Vector2(0.5f, 0f); row.sizeDelta = new Vector2(row.sizeDelta.x, SmallCompareH);
-        UiKit.Icon(row, "earth", T.IconS, T.HudSub);   // 「家まで」の印（文字の代わり）
+        UiKit.Disc(row, "earth", T.Text, SmallLetterD);   // 「家まで」の印（文字の代わり）。#190：色つきの台【01】（隣の A＝go・B＝plum と違う色）
         smallA = Compare.MakeSmall(row, "a");
         smallB = Compare.MakeSmall(row, "b");
         RefreshCompare(null);
@@ -169,7 +174,7 @@ public class MapWidget : HudPart
             Ui.Anchor(big, BigAnchors.x, BigAnchors.y, BigAnchors.z, BigAnchors.w);
         }
         bigGroup = big.gameObject.AddComponent<CanvasGroup>();
-        var face = UiKit.Surface(big, T.RadiusL, T.Panel);
+        var face = UiKit.PanelFace(big, T.Panel);   // #190：明るいパネル（blob_panel＋内ふち＋横縞、影なし。【05】）
         face.raycastTarget = true;
         var btn = big.gameObject.AddComponent<Button>();
         btn.targetGraphic = face; btn.transition = Selectable.Transition.None;
@@ -177,18 +182,18 @@ public class MapWidget : HudPart
         btn.onClick.AddListener(() => SetBig(false));
 
         float pad = T.PanelPad;
-        // 見出し
+        // 見出し：左上の帯（#190【11】）＋右にヒントのピル（閉じる。【09】）
         var head = UiKit.Row(big, T.S2, TextAnchor.MiddleLeft);
         TopBand(head, pad, BigHeaderH);
-        UiKit.Icon(head, "route", T.IconM, T.Ink);
-        Ui.Size(UiKit.Text(head, Words.BigTitle, TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineLeft), flexW: 1);
-        UiKit.Icon(head, "cross", T.IconS, T.InkSub);
-        UiKit.Text(head, Words.Close, TextStyle.Label, T.InkSub);
+        TimelineKit.Ribbon(head, Words.BigTitle, "route", T.Go, out _);
+        Ui.Size(UiKit.Space(head, 0f), flexW: 1);
+        UiKit.Hint(head, "cross", Words.Close, () => SetBig(false));
 
         // 地図
         var area = Ui.Rect("Map", big);
         Ui.Anchor(area, 0, 0, 1, 1, pad, pad + BigFooterH + T.S1 + BigCompareH + T.S1, pad, pad + BigHeaderH + T.S1);
-        UiKit.Fill(UiKit.Round(area, T.RadiusM, T.Ink, "Space").rectTransform);
+        var space = UiKit.Round(area, T.RadiusM, T.Ink, "Space"); UiKit.Fill(space.rectTransform);
+        HudStars.Add(space.rectTransform);   // #190：宇宙に小さな星の模様（線の下）
         bigView = new MapView(area, true);
 
         // 比較（A・B のカード）
@@ -204,9 +209,9 @@ public class MapWidget : HudPart
         Ui.Anchor(foot, 0, 0, 1, 0, pad, 0, pad, 0);
         foot.pivot = new Vector2(0.5f, 0f); foot.sizeDelta = new Vector2(foot.sizeDelta.x, BigFooterH);
         foot.anchoredPosition = new Vector2(foot.anchoredPosition.x, pad);
-        Ui.Size(UiKit.Text(foot, Words.Source, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft), flexW: 1);
+        Ui.Size(UiKit.Text(foot, Words.Source, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineLeft), flexW: 1);
         new TimelineKit.BadgeRow(foot, TimelineKit.MiniBadge).Set(new[] { Seats.Planner }, Ctx.Model.MySeats);
-        UiKit.Text(foot, Words.Picker, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineRight);
+        UiKit.Text(foot, Words.Picker, TextStyle.Label, T.TextSoft, TextAlignmentOptions.MidlineRight);
 
         big.gameObject.SetActive(false);
     }
@@ -321,44 +326,49 @@ public class MapWidget : HudPart
         return at > 0f ? string.Format(format, Ui.Mmss(Mathf.Max(0f, at - s.t))) : Words.HomeUnknown;
     }
 
-    /// <summary>A・B の札と「家まで何分」。小さい地図は1行、大きい地図はカード（速い・遅い、燃料、選んだ印）</summary>
+    /// <summary>A・B の札と「家まで何分」。小さい地図は数のチップ（#190【09】）、大きい地図は色違いのカード（#190【11】：速い・遅い、燃料、選んだ方は 1.12 倍＋チェック）</summary>
     class Compare
     {
         string id;
-        Image tag; TextMeshProUGUI letter, main, sub;
-        RectTransform chosen;
-        Image card;
-
-        static Image Tag(Transform p, string id, float d, out TextMeshProUGUI letter)
-        {
-            var holder = Ui.Rect("Tag_" + id, p); UiKit.Fixed(holder, d, d);
-            var img = UiKit.Pill(holder, RouteColor(id), d, "Face"); UiKit.Fill(img.rectTransform);
-            letter = UiKit.Text(holder, id.ToUpper(), TextStyle.Tag, RouteFg(id)); UiKit.Fill(letter.rectTransform);
-            return img;
-        }
+        TextMeshProUGUI main, sub;
+        CanvasGroup fade;     // 小さい地図：選ばなかった方を薄く
+        UiCard card;          // 大きい地図
+        string shownRoute;
 
         public static Compare MakeSmall(Transform row, string id)
         {
             var c = new Compare { id = id };
-            var r = UiKit.Row(row, T.S1, TextAnchor.MiddleLeft);
-            c.tag = Tag(r, id, SmallTag, out c.letter);
-            c.main = UiKit.Text(r, "", TextStyle.Tag, T.HudText, TextAlignmentOptions.MidlineLeft);
+            var r = UiKit.Row(row, T.S1 * 0.5f, TextAnchor.MiddleLeft, T.S1 * 0.5f);
+            r.name = "Chip_" + id;
+            var le = Ui.Size(r, h: SmallChipH); le.minHeight = SmallChipH; le.flexibleWidth = 0f;
+            var face = UiKit.Blob(r, T.BlobPill, RouteColor(id), SmallChipH * 0.5f, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
+            var disc = UiKit.Disc(r, null, T.Panel, SmallLetterD);
+            var letter = UiKit.Text(disc.Root, id.ToUpper(), TextStyle.Tag, RouteColor(id), TextAlignmentOptions.Center, false); UiKit.Fill(letter.rectTransform);
+            c.main = UiKit.Text(r, "", TextStyle.Tag, RouteFg(id), TextAlignmentOptions.MidlineLeft);
+            Ui.Size(UiKit.Space(r, 0f), w: T.S1 * 0.5f);   // 右の端の余白（数字が丸い端にかからない）
+            c.fade = r.gameObject.AddComponent<CanvasGroup>();
+            c.fade.blocksRaycasts = false;
             return c;
         }
 
         public static Compare MakeBig(RectTransform parent, string id, float x0, float x1)
         {
             var c = new Compare { id = id };
-            var r = Ui.Rect("Card_" + id, parent);
+            c.card = UiKit.Card(parent, RouteColor(id));
+            c.card.Face.raycastTarget = false;   // 押すと大きい地図ごと閉じる（カードで止めない）
+            var r = c.card.Root;
+            r.name = "Card_" + id;
             Ui.Anchor(r, x0, 0, x1, 1, x0 > 0f ? T.S1 : 0f, 0, x1 < 1f ? T.S1 : 0f, 0);
-            c.card = UiKit.Round(r, T.RadiusM, T.Bg, "Face"); UiKit.Fill(c.card.rectTransform);
-            var row = UiKit.Row(r, T.S2, TextAnchor.MiddleLeft, T.S3); UiKit.Fill(row);
-            c.tag = Tag(row, id, BigTag, out c.letter);
+            UiKit.Ignore(r);
+            var vl = r.GetComponent<VerticalLayoutGroup>();
+            vl.padding = new RectOffset((int)T.S3, (int)T.S3, (int)T.S2, (int)T.S2);
+            var row = UiKit.Row(c.card.Content, T.S2, TextAnchor.MiddleLeft);
+            var letter = UiKit.Text(row, id.ToUpper(), TextStyle.Number, T.Panel);   // A・B の大きな字（【11】のカードの中の大きな絵の代わり）
+            UiKit.Fixed(letter, T.TextNumber, T.TextNumber * T.HeadingLineHeight);
             var col = UiKit.Col(row, 0f, TextAnchor.MiddleLeft);
             Ui.Size(col, flexW: 1);
-            c.main = UiKit.Text(col, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineLeft);
-            c.sub = UiKit.Text(col, "", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
-            c.chosen = UiKit.Tag(row, Words.Chosen, T.Ink, T.Panel);
+            c.main = UiKit.Text(col, "", TextStyle.Choice, T.Panel, TextAlignmentOptions.MidlineLeft);
+            c.sub = UiKit.Text(col, "", TextStyle.Label, T.WithAlpha(T.Panel, 0.85f), TextAlignmentOptions.MidlineLeft);
             return c;
         }
 
@@ -366,17 +376,20 @@ public class MapWidget : HudPart
         {
             bool none = route != "a" && route != "b";
             bool on = none || route == id;
-            var col = RouteColor(id); col.a = on ? 1f : FaintAlpha; tag.color = col;
-            if (sub == null)
+            if (card == null)
             {
                 main.text = string.IsNullOrEmpty(home) ? adj : home;
-                main.color = on ? T.HudText : T.HudSub;
+                fade.alpha = on ? 1f : FaintAlpha;
                 return;
             }
             main.text = adj + (string.IsNullOrEmpty(home) ? "" : " · " + home);
-            main.color = on ? T.Ink : T.InkSub;
             sub.text = fuel;
-            chosen.gameObject.SetActive(route == id);
+            if (route != shownRoute)   // 選んだ・決まったが変わったときだけ（弾みを毎回やり直さない）
+            {
+                shownRoute = route;
+                card.SetPicked(route == id);
+                card.SetMuted(!on);
+            }
         }
     }
 
@@ -477,7 +490,7 @@ public class MapWidget : HudPart
 
             // 地球・月
             Body(earthPx, rE, T.Go, "earth", T.Panel);
-            Body(moonPx, rM, T.Line, "moon", T.Ink);
+            Body(moonPx, rM, T.Line, "moon", T.Text);
             if (isBig)
             {
                 Label(Words.Earth, earthPx + new Vector2(0f, -rE - T.S1 * 0.5f), new Vector2(0.5f, 1f), Caption);
@@ -489,9 +502,9 @@ public class MapWidget : HudPart
             float md = isBig ? BigMark : SmallMark;
             var outDir = (bp - moonPx).sqrMagnitude > 1e-4f ? (bp - moonPx).normalized : Vector2.down;
             var mp = bp + outDir * (md * 0.5f);
-            var mark = UiKit.Pill(layer, T.Accent, md, "Burn");
+            var mark = UiKit.Blob(layer, T.BlobDisc, T.Accent, md * 0.5f, "Burn");   // #190：色つきの台に白い絵【01】
             Place(mark.rectTransform, mp, new Vector2(md, md), new Vector2(0.5f, 0.5f));
-            var fl = UiKit.Icon(mark.transform, "ignition", md * 0.7f, T.Ink); UiKit.Center(fl.rectTransform, md * 0.7f, md * 0.7f);
+            var fl = UiKit.Icon(mark.transform, "ignition", md * 0.6f, T.Panel); UiKit.Center(fl.rectTransform, md * 0.6f, md * 0.6f);
             if (isBig) Label(Words.BurnHere, mp + new Vector2(-md * 0.5f - T.S1, 0f), new Vector2(1f, 0.5f), T.Accent);
 
             // A・B の札：帰り道のまん中あたり。2本が離れる向きに少しずらす
@@ -504,16 +517,16 @@ public class MapWidget : HudPart
 
             // 船
             float sd = isBig ? BigShip : SmallShip;
-            var sh = UiKit.Pill(layer, T.Panel, sd, "Ship");
+            var sh = UiKit.Blob(layer, T.BlobDisc, T.Panel, sd * 0.5f, "Ship");   // #190：明るい台に text の絵
             ship = sh.rectTransform;
             Place(ship, earthPx, new Vector2(sd, sd), new Vector2(0.5f, 0.5f));
-            var ri = UiKit.Icon(ship, "rocket", sd * 0.7f, T.Ink);
+            var ri = UiKit.Icon(ship, "rocket", sd * 0.7f, T.Text);
             shipIcon = ri.rectTransform; UiKit.Center(shipIcon, sd * 0.7f, sd * 0.7f);
         }
 
         Image Tag(string id, Vector2 at, float d, out TextMeshProUGUI letter)
         {
-            var img = UiKit.Pill(layer, RouteColor(id), d, "Tag_" + id);
+            var img = UiKit.Blob(layer, T.BlobDisc, RouteColor(id), d * 0.5f, "Tag_" + id);   // #190：A・B の台
             Place(img.rectTransform, at, new Vector2(d, d), new Vector2(0.5f, 0.5f));
             letter = UiKit.Text(img.transform, id.ToUpper(), TextStyle.Tag, RouteFg(id)); UiKit.Fill(letter.rectTransform);
             return img;
