@@ -46,7 +46,7 @@ public class BurnCheck : HudPart
         public const string RouteOk = "Route {0}", RouteAuto = "No route yet (auto)";
         public const string ShieldOk = "Shield forward", ShieldTodo = "Turn to Heat shield";
         public const string You = "You";
-        public const string AllSet = "Count 3-2-1, then press Ignite together!";
+        public const string AllSet = "Count 3-2-1, press together!", AllReady = "All set!";
         // 同時押し
         public const string PressTogether = "Press together";
         public const string Together = "Together!";
@@ -90,11 +90,8 @@ public class BurnCheck : HudPart
     List<Item> burnItems, reentryItems;
 
     // 部品
-    RectTransform panel, header, todoCol, doneRow, readyRow, signalRow;
-    UiRibbon title;
-    UiIconDisc headerDisc;
+    RectTransform panel, todoCol, doneRow, readyRow, signalRow;
     TextMeshProUGUI ready, sigTitle, sigHint, result;
-    TimelineKit.Countdown chip;
     TimelineKit.BadgeRow readyBadges;
     TimelineKit.DualBadge left, right;
     readonly List<TodoRow> todos = new List<TodoRow>();
@@ -128,11 +125,7 @@ public class BurnCheck : HudPart
         var pl = panel.GetComponent<VerticalLayoutGroup>(); pl.padding = new RectOffset((int)T.S3, (int)T.S3, (int)T.S2, (int)T.S2); pl.spacing = T.S1;   // 顔が隠れないよう低く
         panel.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        header = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft);
-        title = TimelineKit.Ribbon(header, "", "ignition", T.Accent, out headerDisc);   // #190：見出しは左上の帯【11】
-        Ui.Size(UiKit.Space(header, 0f), flexW: 1);
-        chip = TimelineKit.Countdown.Make(header, false, T.Text);   // 明るいパネルの上の数のチップは text の面（【09】）
-
+        // #210：見出しの帯と残り秒は出さない（残り秒は TimelineBar の右上のチップだけ）
         todoCol = UiKit.Col(panel, T.S1, TextAnchor.UpperLeft, 0f, 0f, true);
         for (int i = 0; i < TodoPool; i++) todos.Add(MakeTodo(todoCol));
         doneRow = UiKit.Row(panel, T.S1, TextAnchor.MiddleLeft);
@@ -310,7 +303,7 @@ public class BurnCheck : HudPart
 
     public override void Tick(float now)
     {
-        left.Tick(now); right.Tick(now); chip.Tick(now);
+        left.Tick(now); right.Tick(now);
         bool changed = false;
         if (sigCmd != null && now > sigUntil) { sigCmd = null; changed = true; }
         if (resultUntil > 0f && now > resultUntil) { resultUntil = 0f; changed = true; }
@@ -343,33 +336,7 @@ public class BurnCheck : HudPart
         }
         bool signal = sigCmd != null;
 
-        // 見出しと残り秒
-        header.gameObject.SetActive(mode != Mode.None || signal);
-        chip.Root.gameObject.SetActive(mode != Mode.None);
-        bool inWindow = false;
-        if (mode == Mode.Burn)
-        {
-            inWindow = s.t >= s.tBurnOpen;
-            headerDisc.Set("ignition", T.Accent);
-            title.SetText(inWindow ? Words.BurnNow : Words.BurnSoon);
-            // 残り秒はタイムラインの帯（TimelineBar）と同じ式
-            if (inWindow) chip.Set("timer", Words.Left, s.tBurnClose - s.t, true, null, mine);
-            else chip.Set("timer", Words.OpensIn, s.tBurnOpen - s.t, false, null, mine);
-        }
-        else if (mode == Mode.Reentry)
-        {
-            headerDisc.Set("heat_shield", T.Go);
-            bool started = s.t >= s.tReentry;
-            title.SetText(started ? Words.ReentryCheck : Words.ReentrySoon);
-            if (started) chip.Set("timer", Words.CheckIn, readyAt - s.t, true, null, mine);
-            else chip.Set("timer", Words.StartsIn, s.tReentry - s.t, false, null, mine);
-        }
-        else if (signal)
-        {
-            bool swap = sigCmd == "swap_filter";
-            headerDisc.Set(swap ? "filter" : "ignition", swap ? T.Go : T.Accent);
-            title.SetText(swap ? Words.SwapFilter : Words.Ignite);
-        }
+        bool inWindow = mode == Mode.Burn && s.t >= s.tBurnOpen;
 
         // 準備の項目：まだのものは大きく（担当の席と YOU）、できたものは小さく1列
         int nTodo = 0, nDone = 0;
@@ -385,12 +352,17 @@ public class BurnCheck : HudPart
         for (int i = 0; i < todos.Count; i++) todos[i].Root.gameObject.SetActive(i < nTodo);
         for (int i = 0; i < dones.Count; i++) dones[i].Root.gameObject.SetActive(i < nDone);
         todoCol.gameObject.SetActive(nTodo > 0);
-        doneRow.gameObject.SetActive(nDone > 0 && nTodo == 0);   // #146（Fable）：まだの項目がある間は、それだけを出す（できた項目の列は全部そろってから）
+        doneRow.gameObject.SetActive(false);   // #210：できた項目の列は出さない
 
-        // 全部そろった：声に出して一緒に押す
-        bool allSet = mode == Mode.Burn && inWindow && nTodo == 0 && !signal;
+        // #210：まだの物は1つだけ（先頭）。全部そろったら一言
+        for (int i = 1; i < nTodo; i++) todos[i].Root.gameObject.SetActive(false);
+        bool allSet = mode != Mode.None && nTodo == 0 && !signal;
         readyRow.gameObject.SetActive(allSet);
-        if (allSet) readyBadges.Set(new[] { Seats.Pilot, Seats.Comms }, mine);
+        if (allSet)
+        {
+            ready.text = mode == Mode.Burn && inWindow ? Words.AllSet : Words.AllReady;
+            readyBadges.Set(mode == Mode.Burn && inWindow ? new[] { Seats.Pilot, Seats.Comms } : null, mine);
+        }
 
         // 同時押しの合図
         signalRow.gameObject.SetActive(signal);
