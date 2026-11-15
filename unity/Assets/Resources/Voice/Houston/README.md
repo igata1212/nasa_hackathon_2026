@@ -7,8 +7,8 @@
 - 話し方（instructions）：Speak as a friendly, patient teacher. Warm, approachable and encouraging, easy conversational pace.
 - 台詞の出どころ：`docs/design/houston_lines.json` の `milestone_lines`（M01〜M12, ED-A〜C, R01）と `reactive_lines`（H01〜H28）、ブリーフィング B01〜B09
 - 作った日：2026-11-14（B01〜B09 は 2026-11-15 に新しい文で作り直し、#189）
-- 料金：合計 約 $0.08（53本）
-- 合計：376秒、5.3MB
+- 料金：合計 約 $0.08（52本）＋ B01〜B09 の作り直し 約 $0.02
+- 合計：約 410秒、5.7MB
 - ト書き「(pause)」は「...」にして間を空けた（ED-C）。差し込み記号を含む台詞はなかった
 
 | id | 長さ(秒) | 最大音量(dB) |
