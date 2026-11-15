@@ -69,8 +69,9 @@ public class ReportScreen
         var bottom = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepBottom, "Bottom"), T.S3, TextAnchor.MiddleRight, T.ScreenEdge, 0f, EndingTokens.BottomPad);
         var card = UiKit.Row(bottom, T.S3, TextAnchor.MiddleLeft, T.S4);   // 本当の宇宙の話は黄みの豆形（【10】の choice）
         card.name = "Apollo13";
-        var cle = Ui.Size(card, w: 0f, h: EndingTokens.ApolloH, flexW: 1f); cle.minWidth = 0f; cle.minHeight = EndingTokens.ApolloH;
-        var face = UiKit.Blob(card, T.BlobPill, T.Choice, EndingTokens.ApolloH * 0.5f, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
+        var cle = Ui.Size(card, w: 0f, h: EndingTokens.ApolloH, flexW: 1f); cle.minWidth = 0f; cle.minHeight = EndingTokens.ApolloH; cle.preferredHeight = -1f;
+        var cg = card.GetComponent<HorizontalLayoutGroup>(); cg.padding.top = cg.padding.bottom = Mathf.RoundToInt(T.S2);   // 3 行の本文が箱に収まる高さ（本文の高さ＋上下の余白）
+        var face = UiKit.Blob(card, T.BlobPanel, T.Choice, T.PanelCorner, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
         var tag = UiKit.Tag(card, C.ApolloTag, T.Accent, T.Panel);
         tag.localEulerAngles = new Vector3(0f, 0f, T.CounterUnitTilt);
         apollo = EndingWidgets.Wrap(card, "", TextStyle.Hint, T.Text, TextAlignmentOptions.MidlineLeft);

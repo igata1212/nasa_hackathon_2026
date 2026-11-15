@@ -125,6 +125,7 @@ public class BurnCheck : HudPart
         panel = UiKit.Panel(root, T.S2, "BurnPanel");
         panel.anchorMin = new Vector2(0f, 1f); panel.anchorMax = new Vector2(1f, 1f); panel.pivot = new Vector2(0.5f, 1f);
         panel.offsetMin = new Vector2(0f, panel.offsetMin.y); panel.offsetMax = new Vector2(0f, 0f);
+        var pl = panel.GetComponent<VerticalLayoutGroup>(); pl.padding = new RectOffset((int)T.S3, (int)T.S3, (int)T.S2, (int)T.S2); pl.spacing = T.S1;   // 顔が隠れないよう低く
         panel.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         header = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft);
