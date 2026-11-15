@@ -58,7 +58,7 @@
       "cost": 10,
       "min": 0,
       "max": 1,
-      "benefit": "Science value 1. Uses 2%/min power, makes 10 data/min",
+      "benefit": "Science value 1. Uses 3%/min power, makes 15 data/min",
       "weakness": "Lowest science value"
     },
     {
@@ -70,7 +70,7 @@
       "cost": 15,
       "min": 0,
       "max": 1,
-      "benefit": "Science value 2 (what the Moon is made of). Uses 4%/min power, makes 20 data/min",
+      "benefit": "Science value 2 (what the Moon is made of). Uses 5%/min power, makes 30 data/min",
       "weakness": "Highest power use and the most data to send"
     },
     {
@@ -82,7 +82,7 @@
       "cost": 14,
       "min": 0,
       "max": 1,
-      "benefit": "Science value 1.5 (what lies under the surface). Uses 3%/min power, makes 15 data/min",
+      "benefit": "Science value 1.5 (what lies under the surface). Uses 4%/min power, makes 22 data/min",
       "weakness": "Costly for its science value"
     },
     {
@@ -94,7 +94,7 @@
       "cost": 10,
       "min": 0,
       "max": 1,
-      "benefit": "Sends 60 data/min instead of 30",
+      "benefit": "Sends 90 data/min instead of 45",
       "weakness": "Mass and budget"
     },
     {
@@ -116,7 +116,7 @@
       "row": 16,
       "mass": 0,
       "cost": 0,
-      "benefit": "After the accident, returns to Earth with no burn",
+      "benefit": "The Moon's gravity swings you back toward Earth. No extra burn before the far side",
       "weakness": "Less time to observe (science value x1)"
     },
     {
@@ -127,7 +127,7 @@
       "mass": 0,
       "cost": 0,
       "benefit": "Flies close to the Moon for longer (science value x1.5)",
-      "weakness": "After the accident, the burn to get home costs 15% fuel"
+      "weakness": "After the accident, you need an extra burn (15% fuel) before the far side"
     },
     {
       "id": "rocket_small",
