@@ -275,7 +275,7 @@ public class MapWidget : HudPart
         bool built = small.EnsureBuilt(routeA, routeB, hBurn);
         if (bigOpen && bigView.EnsureBuilt(routeA, routeB, hBurn)) built = true;
         if (built) ApplyViews(Ctx.State);
-        if (bigGroup != null && Detail != null) bigGroup.alpha = Detail.alpha;   // 照明 OFF の暗さ（#87）を大きい地図にも
+        // #212：開いた地図は画面全体を覆うので、照明 OFF の暗さ（#87、透明度で出す）をかけない（かけると後ろの盤や吹き出しが透ける）
     }
 
     /// <summary>今の船の軌道（A／B。噴射の前は A）と、その上の GMAT の経過時間（時間）。地図と同じ値（#167：GmatGauges が読む）。軌道が無ければ null</summary>
