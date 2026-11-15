@@ -2,7 +2,7 @@
 // 音（#141。GameAudio）を Game.unity に組み立てる。シーンは手で直さず、ここを直して作り直す。
 //   メニュー Tools/Audio/音を組み立てる … Game.unity を開いて「Audio」を作り直して保存する（GameFlow が要る）
 //   GameFlowScene.BuildScene（Tools/GameFlow/シーンを作り直す）からは BuildInto(flow) を呼ぶ（Story・Urgency の後。StoryDirector・UrgencyFx を拾う）
-// 音の参照はここで AssetDatabase から入れる：効果音は Assets/Audio/Sfx の全部、ジングルは Assets/Audio/Music の jingle_*、BGM は space_calm_01。
+// 音の参照はここで AssetDatabase から入れる：効果音は Assets/Audio/Sfx の全部、ジングルは Assets/Audio/Music の jingle_*、BGM は space_universe_study。
 // 出典は CREDITS.md と各フォルダの SOURCES.md。AudioListener は足さない（メインカメラのものを使う）。
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ public static class AudioScene
     const string Tag = "[Audio] ";
     public const string SfxFolder = "Assets/Audio/Sfx";
     public const string MusicFolder = "Assets/Audio/Music";
-    const string CalmPath = MusicFolder + "/space_calm_01.mp3";   // Spacedman（Shane Ivers, CC BY 4.0）
+    const string CalmPath = MusicFolder + "/space_universe_study.mp3";   // Universe Study（The_Mountain, Pixabay）
 
     [MenuItem("Tools/Audio/音を組み立てる")]
     public static void BuildMenu()

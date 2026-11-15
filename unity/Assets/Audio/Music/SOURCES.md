@@ -4,17 +4,14 @@
 
 ## 取得済み
 
-### space_calm_01.mp3（用途: 穏やかな宇宙。設計画面・練習用、ループ想定）
-- 曲名: Spacedman
-- 作者: Shane Ivers（Silverman Sound）
-- 元 URL: https://www.silvermansound.com/free-music/spacedman
-- 直接 URL: https://www.silvermansound.com/wp-content/uploads/spacedman.mp3
-- ライセンス: CC BY 4.0（無料版は表記が必要。商用可。Pro ライセンスは表記不要だが未購入）
-- 表記文（サイトが示す例）: Music: Spacedman by Shane Ivers - https://www.silvermansound.com
-- 長さ: 3:31（211.2 秒）。MP3 320kbps / 44.1kHz / ステレオ / 8.45MB
-- ID3 タグ: title=Spacedman, artist=Shane Ivers, comment=www.silvermansound.com
-- 注意: 指定の 1〜3 分を超える。作者ページは "It loops cleanly"（ループ向き）と記載しているが、こちらでは未検証。試聴は未実施。
-- 取得日: 2026-11-14 / 取得：haiku
+### space_universe_study.mp3（用途: 穏やかな宇宙。設計画面・練習・飛行、ループ想定）
+- 曲名: Universe Study
+- 作者: The_Mountain
+- 取得元: Pixabay（Pixabay ID 141461。元ファイル名 the_mountain-universe-study-141461.mp3。曲ページの URL 要確認: https://pixabay.com/music/）
+- ライセンス: Pixabay Content License（表記は不要。書いておく）
+- サイズ: 約 3MB の MP3
+- 取得日: 2026-11-15（iizuka が `tmp/` に置いたものを入れた）
+- 前の BGM（Spacedman, Shane Ivers, CC BY）は外した。
 
 ## 未取得（参考: 候補と取得できなかった理由）
 
