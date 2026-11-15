@@ -167,7 +167,7 @@ public class HoustonBubble
     {
         nameText.text = speakerName;
         nameFace.color = tag;
-        roleTag.gameObject.SetActive(houston && (firstTime || S.RoleAlways));   // #146（Fable）：説明のラベルは最初の間だけ（小窓に MISSION CONTROL と出ている）
+        roleTag.gameObject.SetActive(houston && (firstTime || S.RoleAlways));   // #146（Fable）：説明のラベルは最初の間だけ（#189：小窓の下の帯に ON EARTH がいつも出ている）
         roleText.text = firstTime ? S.RoleFirst : S.Role;
         body.gameObject.SetActive(true);
         body.text = marked;

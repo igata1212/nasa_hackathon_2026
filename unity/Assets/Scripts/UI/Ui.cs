@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 席の仕事 Seats.Job）
 // 骨組み用の UGUI 部品（コードで組む。見た目は仮。本番の作り込みは UI の Issue #71〜#94）
 using System;
 using UnityEngine;
@@ -119,4 +119,6 @@ public static class Seats
     public static Color Tint(string s) => s == Pilot ? Ui.Red : s == Life ? Ui.Green : s == Comms ? Ui.Yellow : Ui.Blue;
     public static string Icon(string s) => s == Pilot ? "▲" : s == Life ? "●" : s == Comms ? "■" : "◆";
     public static string Title(string s) => s == Pilot ? "PILOT" : s == Life ? "LIFE SUPPORT" : s == Comms ? "COMMS & POWER" : "MISSION PLANNER";
+    /// <summary>席の仕事（部屋の名前タグの3行目。#189：役の名前だけでは何をする席か分からなかった。ブリーフィング B06・B07 と同じ中身）</summary>
+    public static string Job(string s) => s == Pilot ? "Turns the ship" : s == Life ? "Keeps the air safe" : s == Comms ? "Radio and power" : "Route and science";
 }

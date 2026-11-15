@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 船内の高さを席のパネルに合わせた）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 船内の高さを席のパネルに合わせた）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 先生の小窓の帯）
 // ヒューストン（地上の管制室の先生）の吹き出し（#75）の文言・置き場所・大きさ・時間を1か所に集めたもの。
 // 見た目を直すときはここだけ直す（色は UiTokens の名前で指す。色コードはここにも書かない）。
 // 吹き出しの組み立ては HoustonBubble.cs、出す順番と時間は HoustonBox.cs、台詞の読み込みと区切りは HoustonScript.cs、声は HoustonVoice.cs
@@ -28,7 +28,8 @@ public static class HoustonStyle
     public const string Role = "Mission Control on Earth";
     /// <summary>最初の1回だけ出す、少し長い説明（補助ラベルの代わりに出す）</summary>
     public const string RoleFirst = "Mission Control on Earth: they guide you by radio";
-    public const bool RoleAlways = false;  // true なら補助ラベルをいつも出す。#146（Fable）：文字を減らすため、最初の RoleFirstS 秒とブリーフィングだけ
+    public const bool RoleAlways = false;  // true なら補助ラベルをいつも出す。#146（Fable）：文字を減らすため、最初の RoleFirstS 秒とブリーフィングだけ。
+                                           //   #189：そのかわり先生の小窓の下の帯に「ON EARTH」をいつも出す（WindowTagSmall。本人の「ヒューストンが分からん」）
     public const float RoleFirstS = 20f;   // 長い説明を出しておく秒（最初の台詞が出てから）
     public const string RoleIcon = "earth";
 
@@ -96,6 +97,10 @@ public static class HoustonStyle
     /// <summary>先生の小窓（Story/HoustonWindow）の大きさ。ブリーフィングは顔が主役なので大きく（描く絵は 384×240）</summary>
     public static readonly Vector2 WindowSmall = new Vector2(192f, 120f), WindowBriefing = new Vector2(352f, 220f);
     public const float WindowGap = 8f, WindowGapBriefing = 16f;
+    /// <summary>小窓の下の帯の文字（#189）。小さい窓（船内・エンディング・レポート）と、ブリーフィングの大きい窓。補助ラベル 22 で入る長さにする</summary>
+    public const string WindowTagSmall = "ON EARTH", WindowTagBriefing = "MISSION CONTROL";
+    public const float WindowCaptionH = 30f;          // 帯の高さ（補助ラベル 22 × 行間 1.3 ＝ 約 29）
+    public const float WindowCaptionAlpha = 0.85f;    // 帯（ink）の濃さ。3D の絵の上で白い字が読めるように
     public static readonly Color BriefingScrimColor = T.WithAlpha(T.Ink, 0.97f);   // #146（Fable）：色空間が Linear なので 0.97 でやっと暗い紺に見える。後ろの設計の画面の文字が読めないくらい暗く（先生と台詞だけを見せる）
     public static bool BriefingScrim = true;   // ブリーフィングの間、後ろを暗くする（後ろは押せない。どこを押しても次へ）
 

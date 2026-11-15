@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 何もしていないのに褒めない）
 // タイトルと部屋の画面を「あつ森の方向」に寄せるための値（#153）。動き（速さ・弾み）・案内の文・背景の飾りの大きさは、ここだけを直す。
 // 色はすべて UiTokens の色から作る（色コードは書かない）。px は Canvas の基準 1600×900、3D は m・度・秒。
 // 文の [ ] で囲んだ所は、ボタンの名前などの強調（Rich() で KeyColor の色文字にする）。1行 40 字・2行まで（ui-guidelines 3章 吹き出し）
@@ -13,7 +13,7 @@ public static class TitleLook
 
     // タイトル：今の入力の状態で1つだけ出す（TitleScreen.RefreshHint）
     public const string HintName = "Hi! I'm Houston, your team on Earth.\nFirst, type your name below.";
-    public const string HintCreate = "Nice! Press [CREATE ROOM] to make a room.\nGot a friend's code? Type it, then [JOIN].";
+    public const string HintCreate = "Press [CREATE ROOM] to make a room.\nGot a friend's code? Type it, then [JOIN].";
     public const string HintCode = "A room code has 4 digits.\nKeep typing!";
     public const string HintJoin = "Code ready!\nPress [JOIN] to meet your crew.";
     public const string HintNeedCode = "Type the 4-digit room code first,\nthen press [JOIN].";   // 鍵のかかった JOIN を押したとき

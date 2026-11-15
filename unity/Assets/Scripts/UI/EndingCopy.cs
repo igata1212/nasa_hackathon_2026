@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 SCORE を整数に・出来事の文を短く）
 // エンディング（#85）と事後レポート（#86）の文言・アイコン・並びの表。直すときはこのファイルだけ見ればよい（Fable の採点・Taiga の文言）。
 // 調子：帰還の演出（ReturnStage の SPLASHDOWN!・LostStage の Mission lost）と合わせる。ED-C は責めず静かに、「もう一度考えよう」で終える（赤は使わない）。
 // 画面の文字は英語。フォントに無い字（— や ・）は使わない（Baloo 2・Nunito の Static に焼いたのは ASCII と °₂→✓×▲●■◆▶ だけ）。
@@ -140,12 +140,13 @@ public static class EndingCopy
         new Moment { Cmd = "close_valve", Label = "Stopped the leak", Icon = "valve", Priority = 1, Match = c => Ok(c) },
         new Moment { Cmd = "close_valve", Label = "Closed the wrong valve", Icon = "valve", Priority = 4, Match = c => J.Has(c, "ok") && !Ok(c) },
         new Moment { Cmd = "ignite", Label = "Burn for home", Icon = "ignition", Priority = 1, Match = c => Ok(c) },
-        new Moment { Cmd = "switch", Label = "Heater off to save power", Icon = "temperature", Priority = 2, Match = c => Arg(c, "name", "heater") && On(c, false) },
+        // #189（Fable）：「… to save power」はレポートの列（約 300 px）に入らず「po…」と切れたので短く。Lights・Navigation も同じ長さなのでそろえた
+        new Moment { Cmd = "switch", Label = "Heater off", Icon = "temperature", Priority = 2, Match = c => Arg(c, "name", "heater") && On(c, false) },
         new Moment { Cmd = "swap_filter", Label = "Swapped the CO2 filter", Icon = "filter", Priority = 2, Match = c => Ok(c) },
         new Moment { Cmd = "switch", Label = "Science instruments on", Icon = "camera", Priority = 2,
                      Match = c => On(c, true) && (Arg(c, "name", "camera") || Arg(c, "name", "spectrometer") || Arg(c, "name", "radar")) },
-        new Moment { Cmd = "switch", Label = "Lights off to save power", Icon = "switch", Priority = 3, Match = c => Arg(c, "name", "lights") && On(c, false) },
-        new Moment { Cmd = "switch", Label = "Navigation off to save power", Icon = "switch", Priority = 3, Match = c => Arg(c, "name", "nav") && On(c, false) },
+        new Moment { Cmd = "switch", Label = "Lights off", Icon = "switch", Priority = 3, Match = c => Arg(c, "name", "lights") && On(c, false) },
+        new Moment { Cmd = "switch", Label = "Navigation off", Icon = "switch", Priority = 3, Match = c => Arg(c, "name", "nav") && On(c, false) },
         new Moment { Cmd = "set_attitude", Label = "Pointed at the Moon", Icon = "moon", Priority = 3, Match = c => Arg(c, "mode", "moon") },
         new Moment { Cmd = "set_transmit", Label = "Sent data to Earth", Icon = "send", Priority = 3, Match = c => On(c, true) },
         new Moment { Cmd = "set_attitude", Label = "Heat shield forward", Icon = "heat_shield", Priority = 3, Match = c => Arg(c, "mode", "heatshield") },
@@ -218,6 +219,15 @@ public static class EndingCopy
     /// <summary>小数1桁まで（1281.6・100）。内訳の合計がスコアと合うように、丸めすぎない</summary>
     public static string Num(float v) => float.IsNaN(v) ? "?" : v.ToString("0.#", CultureInfo.InvariantCulture);
     public static string Plus(float v) => (v > 0f ? "+" : "") + Num(v);
+    /// <summary>SCORE と内訳だけ整数（#189：1281.6 → 1282。四捨五入）。内訳はそれぞれ丸めるので、足すと合計と 1〜2 ずれることがある</summary>
+    public static string Score(float v) => float.IsNaN(v) ? "?" : Round(v).ToString(CultureInfo.InvariantCulture);
+    public static string ScorePlus(float v)
+    {
+        if (float.IsNaN(v)) return "?";
+        int n = Round(v);
+        return (n > 0 ? "+" : "") + n.ToString(CultureInfo.InvariantCulture);
+    }
+    static int Round(float v) => (int)Math.Round(v, MidpointRounding.AwayFromZero);
 
     static bool AllPass(EndingInfo i)
     {

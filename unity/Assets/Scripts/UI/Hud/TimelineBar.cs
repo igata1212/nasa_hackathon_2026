@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#77）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#77）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 BURN NOW・HOME if A）
 // 作る Issue：#77（タイムラインの帯とカウントダウン）
 //
 // 上の帯：左に時計（T+）、真ん中に1本の帯（月の裏側＝通信途絶・観測の窓／噴射窓／再突入 A・B／着水）と「いま」の縦線、
@@ -28,13 +28,15 @@ public class TimelineBar : HudPart
         public static readonly string[] BurnDone = { "BURN DONE", "DONE", "" };
         public static readonly string[] BurnMissed = { "MISSED", "" };
         public static readonly string[] Reentry = { "RE-ENTRY", "" };
-        public static readonly string[] IfA = { "RE-ENTRY if A", "if A", "A", "" };
-        public static readonly string[] IfB = { "RE-ENTRY if B", "if B", "B", "" };
+        // #189（Fable）：ルートを選ぶ前の A・B は「どちらなら、いつ家に着くか」。アイコンも盾ではなく地球（右のチップの HOME! と同じ）。
+        //   1600×900 では区間が約 106 px なので、ふつうは2つめの「if A」が出る（地球＋if A で「A なら家」と読める）
+        public static readonly string[] IfA = { "HOME if A", "if A", "A", "" };
+        public static readonly string[] IfB = { "HOME if B", "if B", "B", "" };
         // 右のチップ（次まで／窓の中の残り）
         public const string NextFarSide = "FAR SIDE in {0}";
         public const string InFarSide = "NO RADIO · {0} left";
         public const string NextBurn = "BURN WINDOW in {0}";
-        public const string InBurn = "BURN NOW · {0} left";
+        public const string InBurn = "BURN NOW";   // #189：残り秒は点火の準備のカード（BurnCheck）だけ（2か所に出さない）。残り 10 秒で赤く弾むのはそのまま
         public const string NextReentry = "RE-ENTRY in {0}";
         public const string NextSplash = "SPLASHDOWN in {0}";
         public const string Home = "HOME!";
@@ -45,6 +47,7 @@ public class TimelineBar : HudPart
     static readonly string[] SeatsBurn = { Seats.Pilot, Seats.Comms };
     static readonly string[] SeatsReentry = { Seats.Pilot, Seats.Comms };
     static readonly string[] NoSeats = { };
+    const string IfIcon = "earth";   // ルートを選ぶ前の A・B の区間（#189。盾では意味が取れなかった）
 
     // ------------------------------------------------------------------ 見た目（UiTokens に無い大きさ。#71 の UiKitHud／UiTokens ができたらそちらへ）
     const float BarInsetY = 4f;          // slot の上下のすき間
@@ -176,8 +179,8 @@ public class TimelineBar : HudPart
         }
         else
         {
-            SetSeg(reA, s.tReentryA, s.tSplashdownA, end, T.Panel, T.InkSub, "heat_shield", Words.IfA, NoSeats, mine);
-            SetSeg(reB, s.tReentryB, s.tSplashdownB, end, T.Panel, T.InkSub, "heat_shield", Words.IfB, NoSeats, mine);
+            SetSeg(reA, s.tReentryA, s.tSplashdownA, end, T.Panel, T.InkSub, IfIcon, Words.IfA, NoSeats, mine);
+            SetSeg(reB, s.tReentryB, s.tSplashdownB, end, T.Panel, T.InkSub, IfIcon, Words.IfB, NoSeats, mine);
         }
 
         // 着水（地球）・通った所・いま
@@ -192,7 +195,7 @@ public class TimelineBar : HudPart
         RefreshNext(s, mine);
     }
 
-    /// <summary>右のチップ：次の出来事までの秒、窓の中なら残りの秒（BurnCheck の残り秒と同じ式：窓の終わり − t）</summary>
+    /// <summary>右のチップ：次の出来事までの秒、窓の中なら残りの秒（BurnCheck の残り秒と同じ式：窓の終わり − t）。噴射窓の中は文字に秒を出さない（#189。残り 10 秒の赤と弾みには使う）</summary>
     void RefreshNext(GameState s, List<string> mine)
     {
         float t = s.t;

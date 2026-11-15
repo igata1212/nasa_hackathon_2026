@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#74・#131）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 時計を消した）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#74・#131）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 時計を消した）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 練習の間は名前を出す）
 // 作る Issue：#74（常に見える状態）＋ #131（ゲージの色の閾値を parameters.json に合わせる）
 //
 // 左のパネル。上にゲージ5本（電力・酸素・温度・CO2・燃料）、下に向き・データ、いちばん下に生還ラインの説明（時計は TimelineBar だけ。#146）。
@@ -13,6 +13,7 @@
 // 練習・かき混ぜの間（state が来ない）は、設計の合計で満タンの静かな表示（#74「M03・M04 は静かな表示」）
 // 左の領域（CabinHud.Layout の Left）に入りきらないときは、パネルごと縮める（Fit）。Detail：パネル全体（照明 OFF で暗くしてよい）
 // #146（Fable）：1画面の文字を減らした。名前（POWER など）は出さず、アイコン＋ゲージ＋数字だけ。注意・危険のときだけ、その行の上に言葉（LOW など）を出す。
+//   #189（Fable）：練習と GET READY（stir）の間だけは、安全のときもその行の上に名前（POWER・OXYGEN・TEMP・CO₂・FUEL）を出す（雲のアイコンの数字が CO2 だと分かるように）。事故のあとは上のとおり
 //   向き・データ・生還ラインの説明の行は消した（向きは Pilot のパネル、データは Planner・Comms のパネルにある）
 // 共通のゲージ（#71 の UiKitHud.Gauge）ができたら、下の MiniGauge だけを差し替える
 using System.Collections.Generic;
@@ -259,7 +260,9 @@ public class StatusPanel : HudPart
         float m = Mathf.Max(max, 0.0001f);
         r.gauge.Set(Mathf.Clamp01(v / m), line >= 0f ? Mathf.Clamp01(line / m) : -1f, falling);
         r.value.text = text;
-        r.word.text = falling ? WordLeak : r.def.words[(int)lv];
+        string word = falling ? WordLeak : r.def.words[(int)lv];
+        if (word == "" && Learning) word = r.def.label;   // #189：練習・GET READY の間は、安全でも名前を出す
+        r.word.text = word;
         bool say = r.word.text != "";
         r.word.gameObject.SetActive(say);
         if (r.top.gameObject.activeSelf != say)
@@ -269,6 +272,9 @@ public class StatusPanel : HudPart
             r.size.preferredHeight = r.size.minHeight = h;
         }
     }
+
+    /// <summary>練習（practice）と GET READY（stir）の間。ゲージの名前を覚える時間（#189）</summary>
+    bool Learning => Ctx.Model.Phase == "practice" || Ctx.Model.Phase == "stir";
 
     void SetLevel(Row r, Level lv)
     {

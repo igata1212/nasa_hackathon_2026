@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Claude）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 名前タグに席の仕事）
 // UI ガイドライン 3章の部品（#72 のタイトルと部屋で使うもの）。コードで組む UGUI ＋ TextMeshPro。
 // 色・大きさはすべて UiTokens から読む（ここに色コードや px を書かない）。Ui.cs（legacy Text の骨組み）は変えない。
 // 影つきの部品は「Shadow（下に ShadowY ずらした同じ形）＋ Body（面と中身）」の2枚。押すと UiPress が Body を下げ、影が縮む
@@ -73,7 +73,7 @@ public class UiCrewTag
     public Image Ring, Shadow, Face;
     public UiDashed Dashed;
     public UiSeatBadge Badge, Mini;
-    public TextMeshProUGUI Name, Sub, Note;
+    public TextMeshProUGUI Name, Sub, Job, Note;
 
     /// <param name="player">座っている人の名前。null なら空席</param>
     /// <param name="mainSeat">兼任のとき、その人の主の席。主の席なら null</param>
@@ -92,7 +92,11 @@ public class UiCrewTag
         Name.color = open ? T.InkSub : T.Ink;
         You.gameObject.SetActive(self);
         Sub.text = Seats.Title(Seat);
-        Note.gameObject.SetActive(mainSeat != null);   // 兼任のときだけ3行目（横に広げると隣のタグとぶつかる）
+        Job.text = Seats.Job(Seat);
+        // 3行目：ふだんは席の仕事（#189）、兼任のときは「Covering this seat too」（横に広げると隣のタグとぶつかる）。
+        //   4行にすると、iPhone の横（844×390）で上の合言葉のチップにかぶるので、どちらか1つ
+        Job.gameObject.SetActive(mainSeat == null);
+        Note.gameObject.SetActive(mainSeat != null);
     }
 }
 
@@ -458,6 +462,7 @@ public static class UiKit
         c.Name.overflowMode = TextOverflowModes.Ellipsis;
         c.You = Tag(who, "YOU", T.Ink, T.Panel);
         c.Sub = Text(col, "", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+        c.Job = Text(col, "", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);   // 席の仕事（#189）
         c.Note = Text(col, "Covering this seat too", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
         c.Set(null, false, null);
         return c;

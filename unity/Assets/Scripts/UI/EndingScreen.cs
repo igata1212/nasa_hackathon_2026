@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）／ 更新：iizuka（Opus 5.5、2026-11-14、#85）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#130）／ 更新：iizuka（Opus 5.5、2026-11-14、#85）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 SCORE は整数）
 // エンディング（ED-A・ED-B・ED-C、#85）。帰還の演出（ReturnStage の SPLASHDOWN!・LostStage の Mission lost）のあとに出る。
 // サーバーは ending から 16 秒で report に進む（SEE THE REPORT を誰かが押しても進む）。
 // 並び（EndingLayout）：
@@ -92,7 +92,7 @@ public class EndingScreen
         strictText.text = why;
 
         houston.Set(C.Clean(feed.Line(i.Ending)));
-        score.text = C.Num(i.Score);
+        score.text = C.Score(i.Score);   // #189：整数
     }
 
     /// <summary>ED-A・ED-B：生還ラインとくらべる（足りない物だけ輪とオレンジ）。ED-C：尽きた物に輪（赤は使わない）</summary>

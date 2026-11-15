@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#76）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 声なしの警告もこの帯に）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#76）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 声なしの警告もこの帯に）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 準備のカードの間は注意を隠す）
 // 作る Issue：#76（事故の警報と危機の帯）
 //
 // 中央上の危機の帯（同時に1本、ui-guidelines 3章「警告の帯」）。練習の案内（#84）と同じ場所で、同時には出ない（帯は flight の間だけ）
@@ -11,6 +11,8 @@
 //   ・声なしの警告（event kind=warning：通信途絶・通信 OFF の間のヒューストンの台詞）も、この帯の1行に Look.WarnSec 秒出す（長ければ 22 で2行。帯の高さは 72 のまま）。
 //     前は HoustonBox の上に別の赤い帯を出していて、危機の帯と2本並んだ（#146。ui-guidelines 7章：帯は1本）。危機が無いときは NO RADIO の帯で出す
 //   ・画面の縁の赤（UrgencyFx の枠）と溶けないように、帯の外側に panel の輪と影を付ける。帯そのものは脈打たせない（脈は縁だけ）
+//   ・#189（Fable）：点火・再突入の準備のカード（BurnCheck）が出ている間は、注意（オレンジ）の帯を出さない。危険（赤）だけ出す
+//     （帯＋カード＋吹き出し＋席のパネルが重なって船室が見えなかった。注意はゲージの色でも分かる）
 // 文言・アイコン・席は下の Crises の表の1か所（文言は Taiga が決める。今は houston_lines.json の H07・H11・H14・H16・H18・H26 に合わせた仮）
 // 見た目の値は Look の1か所。帯の形は自分の中の Band にまとめた（#71 の HudKit.Banner ができたら差し替える）
 // UrgencyFx は Object.FindAnyObjectByType で探す（シーンに参照を足さない）。無ければ MASTER ALARM だけ出す
@@ -82,6 +84,7 @@ public class CrisisBanner : HudPart
     string lastPhase = "";
     string warnText = "", warnPriority = ""; float warnUntil; bool warnShown;   // 声なしの警告（#146）
     bool alarmDone; float alarmStart, alarmUntil;
+    BurnCheck burn;                   // 点火・再突入の準備のカード（#189。CabinHud で後から足されるので Tick で探す）
 
     protected override void Build(RectTransform root)
     {
@@ -144,6 +147,7 @@ public class CrisisBanner : HudPart
         string cause = fx != null ? fx.Cause : "";
         bool warnOn = now < warnUntil && Ctx.Model.Phase == "flight";
         bool show = !alarmOn && (level > 0 || warnOn);
+        if (show && !Danger(level, warnOn) && BurnCardShown()) show = false;   // #189：準備のカードの間は危険だけ
         if (band.Root.gameObject.activeSelf != show) band.Root.gameObject.SetActive(show);
         if (!show) { shownLevel = 0; shownCause = ""; warnShown = false; dirty = false; return; }
         if (dirty || level != shownLevel || cause != shownCause || warnOn != warnShown) Apply(level, cause, warnOn);
@@ -186,7 +190,7 @@ public class CrisisBanner : HudPart
         if (level > shownLevel || cause != shownCause) bounceAt = Time.unscaledTime;
         shownLevel = level; shownCause = cause; warnShown = warn; dirty = false;
         var c = level > 0 ? Find(cause) ?? Unknown : Radio;
-        bool danger = level >= 2 || (warn && warnPriority == "critical");
+        bool danger = Danger(level, warn);
         Color face = danger ? T.Danger : T.Accent, fg = danger ? T.Panel : T.Ink;
         band.Face.color = face;
         band.LevelIcon.sprite = T.Icon(danger ? "danger" : "caution"); band.LevelIcon.color = fg;
@@ -201,6 +205,15 @@ public class CrisisBanner : HudPart
         if (seat != null) band.Badge.Set(seat, Ctx.Model.MySeats.Contains(seat), false);
         UpdateStandby(Ctx.State);
         Fit();
+    }
+
+    /// <summary>帯が危険（赤）か。段階 2・3、または critical の声なしの警告</summary>
+    bool Danger(int level, bool warn) => level >= 2 || (warn && warnPriority == "critical");
+
+    bool BurnCardShown()
+    {
+        if (burn == null) foreach (var p in Ctx.Parts) if (p is BurnCheck b) { burn = b; break; }
+        return burn != null && burn.Showing;
     }
 
     static Crisis Find(string cause)

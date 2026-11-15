@@ -1,7 +1,8 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#80）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#80）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 左のカードを向きの見出しに）
 // 作る Issue：#80（Pilot のパネル）。下の PilotCommsKit は #82（Comms & Power）と共用の小さな部品
 //
-// Pilot（▲）の席：左から「燃料（表示だけ）」「船の向き（5つから1つ）」「大ボタン1つ（軌道修正・点火・HELP SWAP のどれか）」。
+// Pilot（▲）の席：左から「向きの見出し（POINT SHIP AT ＋燃料。表示だけ）」「船の向き（5つから1つ）」「大ボタン1つ（軌道修正・点火・HELP SWAP のどれか）」。
+//   ・#189（Fable）：左のカードは EARTH・MOON などが「船を向ける先」だと分かるように見出しにした。燃料と1回の量は2行目
 //   ・HELP SWAP：CO2 が注意の値を超え、フィルターが残っていて、自分が Life Support を持っていないときだけ（#81・#83 と同じ条件と文言）
 //   ・いま要る物を1つだけ橙の輪で光らせ、そのカードの2行目に「何をするか」を書く（NowTarget）
 //   ・押せない大ボタンは灰色＋鍵。2行目に「足りない物（担当の席の形つき）」か「あと何秒」
@@ -30,15 +31,17 @@ public class PilotPanel : SeatPanel
         ("earth", "EARTH", "earth", "Send data"),
         ("moon", "MOON", "moon", "Observe"),
         ("sun", "SUN", "sun", "Charge"),
-        ("burn", "BURN", "rocket", "Engine burn"),
-        ("heatshield", "SHIELD", "heat_shield", "Re-entry"),
+        ("burn", "BURN", "rocket", "Fire engine"),
+        ("heatshield", "SHIELD", "heat_shield", "Heat shield first"),
     };
 
     static class Words
     {
-        public const string Fuel = "FUEL {0}";
-        public const string FuelPractice = "FUEL";
-        public const string FuelNote = "Each turn uses {0}";
+        // 左のカード：向きの列の見出し（#189）。2行目は {0} = 燃料の残り、{1} = 向きを変える1回の燃料。
+        //   <nobr> は「per turn」を2行に割らないため（表示は "Fuel 83, -1 per turn"。幅が足りなければ "Fuel 83, -1" / "per turn"）
+        public const string Fuel = "POINT SHIP AT";
+        public const string FuelPractice = "POINT SHIP AT";
+        public const string FuelNote = "Fuel {0}, -{1} <nobr>per turn</nobr>";
         // いま要る向きのカードの2行目
         // （向きのカードは幅が約 200 しかないので短く。2行まで）
         public const string TurnObserve = "Observe now!";
@@ -70,8 +73,10 @@ public class PilotPanel : SeatPanel
         string me = Seat;
         var line = K.Line(row);
 
-        fuel = K.Card(line, "Fuel", null, null);   // 表示だけ。幅が狭いのでアイコンなし（「FUEL」の字で伝える）
-        K.Width(fuel.Root, K.InfoW, 0f);
+        fuel = K.Card(line, "Heading", null, null);   // 向きの見出し（表示だけ。アイコンなし）。2行目に燃料
+        // 幅：InfoW（176）では「POINT SHIP AT」（Baloo 24 で約 157）が内側 16×2 に入らないので、見出しの幅に合わせて広げる（約 189）
+        float headW = Mathf.Max(fuel.Title.GetPreferredValues(Words.Fuel).x, fuel.Title.GetPreferredValues(Words.FuelPractice).x);
+        K.Width(fuel.Root, Mathf.Max(K.InfoW, Mathf.Ceil(headW) + K.PadX * 2f), 0f);
 
         var dial = UiKit.Row(line, K.Gap, TextAnchor.MiddleLeft);
         dial.name = "Attitude";
@@ -123,9 +128,9 @@ public class PilotPanel : SeatPanel
         string hint = null;
         string now = s != null ? NowTarget(s, out hint) : null;
 
-        // 燃料（練習の間は state が無いので、練習の案内）
+        // 向きの見出し＋燃料（練習の間は state が無いので、2行目は練習の案内）
         if (s == null) fuel.Set(PcLook.Normal, Words.FuelPractice, K.PracticeNote(Ctx, Seat));
-        else fuel.Set(PcLook.Normal, K.F(Words.Fuel, K.Whole(s.fuel)), K.F(Words.FuelNote, K.P("fuel_attitude_change")));
+        else fuel.Set(PcLook.Normal, Words.Fuel, K.F(Words.FuelNote, K.Whole(s.fuel), K.P("fuel_attitude_change")));
 
         // 向き：いまの向きは濃紺、いま要る向きは橙の輪＋2行目が「何をするか」
         dialGlow.enabled = highlighted.Contains("set_attitude");

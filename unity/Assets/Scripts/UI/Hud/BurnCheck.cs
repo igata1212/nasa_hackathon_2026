@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud・GameFlow から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#79）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud・GameFlow から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#79）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 Showing）
 // 作る Issue：#79（同時押しの合図と点火・再突入の準備チェック）
 //
 // 真ん中のパネル（slot の上端から下へ伸びる）。出すのは次の3つだけで、どれも無いときはパネルごと隠す。
@@ -100,6 +100,9 @@ public class BurnCheck : HudPart
     string sigCmd, lastPressStatus;
     float sigUntil, lastPressAt, resultUntil;
     string resultText; Color resultColor;
+
+    /// <summary>カードが出ているか。出ている間、危機の帯（CrisisBanner）は注意（オレンジ）を隠す（#189：点火・再突入で4つ重なった）</summary>
+    public bool Showing => panel != null && panel.gameObject.activeSelf;
 
     class TodoRow { public RectTransform Root; public UiSeatBadge Badge; public RectTransform You; public TextMeshProUGUI Text; }
     class DoneChip { public RectTransform Root; public Image Icon; public TimelineKit.BadgeRow Badge; public TextMeshProUGUI Text; }

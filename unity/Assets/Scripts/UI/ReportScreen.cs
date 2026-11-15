@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 SCORE と内訳は整数）
 // 事後レポート（R01、#86）。エンディングのあと。高校生が「何がよくて、何が足りなかったか」を1画面で分かるようにする。
 // 並び（EndingLayout）：
 //   上  ：MISSION REPORT ＋ 結末のチップ ＋ スコア
@@ -6,7 +6,7 @@
 //         主な出来事の時刻（commands から EndingCopy.Moments の決まりで選ぶ）
 //   HoustonBox の所：ヒューストンのまとめ（よかったこと／次に変えること）。最初の数秒は HoustonBox の R01 がかぶさり、消えるとこれが見える
 //   下  ：本物のアポロ13号の枠（#89 で増やす。今は #107 で決まった1つ）＋ REDESIGN AND FLY AGAIN（主ボタン。again：設計は前回のまま、全員が設計へ）
-// ランキングは作らない（#9）。数字はサーバーの値をそのまま出す（内訳の足し算もしない）。
+// ランキングは作らない（#9）。数字はサーバーの値をそのまま出す（内訳の足し算もしない）。SCORE と内訳だけ整数に丸めて出す（#189。EndingCopy.Score）
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -98,8 +98,8 @@ public class ReportScreen
         endFace.color = st.Face;
         endIcon.sprite = T.Icon(st.Icon); endIcon.color = st.OnFace;
         endText.text = st.Short; endText.color = st.OnFace;
-        total.text = C.Num(i.Score);
-        scoreTotal.text = C.Num(i.Score);
+        total.text = C.Score(i.Score);
+        scoreTotal.text = C.Score(i.Score);
 
         string cause = i.Cause();
         for (int k = 0; k < reqs.Length; k++)
@@ -117,7 +117,7 @@ public class ReportScreen
             scoreRows[k].Root.gameObject.SetActive(has);
             if (!has) continue;
             float v = J.Num(i.Breakdown, key);
-            scoreRows[k].Set(null, C.ScoreRows[k, 2], C.ScoreRows[k, 1], C.Plus(v), v <= 0f);
+            scoreRows[k].Set(null, C.ScoreRows[k, 2], C.ScoreRows[k, 1], C.ScorePlus(v), v <= 0f);
         }
 
         var list = PickMoments(i);
