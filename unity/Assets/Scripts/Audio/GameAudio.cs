@@ -13,12 +13,12 @@
 //                                 エンディング：ED-A jingle_success・ED-B jingle_close・ED-C jingle_fail（舞台が SPLASHDOWN!／Mission lost で鳴らす。
 //                                 演出を飛ばした・流さなかったときは、エンディングに入って少ししてからここで鳴らす）
 //                                 事故：jingle_crisis は本物の声と重なるので、声をミュートしているときだけ代わりに鳴らす
-//   BGM                           設計・練習・飛行で space_calm_01 を小さくループ。危機（段階 2 以上）で下げる。演出の間・エンディングは止める
+//   BGM                           設計・練習・飛行で space_universe_study を小さくループ。危機（段階 2 以上）で下げる。演出の間・エンディングは止める
 //                                 （打ち上げの演出だけは、月へ向かうカットで舞台が BGM を入れ、そのまま船内へ続ける）。曲は用途ごとの枠で差し替えられる
 // 音量は BGM・効果音・声の3つ（SoundPrefs。タイトルの DEV パネルでミュート）。AudioListener はメインカメラのものを使う（無いときだけ足す）。
 // WebGL は最初のタップ（クリック）まで音が出ない（ブラウザの決まり。仕様）。
 // GameFlow・UrgencyFx は変えない：シーンに置いて指すだけ（Editor/Audio/AudioScene.cs が組む）。GameFlow.Client が差し替わったら付け直す。
-// BGM の作者表記（Spacedman は CC BY 4.0 で表記が必須）：タイトル画面の下に小さく1行（musicCredit）。TitleLobbyScreens は触らず、ここで別の Canvas に出す。
+// BGM の作者表記（Universe Study は Pixabay Content License で表記不要。musicCredit は空）：タイトル画面の下に小さく1行（musicCredit）。TitleLobbyScreens は触らず、ここで別の Canvas に出す。
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -67,7 +67,7 @@ public class GameAudio : MonoBehaviour
     public AudioClip[] clips = new AudioClip[0];
 
     [Header("BGM（用途ごとの枠。空の枠は Tooltip の代わりを使う）")]
-    [Tooltip("Spacedman（Shane Ivers, CC BY 4.0。CREDITS.md）")] public AudioClip musicCalm;
+    [Tooltip("Universe Study（The_Mountain, Pixabay。CREDITS.md）")] public AudioClip musicCalm;
     [Tooltip("タイトル・部屋（空なら無音）")] public AudioClip musicTitle;
     [Tooltip("設計（空なら musicCalm）")] public AudioClip musicDesign;
     [Tooltip("練習・飛行（空なら musicCalm）")] public AudioClip musicFlight;
@@ -75,7 +75,7 @@ public class GameAudio : MonoBehaviour
     [Tooltip("危機の段階 2 以上（空なら今の曲を crisisDuck まで下げる）")] public AudioClip musicCrisis;
     [Tooltip("エンディング・報告（空なら無音）")] public AudioClip musicEnding;
     [Tooltip("タイトル画面の下に出す作者表記（CC BY 4.0 で必須。空なら出さない）")]
-    public string musicCredit = "Music: Spacedman by Shane Ivers - silvermansound.com";
+    public string musicCredit = "";
     [Range(0f, 1f)] public float musicLevel = 0.35f;
     [Range(0f, 1f)] public float crisisDuck = 0.55f;
     public float musicFadeS = 1.5f;

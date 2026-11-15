@@ -27226,14 +27226,14 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 81737ec0dc6d74258964da5445cc2c4c, type: 3}
   - {fileID: 8300000, guid: bdd2fd2a5748c467bb7aa140a18d8f74, type: 3}
   - {fileID: 8300000, guid: 76c94c8e5417844fbb1cef8c3490cc17, type: 3}
-  musicCalm: {fileID: 8300000, guid: 021865aa07b6048b3a2dacd8dffff066, type: 3}
+  musicCalm: {fileID: 8300000, guid: d5bae68e7d9f4bdeaf6d95070f03241f, type: 3}
   musicTitle: {fileID: 0}
   musicDesign: {fileID: 0}
   musicFlight: {fileID: 0}
   musicFarside: {fileID: 0}
   musicCrisis: {fileID: 0}
   musicEnding: {fileID: 0}
-  musicCredit: 'Music: Spacedman by Shane Ivers - silvermansound.com'
+  musicCredit: ''
   musicLevel: 0.35
   crisisDuck: 0.55
   musicFadeS: 1.5
