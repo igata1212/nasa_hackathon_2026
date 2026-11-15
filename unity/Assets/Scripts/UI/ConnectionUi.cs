@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-15、#168 設計の画面では札を左上へ）
 // 作る Issue：#94（接続が切れたときの表示。決定：#94 のコメント・#143・architecture.md「再接続」。切れた人は自動で同じ部屋・同じ席に戻る。引き継ぎ（TAKE OVER）は作らない）
 //
 // するのは3つ：
@@ -74,6 +74,7 @@ public class ConnectionUi
         ("practice", new Vector2(0.99f, 0.63f), new Vector2(1f, 1f)),
         ("stir",     new Vector2(0.99f, 0.63f), new Vector2(1f, 1f)),
         ("flight",   new Vector2(0.99f, 0.63f), new Vector2(1f, 1f)),
+        ("design",   new Vector2(0.02f, 0.87f), new Vector2(0f, 1f)),   // #168：右上はお財布と重さのピル。左上の小見出しの下へ
     };
     static readonly Vector2 StripDefaultAt = Vector2.one, StripDefaultPivot = Vector2.one;   // ほかは右上の角（端から ScreenEdge）
     /// <summary>札を出さない段階（タイトルは人がいない。ロビーでは切れた人はサーバーから消える）</summary>

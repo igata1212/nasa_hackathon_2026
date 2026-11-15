@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-15、#168 設計の部品が付く・外れる音 Part）
 // 音（#141）。効果音・BGM・本物の交信の声を、GameFlow.Client の段階・状態・イベントの変化（前の状態との差）で鳴らす。
 //   ヒューストンの台詞            quindar_in →（字幕）→ 少しして quindar_out。演出の間とエンディングは鳴らさない（演出の音は舞台が StoryAudio で鳴らす）
 //   事故（stir → flight／M05）    voice_problem（本物の「Houston, we've had a problem」）。M05 の quindar とマスターアラームはその声のあと
@@ -465,6 +465,9 @@ public class GameAudio : MonoBehaviour
     // ------------------------------------------------------------------ ボタン・演出から（StoryAudio 経由）
     /// <summary>ボタンを押した音（UiPress から）</summary>
     public static void Click() { var a = I; if (a != null) a.Sfx("ui_click", a.clickVol); }
+
+    /// <summary>設計の画面で部品が付いた（軽い音）・外れた（低い音）とき（#168。DesignStage から）</summary>
+    public static void Part(bool on) { var a = I; if (a != null) a.Sfx(on ? "ui_switch_on" : "ui_switch_off", a.switchVol, on ? 1.15f : 0.8f); }
 
     readonly List<RaycastResult> clickHits = new List<RaycastResult>();
 

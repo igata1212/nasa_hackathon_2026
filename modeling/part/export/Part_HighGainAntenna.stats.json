@@ -1,0 +1,69 @@
+{
+ "name": "Part_HighGainAntenna",
+ "tris": 1400,
+ "min": [
+  -0.55,
+  -0.55,
+  0.0
+ ],
+ "max": [
+  0.55,
+  0.55,
+  0.79
+ ],
+ "size": [
+  1.1,
+  1.1,
+  0.79
+ ],
+ "objects": {
+  "Part_HighGainAntenna": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 0
+  },
+  "Part_HighGainAntenna.Arms": {
+   "origin": [
+    0.0,
+    0.0,
+    0.5
+   ],
+   "tris": 336
+  },
+  "Part_HighGainAntenna.Dishes": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 512
+  },
+  "Part_HighGainAntenna.Feeds": {
+   "origin": [
+    -0.29,
+    -0.29,
+    0.64
+   ],
+   "tris": 272
+  },
+  "Part_HighGainAntenna.Foot": {
+   "origin": [
+    0.0,
+    0.0,
+    0.03
+   ],
+   "tris": 140
+  },
+  "Part_HighGainAntenna.Post": {
+   "origin": [
+    0.0,
+    0.0,
+    0.275
+   ],
+   "tris": 140
+  }
+ }
+}
