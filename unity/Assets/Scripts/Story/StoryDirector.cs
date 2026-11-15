@@ -291,6 +291,7 @@ public class StoryDirector : MonoBehaviour
 
         var skip = UiKit.Hint(root, HoustonStyle.SkipIcon, HoustonStyle.Skip, Skip);
         skip.Root.anchorMin = skip.Root.anchorMax = skip.Root.pivot = new Vector2(1f, 0f);
+        skip.Root.sizeDelta = new Vector2(skip.Root.GetComponent<LayoutElement>().preferredWidth, T.Hit);   // 親が配置しないので幅を自分で入れる（入れないとアイコンが字に重なる）
         skip.Root.anchoredPosition = new Vector2(-T.ScreenEdge, 72f + T.S1);   // 下の黒い帯（8% = 72）の上
         skipBtn = skip.Root.gameObject;
 
