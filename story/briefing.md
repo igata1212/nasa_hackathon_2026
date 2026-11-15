@@ -1,4 +1,5 @@
-書いた人：iizuka（下書き：Opus 5.5）／ 最終更新：2026-11-14
+書いた人：iizuka（下書き：Opus 5.5）／ 最終更新：2026-11-15
+更新：iizuka（Fable 5.2 の採点で ① を9本に書き直した、2026-11-15、#189）
 
 # ヒューストンが話す前提知識（下書き）
 
@@ -17,28 +18,24 @@ Issue #152。宇宙を知らない高校生には、「ヒューストン」が�
 - 本物の話とゲームの決まりを混ぜない。本物の話には「Apollo 13」「real」を付ける
 - 今の `houston_lines.json` と同じ中身は重ねない。重なるものは「置き換え」として書いた
 
-## ① 部屋 → 設計の前のブリーフィング（8本・約30〜35秒・SKIP 可）
+## ① 部屋 → 設計の前のブリーフィング（9本・約55秒・SKIP 可）
 
-- **いつ**：ロビーで START を押して、段階が lobby → design に変わった最初の1回だけ。PLAY AGAIN で design に戻ったときは流さない
-- 各クライアントが自分で流す。SKIP もその人だけ
-- **M01 とぶつかる**：サーバーは design に入ると同時に M01 を送る（`server/game/room.py` の `start`）。#75 は、ブリーフィングが終わるか SKIP されるまで M01 を待たせる
-- 表示の目安：1本 = 1秒 + 1語 0.25秒（最短3秒）。合計 約34秒。タップで次へ進めてもよい
-- 話し手はすべて `houston`（名前タグ HOUSTON）
+- **いつ**：ロビーで START を押して、段階が lobby → design に変わった最初の1回だけ（#189 で書き直し）
+- 話し手はすべて `houston`。1本80字以内。声は Achird（`unity/Assets/Resources/Voice/Houston/`）
+- 狙い：ヒューストンが誰か → アポロ13号で何が起きたか（中身は言わず驚きを残す）→ ミッション → 席 → 月の裏で無線が切れる → まず船を作る
+- M01（設計画面）はミッションの説明を繰り返さず、`You have a parts catalog...` から始めてよい（Taiga に確認）
 
-| id | いつ | 英語 | 日本語訳 | ねらい |
-|---|---|---|---|---|
-| B01 | ①の1本目 | Hi, crew! This is Houston, NASA's Mission Control in Houston, Texas. | やあ、クルーのみんな。こちらヒューストン。テキサス州ヒューストンにある NASA の管制センターだ。 | 「ヒューストン」は人の名前ではなく、場所と管制センターのこと。「This is Houston」は本物の交信の名乗り方 |
-| B02 | 2本目 | We watch your ship from the ground. I'm like your teacher. | 私たちは地上から君たちの船を見ている。私は先生のようなものだ。 | 地上にいて、見て、助ける人。ヒューストン先生（#92 の小窓）とつなぐ |
-| B03 | 3本目 | This game is based on Apollo 13, a real trip to the Moon in 1970. | このゲームは、1970年に本当にあった月への旅、アポロ13号がもとになっている。 | 本物の話がもとだと伝える。「based on」なので、ゲームの中身が全部本物だとは言っていない |
-| B04 | 4本目 | Your mission: study the Moon's far side, the side we never see, and come home. | 君たちのミッションは、月の裏側（私たちには決して見えない側）を調べて、帰ってくること。 | 何をするゲームか。far side をすぐ言い換える。「帰る」までがミッション |
-| B05 | 5本目 | Four seats: Pilot steers the ship. Life Support keeps the air safe. | 席は4つ。Pilot は船の向きを変える。Life Support は空気を安全に保つ。 | 席の名前（UI と同じ英語）と仕事を1語で結ぶ |
-| B06 | 6本目 | Comms & Power runs radio and power. Mission Planner does science and the route. | Comms & Power は無線と電気。Mission Planner は観測と帰り道。 | 残りの2席。route は M08 のルート A/B につながる |
-| B07 | 7本目 | We talk by radio. But behind the Moon, the Moon blocks it. | 私たちは無線で話す。でも月の裏側では、月が電波をさえぎる。 | 月の裏で通信が切れる理由を先に言っておく（M09・NO SIGNAL のときに驚かない） |
-| B08 | 8本目 | Whatever happens, work as a team and keep thinking. You can get home. | 何が起きても、チームで考え続けて。そうすれば帰ってこられる。 | 協力と、最後まであきらめないこと。事故の中身は言わない（M05 の驚きを残す） |
-
-ブリーフィングの次は、設計画面の M01（②の案なら M01a「Let's build your ship.」）が続くので、「まず船を作ろう」は入れていない。
-
-人数が4人より少ないときの1本（任意。入れると9本）：「If there are fewer than four of you, some of you take two seats.」（4人より少ないときは、2つの席を持つ人がいる。64字）
+| id | 英語 |
+|---|---|
+| B01 | Hi, crew! I'm Houston, NASA's Mission Control. We guide every flight from Earth. |
+| B02 | We can't fly your ship. We watch it from Earth and talk by radio. |
+| B03 | The game is based on Apollo 13. In 1970, a part broke on the way to the Moon. |
+| B04 | Houston and the crew solved it one problem at a time. All three came home alive. |
+| B05 | Your mission: fly around the Moon, study its far side, and come home. |
+| B06 | Four seats, four jobs. Pilot turns the ship. Life Support keeps the air safe. |
+| B07 | Comms & Power runs radio and batteries. Mission Planner does route and science. |
+| B08 | The Moon blocks radio. Behind it, you won't hear me. You'll be on your own. |
+| B09 | First, build your ship. Then fly it. Talk to each other, and you can get home. |
 
 ## ② 設計画面の最初（何を選ぶか）— M01 の置き換え案
 

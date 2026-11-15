@@ -4,12 +4,12 @@
 
 1. **サーバー**：`cd server && uv run python main.py --port 8765`（確認だけなら `--speed 4` で4倍速。ゲーム内6分 → 1分半）
 2. **Unity**：`unity/` を開き `Assets/Scenes/Game.unity` を Play（無ければ メニュー Tools/GameFlow/シーンを作り直す）。Title で名前、Server URL `ws://localhost:8765`
-3. **部屋**：Title の **CREATE ROOM** → Lobby に4桁の合言葉が出る。ほかの人は合言葉を入れて **JOIN**
+3. **部屋**：Title の **Create a room** → Lobby に4桁の合言葉が出る。ほかの人は合言葉を入れて **Join with a code**
 4. **足りない席をボットで埋める**（人が持たない席を `--seats` に書く。START を押す前に入れる）
    - Unity が作った部屋に：`cd server && uv run python tools/bot_client.py --seats comms_power,life_support,mission_planner --room 1234`
-   - ボットに部屋を作らせる：`uv run python tools/bot_client.py --seats pilot,comms_power` → 出た合言葉で Unity から JOIN
+   - ボットに部屋を作らせる：`uv run python tools/bot_client.py --seats pilot,comms_power` → 出た合言葉で Unity から Join with a code
    - 席の名前：`pilot` `comms_power` `life_support` `mission_planner`。ボットは PLAY_GOOD の時刻どおりに自分の席だけ操作する
-5. **流れ**：Lobby の START MISSION → 設計（± と軌道・ロケット → READY FOR LAUNCH。重すぎ・予算オーバーなら設計に戻る）→ 練習（各席1回操作、または90秒）→ かき混ぜ（Life Support の STIR）→ 事故 → 月の裏側 → 噴射（Pilot と Comms & Power が 0.5 秒以内に IGNITE）→ 再突入 → 着水 → Ending → Report → PLAY AGAIN（設計は前回のまま）
+5. **流れ**：Lobby の Start mission! → 設計（± と軌道・ロケット → Ready for launch!。重すぎ・予算オーバーなら設計に戻る）→ 練習（各席1回操作、または90秒）→ かき混ぜ（Life Support の Stir tanks）→ 事故 → 月の裏側 → 噴射（Pilot と Comms & Power が 0.5 秒以内に Ignite）→ 再突入 → 着水 → Ending → Report → Fly again!（設計は前回のまま）
 
 ## 人数ごと
 

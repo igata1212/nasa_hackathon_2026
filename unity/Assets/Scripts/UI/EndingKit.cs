@@ -1,10 +1,10 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 EndingParams は GameParams から）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 EndingParams は GameParams から）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる：カード・材料の行・見出しの帯・吹き出し）
 // エンディング（#85）と事後レポート（#86）が共通で使うもの。
 //   EndingTokens  … この2画面だけの寸法（UiTokens の値を組み合わせる。px はここにだけ書く）
 //   EndingLayout  … 画面のどこに何を置くか（親に対する割合）。並べ替えはここだけ直す
 //   EndingFeed    … サーバーの値のうち GameModel に入らないもの（result の strict_reason、ED-A/B/C・R01 の台詞）を拾う
 //   EndingInfo    … 2画面が読む値をまとめる。値の出どころはここ1か所（#147 が入ったら Model.ResultMsg・GameState.Threshold に替える）
-//   EndingWidgets … 小さな部品（資源のカード・要件の行・スコアの行・出来事の行・ヒューストンの吹き出し・アイコンの丸）
+//   EndingWidgets … 小さな部品（資源のカード＝UiKit.Card、要件・内訳・出来事の行＝UiKit.Row、見出しの帯＝UiKit.Ribbon＋波の縁、ヒューストンの吹き出し、小さな札）
 // 文言とアイコンの割り当ては EndingCopy.cs。UI は判定をしない（結末・要件の合否・スコアはサーバーの値をそのまま出す）。
 using System;
 using System.Collections.Generic;
@@ -16,39 +16,42 @@ using T = UiTokens;
 // ====================================================================== 寸法
 public static class EndingTokens
 {
-    public const float ChipH = 64;                 // 見出しの横のチップ（結末・スコア）。ui-guidelines のカウントダウンのチップと同じ高さ
-    public const float BigChipH = T.PrimaryH;      // エンディングのスコアのチップ（主ボタンと並ぶので同じ高さ）
-    public const float HeroDot = T.BadgeL;         // エンディングの見出しの左の丸（96）
-    public const float CardW = 320, CardH = 184;   // 資源のカード
-    public const float CardPad = T.S2;             // カードの内側（パネルの 24 だと 844×390 で高さが足りない）
-    public const float RowIcon = 32;               // 一覧の行のアイコン（補助 24 と標準 40 の間。行の高さを Baloo 32 にそろえる）
-    public const float TimeW = 88;                 // 出来事の行の時刻の幅（"10:00" まで）
-    public const float HintDot = T.IconM;          // ✗ の要件の横の「次はこれ」の丸（40）
-    public const float Ring = T.SelfRing;          // 足りなかったカードの輪の太さ
-    public const float QuotePadX = 40, QuotePadTop = 24, QuotePadBottom = 12;  // 吹き出しの内側（ui-guidelines は 28・40。高さが 98 しかないので上下を詰めた）
-    public const float TagTilt = -4f;              // 名前タグの傾き（度）
-    public const float ApolloH = T.PrimaryH;       // アポロ13号の枠の高さ（主ボタンと並ぶ）
-    public const int MaxMoments = 6;               // 出来事の行の数（パネルの高さで決まる）
-    public const float ListPadY = T.S2;            // レポートのパネルの上下の内側（844×390 で 6 行が入るよう 24 から詰めた。左右は 24 のまま）
+    public const float CardW = 320, CardH = 224;   // 資源のカード（【11】の色違いのカード）。状態の1行「Too low (need 12.5°C)」が入る幅
+    public const float CardPad = T.S2;             // カードの内側（内側の線 6+2 の内に 8。844×390 で高さが足りるように 24 から詰めた）
+    public const float StatusD = T.HintDiscD;      // カードの状態の台（40）
+    public const float QuoteCorner = 64;           // ヒューストンの吹き出しの縁（blob_bubble の border 120 を 64 に描く。高さ 120 前後でも上下の縁が収まる）
+    public const float QuotePadX = T.S4 + T.S2, QuotePadTop = T.S3, QuotePadBottom = T.S2;   // 吹き出しの内側（台詞 36 の吹き出しは 72・36。高さが 120 しかないので詰めた）
+    public const float WaveTile = 96;              // wave_edge の1枚の幅（波の幅はこの整数倍にして、右端がこぶで終わるようにする）
+    public const float WaveH = 24;                 // 見出しの帯の下の波（wave_edge の高さ。半分を帯に重ねる）
+    public const float PillH = T.HintH;            // 小さな札（結末・判定が厳しくなった理由。56）
+    public const float ApolloH = T.PrimaryH;       // アポロ13号のカードの高さ（主ボタンと並ぶ）
+    public const float BottomPad = T.S4 * 2f;      // 主ボタンの下（右下の手が画面の外に出ない）
+    // レポートのパネルの行（UiKit.Row を詰めて使う。844×390 に 6 行＋見出しを入れるため。ガイドラインの行は 64）
+    public const int MaxMoments = 6;               // 出来事の行の数
+    public const float RowH = 48, RowMinH = 40;    // 行の高さ（足りなければ 40 まで縮む）
+    public const float RowDiscD = T.HintDiscD;     // 行の左の台（40）
+    public const float RowGap = 4;                 // 行の間
+    public const float RowDashMin = T.S4;          // 点線の最小の長さ（名前と数がくっつかない）
+    public const float HeadDiscD = T.HintDiscD;    // パネルの見出しの台（ガイドライン 3章：40）
+    public const float PanelPadX = T.S3, PanelPadTop = T.S3, PanelPadBottom = T.S2;   // パネルの内側（ガイドラインは 32。行を入れるために詰めた）
 }
 
 // ====================================================================== 置き場所（親に対する割合 x0, y0, x1, y1）
+/// <summary>画面のどこに何を置くか。#146 から ending・report の間は HoustonBox を出さない（GameFlow が Push しない）ので、
+/// ヒューストンの台詞は EndHouston・RepHouston だけに出る。ほかの物をそこに置かない</summary>
 public static class EndingLayout
 {
-    /// <summary>ヒューストンの吹き出し（画面の中の台詞）。#146 から ending・report の間は HoustonBox を出さない（GameFlow が Push しない）ので、
-    /// 台詞はここだけに出る。ほかの物をここに置かない</summary>
-    public static readonly Vector4 HoustonSlot = new Vector4(0.22f, 0.22f, 0.78f, 0.34f);
-
     // エンディング（#85）
-    public static readonly Vector4 EndTop = new Vector4(0f, 0.76f, 1f, 1f);      // 結末の見出し
-    public static readonly Vector4 EndMid = new Vector4(0f, 0.40f, 1f, 0.75f);   // 資源のカード＋判定が厳しくなった理由
-    public static readonly Vector4 EndBottom = new Vector4(0f, 0f, 1f, 0.19f);   // スコア＋REPORT
+    public static readonly Vector4 EndTop = new Vector4(0f, 0.80f, 1f, 1f);          // 見出しの帯＋1行（左）／得点の数のチップ（右）
+    public static readonly Vector4 EndMid = new Vector4(0f, 0.42f, 1f, 0.79f);       // 資源のカード＋判定が厳しくなった理由
+    public static readonly Vector4 EndHouston = new Vector4(0.175f, 0.20f, 0.825f, 0.405f);
+    public static readonly Vector4 EndBottom = new Vector4(0f, 0f, 1f, 0.20f);       // See the report!（右下）
 
     // 事後レポート（#86）
-    public static readonly Vector4 RepTop = new Vector4(0f, 0.88f, 1f, 1f);      // 題・結末・スコア
-    public static readonly Vector4 RepMid = new Vector4(0f, 0.39f, 1f, 0.88f);   // 要件・スコアの内訳・主な出来事の3枚
-    public static readonly Vector4 RepBottom = new Vector4(0f, 0f, 1f, 0.20f);   // アポロ13号の枠＋もう一度
-    public static readonly float[] RepPanelFlex = { 1.15f, 1f, 1.1f };           // 3枚の幅の比（要件・スコア・出来事）
+    public static readonly Vector4 RepTop = new Vector4(0f, 0.89f, 1f, 1f);          // 見出しの帯＋結末の札
+    public static readonly Vector4 RepMid = new Vector4(0f, 0.365f, 1f, 0.89f);      // 要件・スコアの内訳・主な出来事の3枚
+    public static readonly Vector4 RepHouston = new Vector4(0.12f, 0.205f, 0.88f, 0.345f);
+    public static readonly Vector4 RepBottom = new Vector4(0f, 0f, 1f, 0.20f);       // アポロ13号のカード＋合計＋Fly again!
 }
 
 // ====================================================================== サーバーの値を拾う
@@ -200,8 +203,7 @@ public class EndingInfo
 }
 
 // ====================================================================== 小さな部品
-public class UiDot { public RectTransform Root; public Image Face, Icon; public TextMeshProUGUI Text; }
-
+/// <summary>ヒューストンの吹き出し（blob_bubble、名前タグ）</summary>
 public class UiQuote
 {
     public RectTransform Root;
@@ -209,60 +211,92 @@ public class UiQuote
     public void Set(string s) { Line.text = s ?? ""; Root.gameObject.SetActive(!string.IsNullOrEmpty(s)); }
 }
 
+/// <summary>見出しの帯（UiKit.Ribbon）に、左のアイコンと下の波の縁（【11】）を足したもの</summary>
+public class UiEndBanner
+{
+    public UiRibbon Ribbon;
+    public Image Icon, Wave;
+
+    public void Set(string text, Color face, string icon)
+    {
+        Ribbon.SetText(text);
+        Ribbon.Face.color = face;
+        if (Wave != null)
+        {
+            Wave.color = face;
+            // 波の幅をタイル1枚の整数倍に（右端がこぶの途中で切れない）
+            LayoutRebuilder.ForceRebuildLayoutImmediate(Ribbon.Root);
+            float w = LayoutUtility.GetPreferredWidth(Ribbon.Root) - T.RibbonH;
+            var r = Wave.rectTransform;
+            r.anchorMin = r.anchorMax = new Vector2(0.5f, 0f);
+            r.sizeDelta = new Vector2(Mathf.Max(1, Mathf.Floor(w / EndingTokens.WaveTile)) * EndingTokens.WaveTile, EndingTokens.WaveH);
+        }
+        Icon.sprite = icon == null ? null : T.Icon(icon);
+        Icon.gameObject.SetActive(Icon.sprite != null);
+    }
+}
+
+/// <summary>小さな札（blob_pill に台＋文字）。結末の札・判定が厳しくなった理由</summary>
+public class UiEndPill
+{
+    public RectTransform Root;
+    public Image Face;
+    public UiIconDisc Disc;
+    public TextMeshProUGUI Label;
+}
+
+/// <summary>資源のカード（UiKit.Card）：上に資源の台と名前、大きい数字＋単位、下に状態の台＋1行</summary>
 public class UiResourceCard
 {
     public string Res;
+    public UiCard Card;
     public RectTransform Root;
-    public Image Ring, StatusIcon;
-    public TextMeshProUGUI Value, Unit, Status;
+    public UiIconDisc Status;
+    public TextMeshProUGUI Value, Unit, StatusText;
 
-    public void Set(string value, string status, string statusIcon, Color statusColor, Color? ring)
+    /// <summary>statusFace：状態の台の面。iconOnFace：台の上の絵の色（null なら panel）</summary>
+    public void Set(string value, string status, string statusIcon, Color statusFace, Color? iconOnFace = null)
     {
         Value.text = value;
-        Status.text = status;
-        StatusIcon.sprite = T.Icon(statusIcon); StatusIcon.color = statusColor;
-        StatusIcon.gameObject.SetActive(StatusIcon.sprite != null);
-        Ring.enabled = ring.HasValue;
-        if (ring.HasValue) Ring.color = ring.Value;
+        StatusText.text = status;
+        Status.Set(statusIcon, statusFace);
+        Status.Icon.color = iconOnFace ?? T.Panel;
     }
 }
 
+/// <summary>要件の行（UiKit.Row）：台に ✓/✗、名前、点線、右に数（3 / 2 など）。✗ のときだけ一番右に「次はこれ」の台</summary>
 public class UiReqRow
 {
-    public RectTransform Root;
-    public Image Mark;
-    public TextMeshProUGUI Label, Detail;
-    public UiDot Hint;
+    public UiRow Row;
+    public UiIconDisc Hint;
 
-    public void Set(bool pass, string label, string detail, string hintIcon)
+    public void Set(bool pass, string label, string value, string hintIcon)
     {
-        Mark.sprite = T.Icon(pass ? "check" : "cross");
-        Mark.color = pass ? T.Go : T.Accent;
-        Label.text = label;
-        Detail.text = detail ?? "";
-        Detail.gameObject.SetActive(!string.IsNullOrEmpty(detail));
-        Hint.Root.gameObject.SetActive(!pass && hintIcon != null);
-        if (hintIcon != null) Hint.Icon.sprite = T.Icon(hintIcon);
+        Row.Disc.Set(pass ? "check" : "cross", pass ? T.Go : T.Accent);
+        Row.Name.text = label;
+        Row.SetValue(value);
+        bool hint = !pass && hintIcon != null;
+        Row.Right.gameObject.SetActive(hint);
+        if (hint) Hint.Set(hintIcon, T.Text);
     }
 }
 
+/// <summary>レポートの一覧の行（UiKit.Row）：台＋名前＋点線＋右寄せの数（スコアの内訳・出来事の時刻）</summary>
 public class UiLineRow
 {
-    public RectTransform Root;
-    public Image Icon;
-    public TextMeshProUGUI Left, Label, Right;
+    public UiRow Row;
 
-    public void Set(string left, string icon, string label, string right, bool dim = false)
+    public void Set(string icon, Color face, string label, string value, bool dim = false)
     {
-        if (Left != null) Left.text = left ?? "";
-        Icon.sprite = icon == null ? null : T.Icon(icon);
-        Icon.color = dim ? T.InkSub : T.Ink;
-        Icon.enabled = Icon.sprite != null;
-        Label.text = label ?? "";
-        Label.color = dim ? T.InkSub : T.Ink;
-        if (Right != null) { Right.text = right ?? ""; Right.color = dim ? T.InkSub : T.Ink; }
-        Root.gameObject.SetActive(true);
+        Row.Disc.Set(icon, dim ? T.Line : face);
+        Row.Name.text = label ?? "";
+        Row.Name.color = dim ? T.TextSoft : T.Text;
+        Row.SetValue(value);
+        Row.Value.color = dim ? T.TextSoft : T.Text;
+        Row.Root.gameObject.SetActive(true);
     }
+
+    public void Hide() => Row.Root.gameObject.SetActive(false);
 }
 
 public static class EndingWidgets
@@ -275,7 +309,7 @@ public static class EndingWidgets
         return r;
     }
 
-    /// <summary>入れ物いっぱいの縦の並び（左右・上下に余白）。stretch=false なら子は自分の幅のまま a に寄せる（チップが横いっぱいに伸びない）</summary>
+    /// <summary>入れ物いっぱいの縦の並び（左右・上下に余白）。stretch=false なら子は自分の幅のまま a に寄せる</summary>
     public static RectTransform FillCol(RectTransform zone, float spacing, TextAnchor a, float padX, float padTop, float padBottom, bool stretch = true)
     {
         var c = UiKit.Col(zone, spacing, a, padX, 0f, stretch);
@@ -303,142 +337,160 @@ public static class EndingWidgets
         return t;
     }
 
-    /// <summary>横の並びで残りの幅を取る文字（長ければ … で切る）</summary>
-    public static TextMeshProUGUI Flex(Transform p, string s, TextStyle st, Color c, TextAlignmentOptions a = TextAlignmentOptions.MidlineLeft)
-    {
-        var t = UiKit.Text(p, s, st, c, a);
-        t.overflowMode = TextOverflowModes.Ellipsis;
-        var le = Ui.Size(t, w: 0f, flexW: 1f); le.minWidth = 0f;
-        return t;
-    }
-
     public static void Spacer(Transform row) { var le = Ui.Size(Ui.Rect("Flex", row), w: 0f, flexW: 1f); le.minWidth = 0f; }
 
-    /// <summary>色の丸にアイコン（または文字）。face の上は fg</summary>
-    public static UiDot Dot(Transform p, string icon, Color face, Color fg, float d, float iconSize, string text = null)
+    /// <summary>見出しの帯（画面の左上。【11】）：UiKit.Ribbon の左にアイコン、下の辺に波の縁（wave_edge を上下に返して半分重ねる）。
+    /// 波の sprite が無ければ帯だけ</summary>
+    public static UiEndBanner Banner(Transform p, string text, Color face, string icon)
     {
-        var u = new UiDot();
-        u.Root = Ui.Rect("Dot_" + (icon ?? text), p);
-        UiKit.Fixed(u.Root, d, d);
-        u.Face = UiKit.Pill(u.Root, face, d, "Face"); UiKit.Fill(u.Face.rectTransform);
-        if (text != null)
+        var b = new UiEndBanner { Ribbon = UiKit.Ribbon(p, text, face) };
+        var root = b.Ribbon.Root;
+        root.GetComponent<HorizontalLayoutGroup>().spacing = T.S2;
+        b.Icon = UiKit.Icon(root, icon, T.IconM, T.Panel);
+        b.Icon.transform.SetSiblingIndex(b.Ribbon.Label.transform.GetSiblingIndex());
+        var wave = T.Art(T.WaveEdge);
+        if (wave != null)
         {
-            u.Text = UiKit.Text(u.Root, text, TextStyle.Tag, fg, TextAlignmentOptions.Center, false);
-            UiKit.Fill(u.Text.rectTransform);
+            b.Wave = UiKit.Shape(root, wave, face, 0f, "Wave");
+            b.Wave.type = Image.Type.Tiled;
+            UiKit.Ignore(b.Wave);
+            var w = b.Wave.rectTransform;
+            w.anchorMin = new Vector2(0.5f, 0f); w.anchorMax = new Vector2(0.5f, 0f); w.pivot = new Vector2(0.5f, 0.5f);
+            w.sizeDelta = new Vector2(EndingTokens.WaveTile, EndingTokens.WaveH);   // 幅は Set() でタイルの整数倍にする
+            w.anchoredPosition = Vector2.zero;
+            w.localScale = new Vector3(1f, -1f, 1f);   // こぶを下に（art/ui/README.md）
+            w.SetSiblingIndex(b.Ribbon.Face.transform.GetSiblingIndex() + 1);
         }
-        else
+        b.Set(text, face, icon);
+        return b;
+    }
+
+    /// <summary>小さな札：face の blob_pill（高さ 56）に台（disc の面）と文字</summary>
+    public static UiEndPill Pill(Transform p, Color face, string icon, Color disc, TextStyle st, Color fg)
+    {
+        var u = new UiEndPill();
+        u.Root = UiKit.Row(p, T.S2, TextAnchor.MiddleLeft, T.S3);
+        u.Root.name = "Pill_" + icon;
+        var le = Ui.Size(u.Root, h: EndingTokens.PillH); le.minHeight = EndingTokens.PillH; le.flexibleWidth = 0f;
+        u.Face = UiKit.Blob(u.Root, T.BlobPill, face, EndingTokens.PillH * 0.5f, "Face"); UiKit.Fill(u.Face.rectTransform); UiKit.Ignore(u.Face);
+        u.Disc = UiKit.Disc(u.Root, icon, disc, T.HintDiscD);
+        u.Label = UiKit.Text(u.Root, "", st, fg, TextAlignmentOptions.MidlineLeft);
+        // 台を左の丸みに寄せる（左の余白を詰める）
+        u.Root.GetComponent<HorizontalLayoutGroup>().padding.left = Mathf.RoundToInt((EndingTokens.PillH - T.HintDiscD) * 0.5f);
+        return u;
+    }
+
+    /// <summary>資源の台：panel の丸に、カードの色の絵。酸素は O2 の文字（ui-guidelines 4章：しずくは燃料と重なる）</summary>
+    public static UiIconDisc ResourceDisc(Transform p, string res, Color fg, float d)
+    {
+        var u = UiKit.Disc(p, EndingCopy.ResourceIcon(res), T.Panel, d);
+        u.Icon.color = fg;
+        if (res == EndingCopy.Oxygen)
         {
-            u.Icon = UiKit.Icon(u.Root, icon, iconSize, fg);
-            UiKit.Center(u.Icon.rectTransform, iconSize, iconSize);
+            var t = UiKit.Text(u.Root, EndingCopy.O2Text, TextStyle.Tag, fg, TextAlignmentOptions.Center, false);
+            UiKit.Fill(t.rectTransform);
         }
         return u;
     }
 
-    /// <summary>資源のアイコン。酸素は O2 の文字の丸（ui-guidelines 4章：しずくは燃料と重なる）</summary>
-    public static void ResourceIcon(Transform p, string res, float size)
-    {
-        if (res == EndingCopy.Oxygen) Dot(p, null, T.Ink, T.Panel, size, size, EndingCopy.O2Text);
-        else UiKit.Icon(p, EndingCopy.ResourceIcon(res), size, T.Ink);
-    }
-
-    /// <summary>ヒューストンの吹き出し（panel、名前タグ付き）。親の割合 a に置く。文は最大2〜3行（長いと 22 まで縮める）</summary>
+    /// <summary>ヒューストンの吹き出し（blob_bubble・panel、影なし。左上に go の名前タグを傾けてかぶせる。【12】）。
+    /// 親の割合 a に置く。文は 36 から 22 まで縮めて収める</summary>
     public static UiQuote Quote(Transform p, Vector4 a, string who)
     {
         var q = new UiQuote();
         q.Root = Zone(p, a, "HoustonQuote");
-        UiKit.Surface(q.Root, T.RadiusL, T.Panel);
-        q.Line = UiKit.Text(q.Root, "", TextStyle.Body, T.Ink, TextAlignmentOptions.MidlineLeft, false);
+        var face = UiKit.Blob(q.Root, T.BlobBubble, T.Panel, EndingTokens.QuoteCorner, "Face");
+        UiKit.Fill(face.rectTransform);
+        q.Line = UiKit.Text(q.Root, "", TextStyle.Talk, T.Text, TextAlignmentOptions.MidlineLeft, false);
         q.Line.textWrappingMode = TextWrappingModes.Normal;
-        q.Line.enableAutoSizing = true; q.Line.fontSizeMin = T.TextLabel; q.Line.fontSizeMax = T.TextBody;
+        q.Line.enableAutoSizing = true; q.Line.fontSizeMin = T.TextLabel; q.Line.fontSizeMax = T.TextTalk;
         q.Line.lineSpacing = 0f;
         var lr = q.Line.rectTransform; UiKit.Fill(lr);
         lr.offsetMin = new Vector2(EndingTokens.QuotePadX, EndingTokens.QuotePadBottom);
         lr.offsetMax = new Vector2(-EndingTokens.QuotePadX, -EndingTokens.QuotePadTop);
 
-        var tag = UiKit.Tag(q.Root, who, T.Go, T.Panel);
+        var tag = UiKit.Row(q.Root, 0f, TextAnchor.MiddleCenter, T.S3);
+        tag.name = "NameTag";
         tag.anchorMin = tag.anchorMax = new Vector2(0f, 1f); tag.pivot = new Vector2(0f, 0.5f);
-        tag.anchoredPosition = new Vector2(T.S4, 0f);   // 上の縁に半分かぶせる
-        tag.localEulerAngles = new Vector3(0f, 0f, EndingTokens.TagTilt);
+        tag.anchoredPosition = new Vector2(EndingTokens.QuotePadX, 0f);   // 上の縁に半分かぶせる
+        tag.localEulerAngles = new Vector3(0f, 0f, T.NameTagTilt);
+        var tface = UiKit.Blob(tag, T.BlobPill, T.Go, T.NameTagH * 0.5f, "Face"); UiKit.Fill(tface.rectTransform); UiKit.Ignore(tface);
+        UiKit.Text(tag, who, TextStyle.Hint, T.Panel);
+        var tle = Ui.Size(tag, h: T.NameTagH); tle.minHeight = T.NameTagH;
         var fit = tag.gameObject.AddComponent<ContentSizeFitter>();
         fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         q.Root.gameObject.SetActive(false);
         return q;
     }
 
-    /// <summary>資源のカード：アイコン＋名前／大きい数字＋単位／状態のアイコン＋1行。足りなかったカードは外側に輪</summary>
+    /// <summary>資源のカード（【11】の色違いのカード）：資源ごとの色の面、文字は panel。状態は台（色＋アイコン）と1行</summary>
     public static UiResourceCard ResourceCard(Transform p, string res)
     {
         var c = new UiResourceCard { Res = res };
-        c.Root = UiKit.Col(p, T.S1, TextAnchor.MiddleCenter, EndingTokens.CardPad, EndingTokens.CardPad);
+        var face = EndingCopy.ResourceFace(res);
+        c.Card = UiKit.Card(p, face);
+        c.Root = c.Card.Root;
         c.Root.name = "Card_" + res;
         UiKit.Fixed(c.Root, EndingTokens.CardW, EndingTokens.CardH);
-        c.Ring = UiKit.Round(c.Root, T.RadiusM + EndingTokens.Ring, T.Accent, "Ring");
-        UiKit.Fill(c.Ring.rectTransform, -EndingTokens.Ring); UiKit.Ignore(c.Ring);
-        UiKit.Surface(c.Root, T.RadiusM, T.Panel);
+        int pad = Mathf.RoundToInt(EndingTokens.CardPad);
+        c.Root.GetComponent<VerticalLayoutGroup>().padding = new RectOffset(pad, pad, pad, pad);
 
         var head = UiKit.Row(c.Root, T.S1);
-        ResourceIcon(head, res, T.IconM);
-        UiKit.Text(head, EndingCopy.ResourceName(res), TextStyle.Label, T.InkSub);
+        ResourceDisc(head, res, face, T.IconL);
+        UiKit.Text(head, EndingCopy.ResourceName(res), TextStyle.RowName, T.Panel);
         var val = UiKit.Row(c.Root, T.S1, TextAnchor.LowerCenter);
-        c.Value = UiKit.Text(val, "", TextStyle.Big, T.Ink);
-        c.Unit = UiKit.Text(val, EndingCopy.ResourceUnit(res), TextStyle.Sub, T.InkSub);
+        c.Value = UiKit.Text(val, "", TextStyle.Big, T.Panel);
+        c.Unit = UiKit.Text(val, EndingCopy.ResourceUnit(res), TextStyle.Sub, T.Panel);
         var st = UiKit.Row(c.Root, T.S1);
-        c.StatusIcon = UiKit.Icon(st, "check", T.IconS, T.Go);
-        c.Status = UiKit.Text(st, "", TextStyle.Label, T.Ink);
-        c.Set("", "", "check", T.Go, null);
+        c.Status = UiKit.Disc(st, "check", T.Go, EndingTokens.StatusD);
+        c.StatusText = UiKit.Text(st, "", TextStyle.Hint, T.Panel);
+        c.Set("", "", "check", T.Go);
         return c;
     }
 
-    /// <summary>パネル（角丸 40）の見出しの行と点線。right は右端の文字（無ければ null）</summary>
-    public static TextMeshProUGUI PanelHead(Transform panel, string title, string icon, bool right = false)
+    /// <summary>レポートのパネル（UiKit.Panel）。幅は中身の幅＋残りを3枚で分ける（行の名前が切れない。#189 の残り）</summary>
+    public static RectTransform ReportPanel(Transform row, string name)
     {
-        var head = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft);
-        if (icon != null) UiKit.Icon(head, icon, T.IconM, T.Ink);
-        // #146（Fable）：見出しの書体（Baloo 2）は行が高く、… で切る設定だと縦に入らず全部消えた（見出しが空だった）。切らない
-        Flex(head, title, TextStyle.Sub, T.Ink).overflowMode = TextOverflowModes.Overflow;
-        var r = right ? UiKit.Text(head, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineRight) : null;
-        UiKit.DashedLine(panel, T.Line);
-        UiKit.Space(panel, T.S1);
+        var p = UiKit.Panel(row, EndingTokens.RowGap, name);
+        var l = p.GetComponent<VerticalLayoutGroup>();
+        l.padding = new RectOffset(Mathf.RoundToInt(EndingTokens.PanelPadX), Mathf.RoundToInt(EndingTokens.PanelPadX),
+                                   Mathf.RoundToInt(EndingTokens.PanelPadTop), Mathf.RoundToInt(EndingTokens.PanelPadBottom));
+        Ui.Size(p, flexW: 1f, flexH: 1f);
+        return p;
+    }
+
+    /// <summary>パネルの見出し：台 40 ＋ 名前 30、下に点線（【11】）</summary>
+    public static void PanelHead(Transform panel, string title, string icon, Color disc)
+    {
+        var head = UiKit.Row(panel, T.S2, TextAnchor.MiddleLeft, T.S1, 0f);
+        UiKit.Disc(head, icon, disc, EndingTokens.HeadDiscD);
+        UiKit.Text(head, title, TextStyle.RowName, T.Text, TextAlignmentOptions.MidlineLeft);
+        UiKit.DashedLine(panel, T.BgDeep);
+    }
+
+    /// <summary>レポートの行：UiKit.Row（材料の行）を、3枚を横に並べられるよう詰めて使う（高さ 48・台 40・間 8）。右の欄は隠す</summary>
+    public static UiRow ListRow(Transform p)
+    {
+        var r = UiKit.Row(p, (string)null, "");
+        var le = Ui.Size(r.Root, h: EndingTokens.RowH); le.minHeight = EndingTokens.RowMinH;
+        var l = r.Root.GetComponent<HorizontalLayoutGroup>();
+        l.spacing = T.S1; l.padding.left = l.padding.right = Mathf.RoundToInt(T.S1);
+        float d = EndingTokens.RowDiscD;
+        r.Disc.Root.sizeDelta = new Vector2(d, d);
+        UiKit.Fixed(r.Disc.Root, d, d);
+        UiKit.Center(r.Disc.Icon.rectTransform, d * 0.6f, d * 0.6f);
+        Ui.Size(r.Dash).minWidth = EndingTokens.RowDashMin;
+        r.Right.gameObject.SetActive(false);
         return r;
     }
 
-    /// <summary>要件の行：✓/✗＋名前（＋細かい数字）＋ ✗ のときだけ「次はこれ」のアイコンの丸</summary>
+    /// <summary>要件の行（右の欄に「次はこれ」の台）</summary>
     public static UiReqRow ReqRow(Transform p)
     {
-        var u = new UiReqRow();
-        u.Root = UiKit.Row(p, T.S2, TextAnchor.MiddleLeft);
-        u.Mark = UiKit.Icon(u.Root, "check", T.IconM, T.Go);
-        var col = UiKit.Col(u.Root, 0f, TextAnchor.MiddleLeft, 0f, 0f, true);
-        var le = Ui.Size(col, w: 0f, flexW: 1f); le.minWidth = 0f;
-        u.Label = UiKit.Text(col, "", TextStyle.Body, T.Ink, TextAlignmentOptions.MidlineLeft);
-        u.Label.overflowMode = TextOverflowModes.Ellipsis;
-        u.Detail = UiKit.Text(col, "", TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
-        u.Hint = Dot(u.Root, "science", T.Accent, T.Ink, EndingTokens.HintDot, T.IconS);
+        var u = new UiReqRow { Row = ListRow(p) };
+        u.Hint = UiKit.Disc(u.Row.Right, null, T.Text, EndingTokens.RowDiscD);
         return u;
     }
 
-    /// <summary>一覧の行：［左の文字］アイコン 名前 ［右の数字］。左右は null なら作らない</summary>
-    public static UiLineRow LineRow(Transform p, bool left, bool right)
-    {
-        var u = new UiLineRow();
-        u.Root = UiKit.Row(p, T.S2, TextAnchor.MiddleLeft);
-        if (left)
-        {
-            u.Left = UiKit.Text(u.Root, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineRight);
-            UiKit.Fixed(u.Left, EndingTokens.TimeW, T.TextSub * T.HeadingLineHeight);
-        }
-        u.Icon = UiKit.Icon(u.Root, null, EndingTokens.RowIcon, T.Ink);
-        u.Label = Flex(u.Root, "", TextStyle.Body, T.Ink);
-        if (right) u.Right = UiKit.Text(u.Root, "", TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineRight);
-        return u;
-    }
-
-    /// <summary>色の面のチップ：アイコン＋小さな名前＋文字。返す Text を書き換える</summary>
-    public static TextMeshProUGUI Chip(Transform p, Color face, Color fg, string icon, string label, TextStyle valueStyle, float h, out RectTransform root, out Image iconImg)
-    {
-        root = UiKit.Chip(p, face, h, "Chip_" + (label ?? icon));
-        iconImg = UiKit.Icon(root, icon, T.IconM, fg);
-        if (label != null) UiKit.Text(root, label, TextStyle.Label, fg);
-        return UiKit.Text(root, "", valueStyle, fg);
-    }
+    public static UiLineRow LineRow(Transform p) => new UiLineRow { Row = ListRow(p) };
 }

@@ -54,9 +54,9 @@ public class LostStage : StoryStage
         float o2 = 1f, power = 1f;
         if (m.Result != null) { o2 = J.Num(m.Result, "oxygen", 1f); power = J.Num(m.Result, "power", 1f); }
         else if (m.State != null) { o2 = m.State.oxygen; power = m.State.power; }
-        if (o2 <= 0f && power <= 0f) return "POWER AND OXYGEN RAN OUT";
-        if (o2 <= 0f) return "OXYGEN RAN OUT";
-        if (power <= 0f) return "POWER RAN OUT";
+        if (o2 <= 0f && power <= 0f) return "Power and oxygen ran out";
+        if (o2 <= 0f) return "Oxygen ran out";
+        if (power <= 0f) return "Power ran out";
         return "";   // 燃料が足りず帰る噴射ができなかったとき（result では区別できない）
     }
 }

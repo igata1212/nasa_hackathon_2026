@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 吹き出しは HoustonBox.Current から探す）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#146 吹き出しは HoustonBox.Current から探す）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 下の帯の文字を 22 に）
 // 演出2：管制室の先生の小窓（#124。storyboard.md の場面4「ここが先生」）。
 // 管制室（Scene_MissionControl）と先生（Crew_Houston）・管制官を船内から遠くに組み、専用のカメラで RenderTexture に描いて、
 // ヒューストンの字幕の窓（HoustonBox。GameCanvas/Houston）の左に小窓で出す。字幕が出ている間だけ描く。
@@ -6,6 +6,9 @@
 //     Talk(true/false) で外から動かすこともできる（自動の判定より優先）。
 // HoustonBox は変えない：GameCanvas/Houston を名前で探し、その子として小窓を足す（字幕と一緒に出入りし、置き場所の変更にも付いていく）。
 // 設計の画面（字幕の窓が左下に寄る）では、左に場所がないので出さない。
+// 下の帯（#189）：船内などの小窓は「ON EARTH」、ブリーフィングの大きい窓は「MISSION CONTROL」。どちらも補助ラベル 22（ui-guidelines 2章：これより小さくしない）。
+//   吹き出しの名前タグ HOUSTON と合わせて「地球にいるヒューストン」といつも読める（「Mission Control on Earth」の説明は最初の 20 秒だけなので、こちらは消さない）
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,7 +24,9 @@ public class HoustonWindow : MonoBehaviour
     public bool autoTalk = true;
 
     RectTransform panel, frame;
-    Text line, noSignal;
+    Text line;
+    TextMeshProUGUI noSignal;
+    TextMeshProUGUI caption;
     RawImage img;
     RenderTexture rt;
     string lastText = "";
@@ -63,15 +68,22 @@ public class HoustonWindow : MonoBehaviour
         foreach (var tx in panel.GetComponentsInChildren<Text>(true))   // 見出し「HOUSTON」の次が台詞（HoustonBox の作り順）
             if (tx.text != "HOUSTON") { line = tx; break; }
 
-        var fbg = Ui.PanelImg(panel, Ui.Orange, "HoustonWindow"); frame = fbg.rectTransform;
+        var fbg = UiKit.Blob(panel, UiTokens.BlobPanel, UiTokens.Panel, UiTokens.S2, "HoustonWindow"); frame = fbg.rectTransform;   // #190：角丸のカード＋明るい内ふち（Fable 採点 b-5・a-4）
         fbg.raycastTarget = false;
-        var ir = Ui.Rect("View", frame); Ui.Fill(ir); ir.offsetMin = new Vector2(3, 3); ir.offsetMax = new Vector2(-3, -3);
+        fbg.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+        frame.localRotation = Quaternion.Euler(0f, 0f, 2f);   // 写真のように少し傾ける（【03】）
+        var ir = Ui.Rect("View", frame); Ui.Fill(ir); ir.offsetMin = new Vector2(6, 6); ir.offsetMax = new Vector2(-6, -6);
         img = ir.gameObject.AddComponent<RawImage>(); img.texture = rt; img.raycastTarget = false;
-        noSignal = Ui.Label(frame, "NO SIGNAL", 22, Ui.Red, TextAnchor.MiddleCenter, FontStyle.Bold);
-        Ui.Fill(noSignal.rectTransform);
-        var tag = Ui.Label(frame, "MISSION CONTROL", 13, Ui.Cream, TextAnchor.LowerLeft, FontStyle.Bold);
-        Ui.Anchor(tag.rectTransform, 0, 0, 1, 0.2f, 8, 4, 4, 0);
-        tag.gameObject.AddComponent<Shadow>();
+        noSignal = UiKit.Text(frame, HoustonStyle.NoSignalTitle, TextStyle.Label, UiTokens.Panel, TMPro.TextAlignmentOptions.Center, false);   // 画面の言葉。判定は Probe の "NO SIGNAL"（下の Update）
+        UiKit.Fill(noSignal.rectTransform);
+        // 下の帯：紺の帯に白の補助ラベル 22（3D の絵の上でも読めるように）。文字は Update で窓の大きさに合わせて替える
+        var strip = Ui.PanelImg(frame, UiTokens.WithAlpha(UiTokens.Ink, HoustonStyle.WindowCaptionAlpha), "Caption");
+        strip.raycastTarget = false;
+        var sr = strip.rectTransform;
+        sr.anchorMin = Vector2.zero; sr.anchorMax = new Vector2(1f, 0f); sr.pivot = new Vector2(0.5f, 0f);
+        sr.offsetMin = new Vector2(6f, 6f); sr.offsetMax = new Vector2(-6f, 6f + HoustonStyle.WindowCaptionH);
+        caption = UiKit.Text(strip.transform, HoustonStyle.WindowTagSmall, TextStyle.Label, UiTokens.Panel, TMPro.TextAlignmentOptions.Center, false);
+        UiKit.Fill(caption.rectTransform);
     }
 
     void Update()
@@ -94,6 +106,8 @@ public class HoustonWindow : MonoBehaviour
         bool brief = HoustonBox.Current != null && HoustonBox.Current.BriefingPlaying;   // #146：ブリーフィングは大きく（大きさは HoustonStyle）
         frame.sizeDelta = brief ? HoustonStyle.WindowBriefing : HoustonStyle.WindowSmall;
         frame.anchoredPosition = new Vector2(-(brief ? HoustonStyle.WindowGapBriefing : HoustonStyle.WindowGap), 0f);
+        string tag = brief ? HoustonStyle.WindowTagBriefing : HoustonStyle.WindowTagSmall;
+        if (caption.text != tag) caption.text = tag;
         frame.SetAsLastSibling();
 
         string txt = line != null ? line.text : "";

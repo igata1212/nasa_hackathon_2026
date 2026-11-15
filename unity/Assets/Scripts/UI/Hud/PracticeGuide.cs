@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#84）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#84）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 作る Issue：#84（練習の案内とかき混ぜ）
 //
 // 中央上の案内の帯（クリームのピル1本）。練習（M03）とかき混ぜ（M04）の間だけ出す。高校生が初めてでも「何を押すか」で迷わないのが一番
@@ -11,6 +11,9 @@
 // 練習した席は Model.Practiced（practice イベントの done。GameFlow が入れる）。UI は判定しない（済んだかはサーバーの done だけを見る）
 // 練習の残り秒は出さない：締め切り（server/game/config.py の PRACTICE_MAX_S = 90）をサーバーが配っていない
 // 席・段階は Refresh より後に CabinHud が決める（Ctx.ActiveSeat は部品の Refresh の後に入る）ので、表示と光らせるのは毎フレームの Tick で合わせる
+// #190（ui-guidelines 3章【12】【09】）：帯は波打つピル（blob_pill の panel、影なし）。札は名前タグの形（blob_pill、Nunito ExtraBold 26、Houston は傾ける）、
+//   ▼ は角の丸い三角（caret_soft）、済んだ席はバッジの右上にチェック（UiSelect.Check。【09】）。文字は茶、言葉は小文字まじり。
+//   席のパネルのボタンの名前（Close valve・Stir tanks）は先頭だけ大文字で書く（席のパネルの担当と合わせる）
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,8 +25,8 @@ public class PracticeGuide : HudPart
     // ================================================================== 文言（画面の文字は英語。Fable の採点で直すのはここ）
     static class Words
     {
-        public const string PracticeTag = "PRACTICE {0}/{1}";          // {0} 済んだ席の数 {1} 席の数
-        public const string HoustonTag = "HOUSTON";
+        public const string PracticeTag = "Practice {0}/{1}";          // {0} 済んだ席の数 {1} 席の数
+        public const string HoustonTag = "Houston";
         public const string TryAny = "Tap any button below";           // TryCmd に無い席
         public const string Safe = "Nothing breaks yet. Try it!";
         public const string NiceNext = "Nice! Next: {0}";              // {0} 次の席の名前
@@ -32,7 +35,7 @@ public class PracticeGuide : HudPart
         public const string TapToSwitch = "Tap here to switch seats";
         public const string WaitOthers = "Nice! Wait for the others";
         public const string WaitOthersSub = "Every seat tries one button";
-        public const string StirDo = "Tap STIR TANKS";
+        public const string StirDo = "Tap Stir tanks";
         public const string StirDoSub = "Mission control asks: stir the oxygen tanks";
         public const string StirGo = "Go to {0}";                      // {0} = LIFE SUPPORT
         public const string StirGoSub = "Tap here. Mission control needs you";
@@ -45,7 +48,7 @@ public class PracticeGuide : HudPart
     static readonly Dictionary<string, (string cmd, string hint)> TryCmd = new Dictionary<string, (string, string)>
     {
         { Seats.Pilot,   ("set_attitude", "Turn the ship: tap a direction") },
-        { Seats.Life,    ("close_valve",  "Guard the air: tap CLOSE VALVE") },
+        { Seats.Life,    ("close_valve",  "Guard the air: tap Close valve") },
         { Seats.Comms,   ("switch",       "Run the power: flip a switch") },
         { Seats.Planner, ("set_route",    "Plan the trip: pick a route") },
     };
@@ -55,12 +58,10 @@ public class PracticeGuide : HudPart
     // ================================================================== 大きさ・時間（UiTokens に移す候補）
     const float BannerH = T.SecondaryH;        // 帯の高さの目安（ピルの角の半径 = これの半分。slot が低いときは角が縮む）
     const float BadgeD = T.TagH;               // 席バッジ（slot の高さ 72 に入る大きさ）
-    const float CheckD = T.IconS + T.S1;       // 済んだ印の円
-    const float CheckIcon = T.IconS;
-    const float CaretD = T.IconS;              // 帯の下の ▼（ガイドライン 3章の吹き出しと同じ 24・accent）
-    const float CaretBob = T.ShadowY;          // ▼ の上下の幅（6）
-    const float BobPeriod = 0.6f;              // ▼ が1往復する秒
-    const float HoustonTilt = -4f;             // HOUSTON の名前タグの傾き（度。吹き出しの名前タグと同じ）
+    const float CaretW = T.CaretW, CaretH = T.CaretH;   // 帯の下の ▼（#190：吹き出しと同じ角の丸い三角 32×22・accent。【12】）
+    const float CaretBob = T.CaretBob;         // ▼ の上下の幅（6）
+    const float BobPeriod = T.CaretPeriod;     // ▼ が1往復する秒
+    const float HoustonTilt = T.NameTagTilt;   // Houston の名前タグの傾き（度、反時計回り。#190：吹き出しの名前タグと同じ −6°。【12】）
     const float NiceHold = 1.5f;               // 今の席が済んでから、次の席へ自動で切り替えるまで（秒）
     const float AgainHold = 6f;                // M04 の繰り返しのあと「asking again」を出す秒
     const float PopTime = 0.35f, PopScale = 0.3f;        // 済んだ席のバッジが弾む
@@ -74,7 +75,7 @@ public class PracticeGuide : HudPart
     Button tap;
     TextMeshProUGUI tagText, line1, line2;
     readonly UiSeatBadge[] badges = new UiSeatBadge[4];
-    readonly GameObject[] checks = new GameObject[4];
+
     readonly float[] popEnd = new float[4];
 
     // ================================================================== 流れ
@@ -90,7 +91,8 @@ public class PracticeGuide : HudPart
     protected override void Build(RectTransform root)
     {
         box = Ui.Rect("Banner", root); UiKit.Fill(box);
-        face = UiKit.Surface(box, BannerH * 0.5f, T.Panel);
+        face = UiKit.Blob(box, T.BlobPill, T.Panel, BannerH * 0.5f, "Face");   // #190：波打つ帯（影なし）。角の丸さは Tick で帯の高さに合わせる
+        UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
         tap = box.gameObject.AddComponent<Button>();
         tap.targetGraphic = face;
         tap.navigation = new Navigation { mode = Navigation.Mode.None };
@@ -101,31 +103,29 @@ public class PracticeGuide : HudPart
         tap.onClick.AddListener(() => { if (tapTo != null) Ctx.SelectSeat(tapTo); });
 
         var row = UiKit.Row(box, T.S2, TextAnchor.MiddleCenter, T.S2); UiKit.Fill(row);
-        tag = UiKit.Tag(row, Words.HoustonTag, T.Accent, T.Ink);
-        tagText = tag.GetComponentInChildren<TextMeshProUGUI>();
-        tagFace = tag.Find("Face").GetComponent<Image>();
+        tag = NameTag(row, Words.HoustonTag, out tagFace, out tagText);
 
         var col = UiKit.Col(row, 0f, TextAnchor.MiddleCenter, 0f, 0f, true);
         var le = Ui.Size(col, w: 0f, flexW: 1f); le.minWidth = 0f;   // 残りの幅を全部もらう
-        line1 = Line(col, TextStyle.Body, T.Ink);
+        line1 = Line(col, TextStyle.Body, T.Text);
         line1.enableAutoSizing = true; line1.fontSizeMin = T.TextLabel; line1.fontSizeMax = T.TextBody;   // 長い文は 22 まで縮める
-        line2 = Line(col, TextStyle.Label, T.InkSub);
+        line2 = Line(col, TextStyle.Label, T.TextSoft);
 
         // 帯の下の ▼：席のパネル（画面の下）を指す。押すものがあるときだけ
-        var sp = T.Theme != null ? T.Theme.caretDown : null;
+        var sp = T.Art(T.CaretSoft) ?? (T.Theme != null ? T.Theme.caretDown : null);
         caret = UiKit.Shape(col, sp, T.Accent, 0f, "Caret");
         caret.preserveAspect = true;
         UiKit.Ignore(caret);
         var cr = caret.rectTransform;
         cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0f); cr.pivot = new Vector2(0.5f, 1f);
-        cr.sizeDelta = new Vector2(CaretD, CaretD);
+        cr.sizeDelta = new Vector2(CaretW, CaretH);
         caret.gameObject.SetActive(false);
 
         var bRow = UiKit.Row(row, T.S1, TextAnchor.MiddleCenter);
         for (int i = 0; i < Seats.All.Length; i++)
         {
             badges[i] = UiKit.SeatBadge(bRow, Seats.All[i], BadgeD);
-            checks[i] = Check(badges[i].Root);
+            UiSelect.Check(badges[i].Root, false);   // 済んだ印（右上のチェック。【09】）
         }
         box.gameObject.SetActive(false);
     }
@@ -138,17 +138,26 @@ public class PracticeGuide : HudPart
         return t;
     }
 
-    /// <summary>済んだ印：バッジの右下にかぶせる go の円に白い check</summary>
-    static GameObject Check(RectTransform badge)
+    /// <summary>名前タグ（#190：blob_pill、高さ 48、Nunito ExtraBold 26。【12】）。色と傾きは Apply で</summary>
+    static RectTransform NameTag(Transform p, string text, out Image face, out TextMeshProUGUI label)
     {
-        var c = UiKit.Pill(badge, T.Go, CheckD, "Done");
-        var r = c.rectTransform;
-        r.anchorMin = r.anchorMax = new Vector2(1f, 0f); r.pivot = new Vector2(0.5f, 0.5f);
-        r.sizeDelta = new Vector2(CheckD, CheckD); r.anchoredPosition = new Vector2(-CheckD * 0.25f, CheckD * 0.25f);
-        var ic = UiKit.Icon(c.transform, "check", CheckIcon, T.Panel);
-        UiKit.Center(ic.rectTransform, CheckIcon, CheckIcon);
-        c.gameObject.SetActive(false);
-        return c.gameObject;
+        var r = UiKit.Row(p, 0f, TextAnchor.MiddleCenter, T.S2);
+        r.name = "Tag";
+        face = UiKit.Blob(r, T.BlobPill, T.Accent, T.TagH * 0.5f, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
+        label = UiKit.Text(r, text, TextStyle.Hint, T.Ink);
+        label.font = T.FontStrong;
+        var le = Ui.Size(r, h: T.TagH); le.minHeight = T.TagH; le.flexibleWidth = 0f;
+        return r;
+    }
+
+    /// <summary>波打つ帯の丸い端を、帯の高さの半分に合わせる（帯は slot いっぱいなので高さが画面で変わる）</summary>
+    void FitFace()
+    {
+        var sp = face.sprite;
+        float h = box.rect.height;
+        if (sp == null || sp.border.x <= 0f || h <= 0f) return;
+        float m = sp.border.x / (h * 0.5f);
+        if (!Mathf.Approximately(face.pixelsPerUnitMultiplier, m)) face.pixelsPerUnitMultiplier = m;
     }
 
     // ================================================================== イベント
@@ -294,6 +303,7 @@ public class PracticeGuide : HudPart
             default: l1 = string.Format(Words.StirWait, life); l2 = Words.StirWaitSub; break;
         }
         line1.text = l1; line2.text = l2;
+        line2.gameObject.SetActive(!string.IsNullOrEmpty(l2));
 
         caret.gameObject.SetActive(caret.sprite != null && (v == View.Try || v == View.StirDo));
         tapTo = v == View.NiceNext || v == View.NextManual || v == View.StirGo ? other : null;
@@ -306,12 +316,13 @@ public class PracticeGuide : HudPart
             badges[i].Root.gameObject.SetActive(!stir || s == Seats.Life);   // かき混ぜの間は Life Support だけ
             bool done = !stir && m.Practiced.Contains(s);
             badges[i].Set(s, m.MySeats.Contains(s), !stir && !done);         // まだの席は灰色、済んだ席は席の色＋✓
-            checks[i].SetActive(done);
+            UiSelect.Check(badges[i].Root, done);
         }
     }
 
     void Animate(float now)
     {
+        FitFace();
         float b = 1f + BounceScale * Ease(bounceEnd - now, BounceTime);
         box.localScale = new Vector3(b, b, 1f);
         for (int i = 0; i < badges.Length; i++)

@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#190 数字は accent・固有名詞は go）
 // ヒューストンの台詞のデータと、字幕にする前の下ごしらえ（#75）。
 //   HoustonLine           台詞1本（id・話し手・文）。サーバーの houston イベントも、ブリーフィングの1行も同じ形
 //   HoustonScript.Parse   台詞の列の JSON を読む。形は [{"id":"B01","speaker":"houston","text":"..."}]（#152 の briefing.json）
@@ -128,12 +128,15 @@ public static class HoustonScript
         }
     }
 
-    /// <summary>固有名詞と数字を色文字にした TextMeshPro のリッチテキスト</summary>
-    public static string Mark(string page, Color c)
+    /// <summary>固有名詞と数字を色文字にした TextMeshPro のリッチテキスト（どちらも同じ色）</summary>
+    public static string Mark(string page, Color c) => Mark(page, c, c);
+
+    /// <summary>固有名詞は noun、数字は number の色にする（#190。ui-guidelines 3章「会話の吹き出し」【03】：固有名詞は go、数字は accent）</summary>
+    public static string Mark(string page, Color noun, Color number)
     {
         if (string.IsNullOrEmpty(page)) return "";
-        string hex = ColorUtility.ToHtmlStringRGB(c);
-        return Marker.Replace(page, m => "<color=#" + hex + ">" + m.Value + "</color>");
+        string nh = ColorUtility.ToHtmlStringRGB(noun), dh = ColorUtility.ToHtmlStringRGB(number);
+        return Marker.Replace(page, m => "<color=#" + (char.IsDigit(m.Value[0]) ? dh : nh) + ">" + m.Value + "</color>");
     }
 
     /// <summary>読む時間（秒）の目安</summary>

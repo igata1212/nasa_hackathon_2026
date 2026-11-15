@@ -1,12 +1,15 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 SCORE と内訳は整数）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 事後レポート（R01、#86）。エンディングのあと。高校生が「何がよくて、何が足りなかったか」を1画面で分かるようにする。
-// 並び（EndingLayout）：
-//   上  ：MISSION REPORT ＋ 結末のチップ ＋ スコア
-//   中  ：3枚のパネル。要件4つの ✓/✗（✗ には「次はこれ」のアイコン）／スコアの内訳（score_breakdown、SPEC 8章の式の順）／
-//         主な出来事の時刻（commands から EndingCopy.Moments の決まりで選ぶ）
-//   HoustonBox の所：ヒューストンのまとめ（よかったこと／次に変えること）。最初の数秒は HoustonBox の R01 がかぶさり、消えるとこれが見える
-//   下  ：本物のアポロ13号の枠（#89 で増やす。今は #107 で決まった1つ）＋ REDESIGN AND FLY AGAIN（主ボタン。again：設計は前回のまま、全員が設計へ）
-// ランキングは作らない（#9）。数字はサーバーの値をそのまま出す（内訳の足し算もしない）。
+// 並び（EndingLayout。#190：ui-guidelines 3章のレポート）：
+//   上  ：見出しの帯 Mission report（左上、下の縁が波。【11】）＋ 結末の札
+//   中  ：3枚のパネル（【05】）。各行は材料の行（台＋名前＋点線＋右寄せの数。【11】）
+//         要件4つ（台に ✓/✗、右に「いま / 要る量」、✗ には「次はこれ」の台）／スコアの内訳（score_breakdown、SPEC 8章の式の順）／
+//         主な出来事と時刻（commands から EndingCopy.Moments の決まりで選ぶ）
+//   RepHouston：ヒューストンのまとめ（よかったこと／次に変えること）
+//   下  ：本物のアポロ13号のカード（#89 で増やす。今は #107 で決まった1つ）＋ 得点の合計（数のチップ。【09】の合計のピル）＋
+//         Fly again!（主ボタン、右下に手。again：設計は前回のまま、全員が設計へ）
+// パネルの幅は中身の幅＋残りを3枚で分ける（#189 の残り：出来事の列が狭く「Missed the burn window」が切れた）。
+// ランキングは作らない（#9）。数字はサーバーの値をそのまま出す（内訳の足し算もしない）。SCORE と内訳だけ整数に丸めて出す（#189。EndingCopy.Score）
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -21,8 +24,9 @@ public class ReportScreen
     readonly GameFlow f;
     readonly EndingFeed feed;
     readonly GameObject body;
-    readonly Image endFace, endIcon;
-    readonly TextMeshProUGUI endText, total, scoreTotal, apollo;
+    readonly UiEndPill ending;
+    readonly UiCounter total;
+    readonly TextMeshProUGUI apollo;
     readonly UiReqRow[] reqs = new UiReqRow[C.Reqs.Length];
     readonly UiLineRow[] scoreRows = new UiLineRow[C.ScoreRows.GetLength(0)];
     readonly UiLineRow[] moments = new UiLineRow[EndingTokens.MaxMoments];
@@ -31,61 +35,72 @@ public class ReportScreen
     public ReportScreen(Transform parent, GameFlow f)
     {
         this.f = f;
-        var bg = Ui.PanelImg(parent, T.Bg, "Report"); Root = bg.gameObject; Ui.Fill(bg.rectTransform);
+        var bg = Ui.PanelImg(parent, T.Bg, "Report"); Root = bg.gameObject; Ui.Fill(bg.rectTransform); TitleBackdrop.Motifs(bg.rectTransform);
         feed = EndingFeed.For(parent, f);
         feed.Changed += () => { if (Root.activeInHierarchy) Refresh(); };
 
         var bodyRect = Ui.Rect("Body", bg.transform); UiKit.Fill(bodyRect); body = bodyRect.gameObject;
         var safe = UiKit.SafeArea(bodyRect);
 
-        // 上：題・結末・スコア
-        var top = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepTop, "Top"), T.S3, TextAnchor.MiddleLeft, T.ScreenEdge, T.S3, 0f);
-        UiKit.Text(top, C.ReportTitle, TextStyle.Big, T.Ink, TextAlignmentOptions.MidlineLeft);
-        var chip = UiKit.Chip(top, T.Go, EndingTokens.ChipH, "Ending");
-        endFace = chip.Find("Face").GetComponent<Image>();
-        endIcon = UiKit.Icon(chip, "check", T.IconM, T.Panel);
-        endText = UiKit.Text(chip, "", TextStyle.Sub, T.Panel);
+        // 上：見出しの帯＋結末の札
+        var top = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepTop, "Top"), T.S3, TextAnchor.MiddleLeft, T.ScreenEdge, 0f, 0f);
+        EndingWidgets.Banner(top, C.ReportTitle, T.Plum, C.ReportIcon);
+        ending = EndingWidgets.Pill(top, T.Go, "check", T.Panel, TextStyle.Choice, T.Panel);
         EndingWidgets.Spacer(top);
-        total = EndingWidgets.Chip(top, T.Ink, T.Panel, "score", C.ScoreLabel, TextStyle.Number, EndingTokens.ChipH, out _, out _);
 
         // 中：3枚のパネル
-        var row = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepMid, "Panels"), T.S3, TextAnchor.UpperCenter, T.ScreenEdge, T.S1, T.S2);
-        var goals = Panel(row, "Goals", EndingLayout.RepPanelFlex[0]);
-        EndingWidgets.PanelHead(goals, C.GoalsTitle, C.GoalsIcon);
+        var row = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepMid, "Panels"), T.S2, TextAnchor.UpperCenter, T.S3, 0f, T.S1);
+        var goals = EndingWidgets.ReportPanel(row, "Goals");
+        EndingWidgets.PanelHead(goals, C.GoalsTitle, C.GoalsIcon, C.GoalsFace);
         for (int k = 0; k < reqs.Length; k++) reqs[k] = EndingWidgets.ReqRow(goals);
 
-        var sc = Panel(row, "Score", EndingLayout.RepPanelFlex[1]);
-        scoreTotal = EndingWidgets.PanelHead(sc, C.ScoreTitle, C.ScoreIcon, true);
-        for (int k = 0; k < scoreRows.Length; k++) scoreRows[k] = EndingWidgets.LineRow(sc, false, true);
+        var sc = EndingWidgets.ReportPanel(row, "Score");
+        EndingWidgets.PanelHead(sc, C.ScoreTitle, C.ScoreIcon, C.ScoreFace);
+        for (int k = 0; k < scoreRows.Length; k++) scoreRows[k] = EndingWidgets.LineRow(sc);
 
-        var mo = Panel(row, "Moments", EndingLayout.RepPanelFlex[2]);
-        EndingWidgets.PanelHead(mo, C.MomentsTitle, C.MomentsIcon);
-        for (int k = 0; k < moments.Length; k++) moments[k] = EndingWidgets.LineRow(mo, true, false);
+        var mo = EndingWidgets.ReportPanel(row, "Moments");
+        EndingWidgets.PanelHead(mo, C.MomentsTitle, C.MomentsIcon, C.MomentsFace);
+        for (int k = 0; k < moments.Length; k++) moments[k] = EndingWidgets.LineRow(mo);
 
-        // HoustonBox の所：ヒューストンのまとめ
-        houston = EndingWidgets.Quote(bodyRect, EndingLayout.HoustonSlot, C.HoustonTag);
+        // ヒューストンのまとめ
+        houston = EndingWidgets.Quote(safe, EndingLayout.RepHouston, C.HoustonTag);
 
-        // 下：本物のアポロ13号＋もう一度
-        var bottom = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepBottom, "Bottom"), T.S3, TextAnchor.LowerCenter, T.ScreenEdge, 0f, T.ScreenEdge);   // 下に寄せる（上の HoustonBox の所に入らない）
-        var card = UiKit.Row(bottom, T.S2, TextAnchor.MiddleLeft, T.S3, T.S1);
+        // 下：本物のアポロ13号のカード＋合計＋もう一度（右下に手）
+        var bottom = EndingWidgets.FillRow(EndingWidgets.Zone(safe, EndingLayout.RepBottom, "Bottom"), T.S3, TextAnchor.MiddleRight, T.ScreenEdge, 0f, EndingTokens.BottomPad);
+        var card = UiKit.Row(bottom, T.S3, TextAnchor.MiddleLeft, T.S4);   // 本当の宇宙の話は黄みの豆形（【10】の choice）
         card.name = "Apollo13";
-        UiKit.Surface(card, T.RadiusM, T.Panel);
-        var cle = Ui.Size(card, w: 0f, h: EndingTokens.ApolloH, flexW: 1f); cle.minWidth = 0f; cle.minHeight = EndingTokens.ApolloH;
-        UiKit.Tag(card, C.ApolloTag, T.Ink, T.Panel);
-        apollo = EndingWidgets.Wrap(card, "", TextStyle.Label, T.Ink, TextAlignmentOptions.MidlineLeft);
+        var cle = Ui.Size(card, w: 0f, h: EndingTokens.ApolloH, flexW: 1f); cle.minWidth = 0f; cle.minHeight = EndingTokens.ApolloH; cle.preferredHeight = -1f;
+        var cg = card.GetComponent<HorizontalLayoutGroup>(); cg.padding.top = cg.padding.bottom = Mathf.RoundToInt(T.S2);   // 3 行の本文が箱に収まる高さ（本文の高さ＋上下の余白）
+        var face = UiKit.Blob(card, T.BlobPanel, T.Choice, T.PanelCorner, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
+        var tag = UiKit.Tag(card, C.ApolloTag, T.Accent, T.Panel);
+        tag.localEulerAngles = new Vector3(0f, 0f, T.CounterUnitTilt);
+        apollo = EndingWidgets.Wrap(card, "", TextStyle.Hint, T.Text, TextAlignmentOptions.MidlineLeft);
         var ale = Ui.Size(apollo, w: 0f, flexW: 1f); ale.minWidth = 0f;
-        UiKit.PrimaryButton(bottom, C.FlyAgain, C.FlyAgainIcon, () => f.Client?.Send(Cmd.Type("again")));
+
+        total = UiKit.Counter(bottom, C.ScoreIcon, C.ScoreUnit);
+        TotalLook(total);
+        var again = UiKit.PrimaryButton(bottom, C.FlyAgain, C.FlyAgainIcon, () => f.Client?.Send(Cmd.Type("again")));
+        UiSelect.Cursor(again.Root, CursorDir.UpLeft);   // 最後に押すボタンに手（【05】）
 
         body.SetActive(false);
     }
 
-    static RectTransform Panel(Transform row, string name, float flex)
+    /// <summary>合計のピル（【09】下）：数のチップのトロフィーの台を、上ではなくピルの中の左に置く（上に出すと吹き出しにかかる）</summary>
+    static void TotalLook(UiCounter c)
     {
-        var p = UiKit.Panel(row, 0f, name);   // 行の間は 0（行の高さで十分あく）
-        var l = p.GetComponent<VerticalLayoutGroup>();
-        l.padding.top = l.padding.bottom = Mathf.RoundToInt(EndingTokens.ListPadY);
-        var le = Ui.Size(p, w: 0f, flexW: flex, flexH: 1f); le.minWidth = 0f;
-        return p;
+        float d = T.CounterIconD;
+        var dr = c.Disc.Root;
+        dr.anchorMin = dr.anchorMax = new Vector2(0f, 0.5f); dr.pivot = new Vector2(0.5f, 0.5f);
+        dr.anchoredPosition = new Vector2(T.S2 + d * 0.5f, 0f);
+        var hl = c.Root.GetComponent<HorizontalLayoutGroup>();
+        hl.padding.left = Mathf.RoundToInt(T.S2 * 2f + d);
+        hl.spacing = T.S1;
+        // 小さな見出し → 点線 → 数（【09】下の合計のピル）
+        var lab = UiKit.Text(c.Root, C.TotalLabel, TextStyle.Label, T.Panel);
+        lab.transform.SetSiblingIndex(0);
+        var dash = UiKit.DashedLine(c.Root, T.WithAlpha(T.Panel, 0.6f));
+        Ui.Size(dash, w: T.S4);
+        dash.transform.SetSiblingIndex(1);
     }
 
     public void Refresh()
@@ -95,36 +110,33 @@ public class ReportScreen
         if (i == null) return;
 
         var st = C.For(i.Ending);
-        endFace.color = st.Face;
-        endIcon.sprite = T.Icon(st.Icon); endIcon.color = st.OnFace;
-        endText.text = st.Short; endText.color = st.OnFace;
-        total.text = C.Num(i.Score);
-        scoreTotal.text = C.Num(i.Score);
+        ending.Face.color = st.Face;
+        ending.Disc.Set(st.Icon, T.Panel);
+        ending.Disc.Icon.color = st.Face;
+        ending.Label.text = st.Short;
+        total.Set(C.Score(i.Score));
 
         string cause = i.Cause();
         for (int k = 0; k < reqs.Length; k++)
         {
             var r = C.Reqs[k];
             string hint = r.Key == "req1_crew_alive" ? C.CrewHint(cause) : r.Hint;
-            bool pass = i.Pass(r.Key);
-            reqs[k].Set(pass, r.Label, pass && !r.DetailWhenPass ? null : r.Detail?.Invoke(i), hint);
+            reqs[k].Set(i.Pass(r.Key), r.Label, r.Value?.Invoke(i), hint);
         }
 
         for (int k = 0; k < scoreRows.Length; k++)
         {
             string key = C.ScoreRows[k, 0];
-            bool has = J.Has(i.Breakdown, key);
-            scoreRows[k].Root.gameObject.SetActive(has);
-            if (!has) continue;
+            if (!J.Has(i.Breakdown, key)) { scoreRows[k].Hide(); continue; }
             float v = J.Num(i.Breakdown, key);
-            scoreRows[k].Set(null, C.ScoreRows[k, 2], C.ScoreRows[k, 1], C.Plus(v), v <= 0f);
+            scoreRows[k].Set(C.ScoreRows[k, 2], C.ScoreRowFace, C.ScoreRows[k, 1], C.ScorePlus(v), v <= 0f);
         }
 
         var list = PickMoments(i);
         for (int k = 0; k < moments.Length; k++)
         {
-            if (k < list.Count) moments[k].Set(Ui.Mmss(list[k].t), list[k].icon, list[k].label, null);
-            else moments[k].Root.gameObject.SetActive(false);
+            if (k < list.Count) moments[k].Set(list[k].icon, list[k].face, list[k].label, Ui.Mmss(list[k].t));
+            else moments[k].Hide();
         }
 
         houston.Set(C.Takeaway(i));
@@ -132,9 +144,9 @@ public class ReportScreen
     }
 
     /// <summary>主な出来事：事故・結末（必ず）＋ commands から決まりに当たったもの ＋ 時刻の目印。優先度の高い順に選んで時刻順に並べる</summary>
-    static List<(float t, int pr, string icon, string label)> PickMoments(EndingInfo i)
+    static List<(float t, int pr, string icon, Color face, string label)> PickMoments(EndingInfo i)
     {
-        var all = new List<(float t, int pr, string icon, string label)> { (0f, C.PriorityFixed, C.MomentAccidentIcon, C.MomentAccident) };
+        var all = new List<(float t, int pr, string icon, Color face, string label)> { (0f, C.PriorityFixed, C.MomentAccidentIcon, C.MomentAlertFace, C.MomentAccident) };
         var used = new HashSet<int>();
         if (i.Commands != null)
             foreach (var o in i.Commands)
@@ -147,20 +159,20 @@ public class ReportScreen
                     if (used.Contains(k) || m.Cmd != cmd || (m.Match != null && !m.Match(c))) continue;
                     used.Add(k);
                     string label = m.Show == null ? m.Label : string.Format(m.Label, J.Str(J.Obj(c, "args"), m.Show).ToUpperInvariant());
-                    all.Add((J.Num(c, "t"), m.Priority, m.Icon, label));
+                    all.Add((J.Num(c, "t"), m.Priority, m.Icon, C.MomentFace, label));
                     break;
                 }
             }
         var s = i.LastState;
         if (s != null)
         {
-            if (i.StrictReason == "missed_burn") all.Add((s.tBurnClose, C.PriorityMissed, C.MomentMissedBurnIcon, C.MomentMissedBurn));
-            if (s.tLos > 0f && i.TEnd > s.tLos) all.Add((s.tLos, C.PriorityTimeline, C.MomentFarSideIcon, C.MomentFarSide));
-            if (s.tAos > 0f && i.TEnd > s.tAos) all.Add((s.tAos, C.PriorityTimeline, C.MomentSignalIcon, C.MomentSignal));
+            if (i.StrictReason == "missed_burn") all.Add((s.tBurnClose, C.PriorityMissed, C.MomentMissedBurnIcon, C.MomentAlertFace, C.MomentMissedBurn));
+            if (s.tLos > 0f && i.TEnd > s.tLos) all.Add((s.tLos, C.PriorityTimeline, C.MomentFarSideIcon, C.MomentTimelineFace, C.MomentFarSide));
+            if (s.tAos > 0f && i.TEnd > s.tAos) all.Add((s.tAos, C.PriorityTimeline, C.MomentSignalIcon, C.MomentTimelineFace, C.MomentSignal));
         }
         string cause = i.Cause();
-        if (i.Survived) all.Add((i.TEnd, C.PriorityFixed, C.MomentSplashIcon, C.MomentSplash));
-        else all.Add((i.TEnd, C.PriorityFixed, C.MomentLostIcon, cause == "" ? C.MomentLostOther : string.Format(C.MomentLost, C.CauseName(cause))));
+        if (i.Survived) all.Add((i.TEnd, C.PriorityFixed, C.MomentSplashIcon, C.MomentSplashFace, C.MomentSplash));
+        else all.Add((i.TEnd, C.PriorityFixed, C.MomentLostIcon, C.MomentLostFace, cause == "" ? C.MomentLostOther : string.Format(C.MomentLost, C.CauseName(cause))));
 
         return all.OrderBy(x => x.pr).ThenBy(x => x.t).Take(EndingTokens.MaxMoments)
                   .OrderBy(x => x.t).ThenBy(x => x.pr).ToList();

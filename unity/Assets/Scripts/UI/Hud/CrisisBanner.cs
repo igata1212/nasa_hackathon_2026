@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#76）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 声なしの警告もこの帯に）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#76）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 声なしの警告もこの帯に）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 準備のカードの間は注意を隠す）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 作る Issue：#76（事故の警報と危機の帯）
 //
 // 中央上の危機の帯（同時に1本、ui-guidelines 3章「警告の帯」）。練習の案内（#84）と同じ場所で、同時には出ない（帯は flight の間だけ）
@@ -10,7 +10,11 @@
 //   ・照明 OFF でも暗くしない（Detail を持たない。#87）
 //   ・声なしの警告（event kind=warning：通信途絶・通信 OFF の間のヒューストンの台詞）も、この帯の1行に Look.WarnSec 秒出す（長ければ 22 で2行。帯の高さは 72 のまま）。
 //     前は HoustonBox の上に別の赤い帯を出していて、危機の帯と2本並んだ（#146。ui-guidelines 7章：帯は1本）。危機が無いときは NO RADIO の帯で出す
-//   ・画面の縁の赤（UrgencyFx の枠）と溶けないように、帯の外側に panel の輪と影を付ける。帯そのものは脈打たせない（脈は縁だけ）
+//   ・画面の縁の赤（UrgencyFx の枠）と溶けないように、帯の外側に panel のふち（5）を付ける。帯そのものは脈打たせない（脈は縁だけ）
+//   ・#190（ui-guidelines 3章「警告の帯」【09】【12】）：帯は波打つ形（blob_pill）、ふち 5（panel）、影なし。原因のアイコンは panel の台に帯の色の絵（【01】）、
+//     待機のアイコンも panel の台に text の絵。言葉は小文字まじり（原則 12。CO2 などの頭字語はそのまま）
+//   ・#189（Fable）：点火・再突入の準備のカード（BurnCheck）が出ている間は、注意（オレンジ）の帯を出さない。危険（赤）だけ出す
+//     （帯＋カード＋吹き出し＋席のパネルが重なって船室が見えなかった。注意はゲージの色でも分かる）
 // 文言・アイコン・席は下の Crises の表の1か所（文言は Taiga が決める。今は houston_lines.json の H07・H11・H14・H16・H18・H26 に合わせた仮）
 // 見た目の値は Look の1か所。帯の形は自分の中の Band にまとめた（#71 の HudKit.Banner ができたら差し替える）
 // UrgencyFx は Object.FindAnyObjectByType で探す（シーンに参照を足さない）。無ければ MASTER ALARM だけ出す
@@ -35,18 +39,18 @@ public class CrisisBanner : HudPart
     // 並び = 待機のアイコンの並び（#76 の表の順：必須 → 余裕があれば）
     static readonly Crisis[] Crises =
     {
-        new Crisis { cause = "leak",   icon = "valve",       title = "OXYGEN LEAK", seat = Seats.Life,    line = "Close the valve" },
-        new Crisis { cause = "power",  icon = "power",       title = "LOW POWER",   seat = Seats.Comms,   line = "Switch things off" },
-        new Crisis { cause = "oxygen", glyph = "O2",         title = "LOW OXYGEN",  seat = Seats.Planner, line = "Pick the faster route" },
-        new Crisis { cause = "co2",    icon = "co2",         title = "HIGH CO2",    seat = Seats.Life,    line = "Swap the filter together" },
-        new Crisis { cause = "temp",   icon = "temperature", title = "TOO COLD",    seat = Seats.Comms,   line = "Heater on" },
-        new Crisis { cause = "fuel",   icon = "fuel",        title = "LOW FUEL",    seat = Seats.Pilot,   line = "Turn the ship less" },
+        new Crisis { cause = "leak",   icon = "valve",       title = "Oxygen leak", seat = Seats.Life,    line = "Close the valve" },
+        new Crisis { cause = "power",  icon = "power",       title = "Low power",   seat = Seats.Comms,   line = "Switch things off" },
+        new Crisis { cause = "oxygen", glyph = "O2",         title = "Low oxygen",  seat = Seats.Planner, line = "Pick the faster route" },
+        new Crisis { cause = "co2",    icon = "co2",         title = "High CO2",    seat = Seats.Life,    line = "Swap the filter together" },
+        new Crisis { cause = "temp",   icon = "temperature", title = "Too cold",    seat = Seats.Comms,   line = "Heater on" },
+        new Crisis { cause = "fuel",   icon = "fuel",        title = "Low fuel",    seat = Seats.Pilot,   line = "Turn the ship less" },
     };
     /// <summary>表に無い原因（UrgencyFx の debugLevel の "debug" など）</summary>
-    static readonly Crisis Unknown = new Crisis { cause = "", icon = "alarm", title = "WARNING", line = "Check the gauges" };
+    static readonly Crisis Unknown = new Crisis { cause = "", icon = "alarm", title = "Warning", line = "Check the gauges" };
     /// <summary>危機が無いときに声なしの警告だけ出す帯（1行はヒューストンの台詞。席は台詞に出てきた席）</summary>
-    static readonly Crisis Radio = new Crisis { cause = "", icon = "comms_lost", title = "NO RADIO", line = "" };
-    const string AlarmText = "MASTER ALARM";
+    static readonly Crisis Radio = new Crisis { cause = "", icon = "comms_lost", title = "No radio", line = "" };
+    const string AlarmText = "Master alarm";
 
     // ================================================================== 見た目の値（直すのはここ）
     static class Look
@@ -82,6 +86,7 @@ public class CrisisBanner : HudPart
     string lastPhase = "";
     string warnText = "", warnPriority = ""; float warnUntil; bool warnShown;   // 声なしの警告（#146）
     bool alarmDone; float alarmStart, alarmUntil;
+    BurnCheck burn;                   // 点火・再突入の準備のカード（#189。CabinHud で後から足されるので Tick で探す）
 
     protected override void Build(RectTransform root)
     {
@@ -144,6 +149,7 @@ public class CrisisBanner : HudPart
         string cause = fx != null ? fx.Cause : "";
         bool warnOn = now < warnUntil && Ctx.Model.Phase == "flight";
         bool show = !alarmOn && (level > 0 || warnOn);
+        if (show && !Danger(level, warnOn) && BurnCardShown()) show = false;   // #189：準備のカードの間は危険だけ
         if (band.Root.gameObject.activeSelf != show) band.Root.gameObject.SetActive(show);
         if (!show) { shownLevel = 0; shownCause = ""; warnShown = false; dirty = false; return; }
         if (dirty || level != shownLevel || cause != shownCause || warnOn != warnShown) Apply(level, cause, warnOn);
@@ -186,11 +192,11 @@ public class CrisisBanner : HudPart
         if (level > shownLevel || cause != shownCause) bounceAt = Time.unscaledTime;
         shownLevel = level; shownCause = cause; warnShown = warn; dirty = false;
         var c = level > 0 ? Find(cause) ?? Unknown : Radio;
-        bool danger = level >= 2 || (warn && warnPriority == "critical");
+        bool danger = Danger(level, warn);
         Color face = danger ? T.Danger : T.Accent, fg = danger ? T.Panel : T.Ink;
         band.Face.color = face;
         band.LevelIcon.sprite = T.Icon(danger ? "danger" : "caution"); band.LevelIcon.color = fg;
-        band.Cause.Set(c, fg, face);
+        band.Cause.Set(c, T.Panel, face);   // #190：panel の台に帯の色の絵
         band.Title.text = c.title; band.Title.color = fg;
         band.Title.gameObject.SetActive(!warn);   // 警告の台詞を出す間は短い言葉を隠して、台詞に幅をあげる（2行で 110 字ほど入る）
         band.Line.text = warn ? warnText : c.line; band.Line.color = fg;
@@ -201,6 +207,18 @@ public class CrisisBanner : HudPart
         if (seat != null) band.Badge.Set(seat, Ctx.Model.MySeats.Contains(seat), false);
         UpdateStandby(Ctx.State);
         Fit();
+    }
+
+    /// <summary>帯が危険（赤）か。段階 2・3、または critical の声なしの警告</summary>
+    bool Danger(int level, bool warn) => level >= 2 || (warn && warnPriority == "critical");
+
+    /// <summary>危機の帯が出ているか（BurnCheck がカードの位置をずらすのに使う）</summary>
+    public bool Showing => band != null && band.Root != null && band.Root.gameObject.activeSelf;
+
+    bool BurnCardShown()
+    {
+        if (burn == null) foreach (var p in Ctx.Parts) if (p is BurnCheck b) { burn = b; break; }
+        return burn != null && burn.Showing;
     }
 
     static Crisis Find(string cause)
@@ -258,39 +276,34 @@ public class CrisisBanner : HudPart
     }
 
     // ================================================================== 部品（#71 の HudKit.Banner ができたら差し替える）
-    /// <summary>白いアイコンか、円に文字（O2）。色は Set で付ける</summary>
+    /// <summary>アイコンの台（#190【01】。UiKit.Disc）。アイコンが無い物（O2）は台に文字。色は Set で付ける</summary>
     class Glyph
     {
         public RectTransform Root;
-        public Image Icon, Chip;
+        public UiIconDisc Disc;
         public TextMeshProUGUI Text;
 
-        /// <param name="d">円の直径</param><param name="iconD">アイコンの大きさ</param>
-        public static Glyph Make(Transform p, float d, float iconD, string name)
+        /// <param name="d">台の直径（絵は台の 60%）</param>
+        public static Glyph Make(Transform p, float d, string name)
         {
             var g = new Glyph();
-            g.Root = Ui.Rect(name, p);
-            g.Root.sizeDelta = new Vector2(d, d);
-            UiKit.Fixed(g.Root, d, d);
-            g.Chip = UiKit.Pill(g.Root, T.Ink, d, "Chip"); UiKit.Fill(g.Chip.rectTransform);
-            g.Text = UiKit.Text(g.Chip.transform, "", TextStyle.Tag, T.Panel, TextAlignmentOptions.Center, false); UiKit.Fill(g.Text.rectTransform);
-            g.Icon = UiKit.Shape(g.Root, null, T.Ink, 0f, "Icon"); g.Icon.preserveAspect = true;
-            UiKit.Center(g.Icon.rectTransform, iconD, iconD);
+            g.Disc = UiKit.Disc(p, null, T.Panel, d);
+            g.Root = g.Disc.Root; g.Root.name = name;
+            g.Text = UiKit.Text(g.Root, "", TextStyle.Tag, T.Text, TextAlignmentOptions.Center, false); UiKit.Fill(g.Text.rectTransform);
             return g;
         }
 
-        /// <param name="fg">アイコン・円の色</param><param name="bg">円の中の文字の色</param>
-        public void Set(Crisis c, Color fg, Color bg)
+        /// <param name="disc">台の色</param><param name="ink">絵と文字（O2）の色</param>
+        public void Set(Crisis c, Color disc, Color ink)
         {
-            bool icon = c.icon != null;
-            Icon.gameObject.SetActive(icon);
-            Chip.gameObject.SetActive(!icon);
-            if (icon) { Icon.sprite = T.Icon(c.icon); Icon.color = fg; }
-            else { Chip.color = fg; Text.text = c.glyph; Text.color = bg; }
+            Disc.Set(c.icon, disc);
+            Disc.Icon.color = ink;
+            Text.gameObject.SetActive(c.icon == null);
+            Text.text = c.glyph ?? ""; Text.color = ink;
         }
     }
 
-    /// <summary>危機の帯：ピル（高さ 72）。影・panel の輪・面の3枚を敷き、中身を横に並べる。幅は中身に合わせる（上の中央に吊る）</summary>
+    /// <summary>危機の帯：波打つピル（blob_pill、高さ 72）。panel のふち・面の2枚を敷き、中身を横に並べる。幅は中身に合わせる（上の中央に吊る）</summary>
     class Band
     {
         public RectTransform Root, StandbyRow;
@@ -311,24 +324,21 @@ public class CrisisBanner : HudPart
             b.Face = PillBack(b.Root, Look.BandH, T.Danger);
 
             b.LevelIcon = UiKit.Icon(b.Root, "danger", T.IconM, T.Panel);
-            b.Cause = Glyph.Make(b.Root, T.IconM, T.IconM, "Cause");
-            b.Title = UiKit.Text(b.Root, "", TextStyle.Sub, T.Panel);
+            b.Cause = Glyph.Make(b.Root, T.IconM, "Cause");
+            b.Title = UiKit.Text(b.Root, "", TextStyle.Choice, T.Panel);
             b.Badge = UiKit.SeatBadge(b.Root, Seats.Life, Look.BadgeD);
             b.Line = UiKit.Text(b.Root, "", TextStyle.Body, T.Panel, TextAlignmentOptions.MidlineLeft);
             b.Line.overflowMode = TextOverflowModes.Ellipsis;
             b.LineSize = Ui.Size(b.Line);
 
-            // 待機：panel の小さな円に ink のアイコン
+            // 待機：panel の台に text のアイコン（#190）
             b.StandbyRow = UiKit.Row(b.Root, T.S1, TextAnchor.MiddleCenter);
             b.StandbyRow.name = "Standby";
             b.Standby = new Glyph[Crises.Length];
             for (int i = 0; i < Crises.Length; i++)
             {
-                var g = Glyph.Make(b.StandbyRow, Look.StandbyD, T.IconS, "Standby_" + Crises[i].cause);
-                var bg = UiKit.Pill(g.Root, T.Panel, Look.StandbyD, "Face"); UiKit.Fill(bg.rectTransform);
-                bg.transform.SetAsFirstSibling();
-                g.Set(Crises[i], T.Ink, T.Panel);
-                if (Crises[i].icon == null) { g.Chip.color = T.Clear; g.Text.color = T.Ink; }   // O2 は円を重ねず、文字だけ
+                var g = Glyph.Make(b.StandbyRow, Look.StandbyD, "Standby_" + Crises[i].cause);
+                g.Set(Crises[i], T.Panel, T.Text);
                 g.Root.gameObject.SetActive(false);
                 b.Standby[i] = g;
             }
@@ -337,7 +347,7 @@ public class CrisisBanner : HudPart
         }
     }
 
-    /// <summary>MASTER ALARM：大きいピル（高さ 96）。警報のアイコン＋文字＋警報のアイコン。CanvasGroup で点滅</summary>
+    /// <summary>Master alarm：大きい波打つピル（高さ 96）。警報のアイコン＋文字＋警報のアイコン。CanvasGroup で点滅</summary>
     class Alarm
     {
         public RectTransform Root;
@@ -353,7 +363,8 @@ public class CrisisBanner : HudPart
             a.Group.blocksRaycasts = false; a.Group.interactable = false;
             PillBack(a.Root, Look.AlarmH, T.Danger);
             UiKit.Icon(a.Root, "alarm", T.IconL, T.Panel);
-            UiKit.Text(a.Root, AlarmText, TextStyle.Big, T.Panel);
+            var t = UiKit.Text(a.Root, AlarmText, TextStyle.Choice, T.Panel);
+            t.fontSize = T.TextBig;   // #190：Baloo は数字だけ。言葉は Nunito ExtraBold を大きく
             UiKit.Icon(a.Root, "alarm", T.IconL, T.Panel);
             return a;
         }
@@ -368,14 +379,12 @@ public class CrisisBanner : HudPart
         r.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
     }
 
-    /// <summary>ピルの裏：影（下に ShadowY）・panel の輪（外に Border。画面の縁の赤と分ける）・面。どれもレイアウトの外。面を返す</summary>
+    /// <summary>帯の裏（#190）：panel のふち（外に RimButton。画面の縁の赤と分ける）・面。どちらも波打つピル（blob_pill）でレイアウトの外。影なし。面を返す</summary>
     static Image PillBack(RectTransform r, float h, Color face)
     {
-        float ringH = h + T.Border * 2f;
-        var sh = UiKit.Pill(r, T.Shadow, ringH, "Shadow"); UiKit.Fill(sh.rectTransform, -T.Border); UiKit.Ignore(sh);
-        sh.rectTransform.anchoredPosition = new Vector2(0f, -T.ShadowY);
-        var ring = UiKit.Pill(r, T.Panel, ringH, "Ring"); UiKit.Fill(ring.rectTransform, -T.Border); UiKit.Ignore(ring);
-        var f = UiKit.Pill(r, face, h, "Face"); UiKit.Fill(f.rectTransform); UiKit.Ignore(f);
+        float ringH = h + T.RimButton * 2f;
+        var ring = UiKit.Blob(r, T.BlobPill, T.Panel, ringH * 0.5f, "Ring"); UiKit.Fill(ring.rectTransform, -T.RimButton); UiKit.Ignore(ring);
+        var f = UiKit.Blob(r, T.BlobPill, face, h * 0.5f, "Face"); UiKit.Fill(f.rectTransform); UiKit.Ignore(f);
         return f;
     }
 }

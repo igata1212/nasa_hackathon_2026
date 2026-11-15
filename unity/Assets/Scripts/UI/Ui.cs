@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#189 席の仕事 Seats.Job）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 席の名前の大文字をやめ、ボタンの文字を茶に）
 // 骨組み用の UGUI 部品（コードで組む。見た目は仮。本番の作り込みは UI の Issue #71〜#94）
 using System;
 using UnityEngine;
@@ -55,7 +55,7 @@ public static class Ui
         var b = img.gameObject.AddComponent<Button>();
         b.targetGraphic = img;
         var cb = b.colors; cb.highlightedColor = new Color(1f, 1f, 1f, 0.85f); cb.pressedColor = new Color(0.8f, 0.8f, 0.8f, 1f); b.colors = cb;
-        var t = Label(img.transform, s, size, fg ?? Navy, TextAnchor.MiddleCenter, FontStyle.Bold);
+        var t = Label(img.transform, s, size, fg ?? UiTokens.Text, TextAnchor.MiddleCenter, FontStyle.Bold);
         Fill(t.rectTransform);
         if (on != null) b.onClick.AddListener(() => on());
         return b;
@@ -118,5 +118,8 @@ public static class Seats
 
     public static Color Tint(string s) => s == Pilot ? Ui.Red : s == Life ? Ui.Green : s == Comms ? Ui.Yellow : Ui.Blue;
     public static string Icon(string s) => s == Pilot ? "▲" : s == Life ? "●" : s == Comms ? "■" : "◆";
-    public static string Title(string s) => s == Pilot ? "PILOT" : s == Life ? "LIFE SUPPORT" : s == Comms ? "COMMS & POWER" : "MISSION PLANNER";
+    /// <summary>席の名前（#190：大文字をやめた。席は固有名詞なので語の頭を大文字）</summary>
+    public static string Title(string s) => s == Pilot ? "Pilot" : s == Life ? "Life Support" : s == Comms ? "Comms & Power" : "Mission Planner";
+    /// <summary>席の仕事（部屋の名前タグの3行目。#189：役の名前だけでは何をする席か分からなかった。ブリーフィング B06・B07 と同じ中身）</summary>
+    public static string Job(string s) => s == Pilot ? "Turns the ship" : s == Life ? "Keeps the air safe" : s == Comms ? "Radio and power" : "Route and science";
 }

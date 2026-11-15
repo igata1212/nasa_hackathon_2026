@@ -1,10 +1,11 @@
 [
-  {"id": "B01", "speaker": "houston", "text": "Hi, crew! This is Houston, NASA's Mission Control in Houston, Texas."},
-  {"id": "B02", "speaker": "houston", "text": "We watch your ship from the ground. I'm like your teacher."},
-  {"id": "B03", "speaker": "houston", "text": "This game is based on Apollo 13, a real trip to the Moon in 1970."},
-  {"id": "B04", "speaker": "houston", "text": "Your mission: study the Moon's far side, the side we never see, and come home."},
-  {"id": "B05", "speaker": "houston", "text": "Four seats: Pilot steers the ship. Life Support keeps the air safe."},
-  {"id": "B06", "speaker": "houston", "text": "Comms & Power runs radio and power. Mission Planner does science and the route."},
-  {"id": "B07", "speaker": "houston", "text": "We talk by radio. But behind the Moon, the Moon blocks it."},
-  {"id": "B08", "speaker": "houston", "text": "Whatever happens, work as a team and keep thinking. You can get home."}
+  {"id": "B01", "speaker": "houston", "text": "Hi, crew! I'm Houston, NASA's Mission Control. We guide every flight from Earth."},
+  {"id": "B02", "speaker": "houston", "text": "We can't fly your ship. We watch it from Earth and talk by radio."},
+  {"id": "B03", "speaker": "houston", "text": "The game is based on Apollo 13. In 1970, a part broke on the way to the Moon."},
+  {"id": "B04", "speaker": "houston", "text": "Houston and the crew solved it one problem at a time. All three came home alive."},
+  {"id": "B05", "speaker": "houston", "text": "Your mission: fly around the Moon, study its far side, and come home."},
+  {"id": "B06", "speaker": "houston", "text": "Four seats, four jobs. Pilot turns the ship. Life Support keeps the air safe."},
+  {"id": "B07", "speaker": "houston", "text": "Comms & Power runs radio and batteries. Mission Planner does route and science."},
+  {"id": "B08", "speaker": "houston", "text": "The Moon blocks radio. Behind it, you won't hear me. You'll be on your own."},
+  {"id": "B09", "speaker": "houston", "text": "First, build your ship. Then fly it. Talk to each other, and you can get home."}
 ]

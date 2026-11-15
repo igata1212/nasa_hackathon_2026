@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using T = UiTokens;
 
 public class StoryDirector : MonoBehaviour
 {
@@ -34,7 +35,8 @@ public class StoryDirector : MonoBehaviour
     GameObject overlay;
     RawImage view;
     Image fade;
-    Text caption, sub, houstonLine;
+    Text caption, sub;
+    UiQuote houstonQuote;
     GameObject houstonBar, skipBtn, bars;
 
     public bool Playing => running != null;
@@ -252,7 +254,7 @@ public class StoryDirector : MonoBehaviour
 
     void ShowHouston(string text)
     {
-        houstonLine.text = CleanLine(text);
+        houstonQuote.Line.text = CleanLine(text);
         houstonBar.SetActive(true);
     }
 
@@ -280,24 +282,18 @@ public class StoryDirector : MonoBehaviour
 
         caption = Ui.Label(root, "", 120, Ui.Cream, TextAnchor.MiddleCenter, FontStyle.Bold);
         Ui.Anchor(caption.rectTransform, 0, 0.45f, 1, 0.7f);
-        caption.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(4, -4);
         sub = Ui.Label(root, "", 36, Ui.Cream, TextAnchor.MiddleCenter, FontStyle.Bold);
         Ui.Anchor(sub.rectTransform, 0, 0.36f, 1, 0.45f);
-        sub.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(2, -2);
 
-        var hb = Ui.PanelImg(root, new Color(0.05f, 0.08f, 0.16f, 0.85f), "HoustonLine"); houstonBar = hb.gameObject;
-        Ui.Anchor(hb.rectTransform, 0.18f, 0.79f, 0.82f, 0.9f);   // 上（下の帯の上はクルーや海が映るので）
-        var who = Ui.Label(hb.transform, "HOUSTON", 18, Ui.Orange, TextAnchor.UpperLeft, FontStyle.Bold);
-        Ui.Anchor(who.rectTransform, 0, 0.7f, 1, 1, 14, 0, 8, 4);
-        houstonLine = Ui.Label(hb.transform, "", 22, Ui.Cream, TextAnchor.UpperLeft);
-        Ui.Anchor(houstonLine.rectTransform, 0, 0, 1, 0.74f, 14, 4, 14, 0);
-        houstonLine.resizeTextForBestFit = true; houstonLine.resizeTextMinSize = 12; houstonLine.resizeTextMaxSize = 22;
-        houstonLine.verticalOverflow = VerticalWrapMode.Truncate;   // 長い台詞が帯の外にはみ出さない（#130）
+        houstonQuote = EndingWidgets.Quote(root, new Vector4(0.20f, 0.74f, 0.80f, 0.905f), HoustonStyle.Name);   // 上（下の帯の上はクルーや海が映るので）
+        houstonBar = houstonQuote.Root.gameObject;
         houstonBar.SetActive(false);
 
-        var skip = Ui.Btn(root, "SKIP  >>", new Color(1f, 1f, 1f, 0.85f), Skip, 26, Ui.Navy);
-        Ui.Anchor((RectTransform)skip.transform, 0.86f, 0.095f, 0.98f, 0.165f);
-        skipBtn = skip.gameObject;
+        var skip = UiKit.Hint(root, HoustonStyle.SkipIcon, HoustonStyle.Skip, Skip);
+        skip.Root.anchorMin = skip.Root.anchorMax = skip.Root.pivot = new Vector2(1f, 0f);
+        skip.Root.sizeDelta = new Vector2(skip.Root.GetComponent<LayoutElement>().preferredWidth, T.Hit);   // 親が配置しないので幅を自分で入れる（入れないとアイコンが字に重なる）
+        skip.Root.anchoredPosition = new Vector2(-T.ScreenEdge, 72f + T.S1);   // 下の黒い帯（8% = 72）の上
+        skipBtn = skip.Root.gameObject;
 
         view.enabled = false;
         bars.SetActive(false);
@@ -312,8 +308,8 @@ public class StoryDirector : MonoBehaviour
     [Tooltip("見出しの書体（Baloo 2 ExtraBold の ttf）。StoryScene が入れる。空なら既定の書体")] public Font headingFont;
     [Tooltip("大きい字幕の位置（anchor の x0, y0, x1, y1）")] public Vector4 endingBig = new Vector4(0f, 0.62f, 1f, 0.84f);
     [Tooltip("小さい字幕の位置")] public Vector4 endingSmall = new Vector4(0f, 0.53f, 1f, 0.61f);
-    [Tooltip("下の短い字幕（RE-ENTRY など）の位置")] public Vector4 endingLow = new Vector4(0f, 0.11f, 1f, 0.19f);
-    [Tooltip("ヒューストンの帯の位置")] public Vector4 endingBar = new Vector4(0.20f, 0.10f, 0.80f, 0.19f);
+    [Tooltip("下の短い字幕（RE-ENTRY など）の位置")] public Vector4 endingLow = new Vector4(0f, 0.27f, 1f, 0.34f);
+    [Tooltip("ヒューストンの帯の位置")] public Vector4 endingBar = new Vector4(0.20f, 0.095f, 0.80f, 0.255f);
     public int endingSmallSize = 40, endingLowSize = 34;
     public Vector2 endingOutline = new Vector2(3f, -3f);
 
@@ -356,7 +352,7 @@ public class StoryDirector : MonoBehaviour
     {
         if (houstonBar == null) return;
         bool on = !string.IsNullOrEmpty(text);
-        if (on) houstonLine.text = CleanLine(text);
+        if (on) houstonQuote.Line.text = CleanLine(text);
         if (houstonBar.activeSelf != on) houstonBar.SetActive(on);
     }
 

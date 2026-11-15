@@ -1,4 +1,4 @@
-// 書いた人：Claude ／ 最終更新：2026-11-14 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#74・#131）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 時計を消した）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#147 で CabinHud から分けた）／ 更新：iizuka（Opus 5.5、2026-11-14、#74・#131）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 時計を消した）／ 更新：iizuka（Opus 5.5、2026-11-15、#189 練習の間は名前を出す）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 あつ森に寄せる）
 // 作る Issue：#74（常に見える状態）＋ #131（ゲージの色の閾値を parameters.json に合わせる）
 //
 // 左のパネル。上にゲージ5本（電力・酸素・温度・CO2・燃料）、下に向き・データ、いちばん下に生還ラインの説明（時計は TimelineBar だけ。#146）。
@@ -13,8 +13,11 @@
 // 練習・かき混ぜの間（state が来ない）は、設計の合計で満タンの静かな表示（#74「M03・M04 は静かな表示」）
 // 左の領域（CabinHud.Layout の Left）に入りきらないときは、パネルごと縮める（Fit）。Detail：パネル全体（照明 OFF で暗くしてよい）
 // #146（Fable）：1画面の文字を減らした。名前（POWER など）は出さず、アイコン＋ゲージ＋数字だけ。注意・危険のときだけ、その行の上に言葉（LOW など）を出す。
+//   #189（Fable）：練習と GET READY（stir）の間だけは、安全のときもその行の上に名前（POWER・OXYGEN・TEMP・CO₂・FUEL）を出す（雲のアイコンの数字が CO2 だと分かるように）。事故のあとは上のとおり
 //   向き・データ・生還ラインの説明の行は消した（向きは Pilot のパネル、データは Planner・Comms のパネルにある）
 // 共通のゲージ（#71 の UiKitHud.Gauge）ができたら、下の MiniGauge だけを差し替える
+// #190（ui-guidelines 1章「船内の計器は濃紺のまま」【06】【01】【07】）：面の色（HudFace）は変えず、形を blob_panel に、星の模様を hudText の 6%（TimelineKit.GaugeFace）。影なし。
+//   左のアイコンは色つきの台（UiKit.Disc。【01】台ごとに色が違う：安全のときは RowDef.disc の色、注意＝accent、危険＝danger）。言葉は小文字まじり（原則 12）。ゲージの形は前の版のまま
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -33,7 +36,7 @@ public class StatusPanel : HudPart
         public const float Gap = T.S1;                 // 行の間
         public const float NameH = 22, BarH = 30;      // ゲージの行：上に名前（＋状態）、下にゲージと数字
         public const float RowH = NameH + BarH;
-        public const float ChipD = 44, ChipIcon = 28;  // 左の円とアイコン
+        public const float ChipD = T.RowDiscD;         // 左のアイコンの台（#190：材料の行の台と同じ 48。絵は台の 60%）
         public const float RowSafeH = ChipD;           // 安全のとき（言葉の行を出さない）の行の高さ
         public const float GaugeH = 28;                // ゲージのピル（ガイドライン 3章）
         public const float NumW = 88;                  // 数字の箱（右寄せで桁ぶれを防ぐ）
@@ -53,27 +56,28 @@ public class StatusPanel : HudPart
     class RowDef
     {
         public string key, label, icon, chipText, unitParam;
+        public Color disc;         // 安全のときの台の色（#190【01】。隣どうしを同じ色にしない。accent・danger は状態の色なので使わない）
         public string[] words;     // Safe・Caution・Danger のときに名前の横に出す言葉
         public bool endIsDanger;   // 生還ラインの下なら危険（UrgencyFx の段階3 と同じ：電力・酸素）
     }
 
     static readonly RowDef[] Defs =
     {
-        new RowDef { key = "power",  label = "POWER",  icon = "power",       unitParam = "power_per_battery", words = new[] { "", "LOW", "VERY LOW" }, endIsDanger = true },
-        new RowDef { key = "oxygen", label = "OXYGEN", chipText = "O₂", unitParam = "oxygen_start",      words = new[] { "", "LOW", "VERY LOW" }, endIsDanger = true },
-        new RowDef { key = "temp",   label = "TEMP",   icon = "temperature", unitParam = "temp_start",        words = new[] { "", "COLD", "TOO COLD" } },
-        new RowDef { key = "co2",    label = "CO₂", icon = "co2",       unitParam = "co2_start",         words = new[] { "", "HIGH", "TOO HIGH" } },
-        new RowDef { key = "fuel",   label = "FUEL",   icon = "fuel",        unitParam = "fuel_start",        words = new[] { "", "LOW", "NOT ENOUGH" } },
+        new RowDef { key = "power",  label = "Power",  icon = "power",       disc = T.Plum, unitParam = "power_per_battery", words = new[] { "", "Low", "Very low" }, endIsDanger = true },
+        new RowDef { key = "oxygen", label = "Oxygen", chipText = "O₂",      disc = T.Go,   unitParam = "oxygen_start",      words = new[] { "", "Low", "Very low" }, endIsDanger = true },
+        new RowDef { key = "temp",   label = "Temp",   icon = "temperature", disc = T.Plum, unitParam = "temp_start",        words = new[] { "", "Cold", "Too cold" } },
+        new RowDef { key = "co2",    label = "CO₂",    icon = "co2",         disc = T.Go,   unitParam = "co2_start",         words = new[] { "", "High", "Too high" } },
+        new RowDef { key = "fuel",   label = "Fuel",   icon = "fuel",        disc = T.Plum, unitParam = "fuel_start",        words = new[] { "", "Low", "Not enough" } },
     };
-    const string WordLeak = "LEAKING";   // 酸素が漏れている間（leak_open）。危険にする
+    const string WordLeak = "Leaking";   // 酸素が漏れている間（leak_open）。危険にする
 
     // 船の向き（state の attitude → 言葉・アイコン）。Pilot のパネル（#80）と言葉をそろえるときはここ
     static readonly Dictionary<string, (string word, string icon)> Facing = new Dictionary<string, (string, string)>
     {
-        { "earth", ("EARTH", "earth") }, { "moon", ("MOON", "moon") }, { "sun", ("SUN", "sun") },
-        { "burn", ("BURN", "ignition") }, { "heatshield", ("HEAT SHIELD", "heat_shield") },
+        { "earth", ("Earth", "earth") }, { "moon", ("Moon", "moon") }, { "sun", ("Sun", "sun") },
+        { "burn", ("Burn", "ignition") }, { "heatshield", ("Heat shield", "heat_shield") },
     };
-    const string LabelFacing = "FACING", LabelData = "DATA SENT";
+    const string LabelFacing = "Facing", LabelData = "Data sent";
     const string DataFormat = "{0} / {1}";           // 送った量 / 集めた量
     const string Legend = "Keep above the line";     // 生還ライン（ink の縦線）の説明
     const float Co2Scale = 100f;                     // SPEC 3章：co2 は 0〜100（reference_sim も 100 で止める）
@@ -83,7 +87,8 @@ public class StatusPanel : HudPart
     {
         public RowDef def;
         public RectTransform chip;
-        public Image tint, chipFace, chipIcon, statusIcon;
+        public UiIconDisc disc;
+        public Image tint, statusIcon;
         public TextMeshProUGUI chipText, name, word, value;
         public MiniGauge gauge;
         public Level level = (Level)(-1);
@@ -102,7 +107,7 @@ public class StatusPanel : HudPart
         panel = Ui.Rect("Panel", root);
         panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 1f);
         panel.anchoredPosition = Vector2.zero;
-        UiKit.Surface(panel, T.RadiusL, T.HudFace);   // 計器は暗い面（UiTokens の Hud*）
+        TimelineKit.GaugeFace(panel, T.RadiusL);   // 計器は暗い面（UiTokens の Hud*）。#190：blob_panel＋星の模様、影なし
         var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
         int pad = Mathf.RoundToInt(Look.Pad);
         vl.padding = new RectOffset(pad, pad, pad, pad);
@@ -125,21 +130,16 @@ public class StatusPanel : HudPart
         var le = Ui.Size(row, h: Look.RowSafeH); le.minHeight = Look.RowSafeH; r.size = le;
 
         // 注意・危険のときに行の後ろに敷く色（レイアウトの外）
-        r.tint = UiKit.Round(row, T.RadiusS, T.Clear, "Tint"); UiKit.Ignore(r.tint);
+        r.tint = UiKit.Round(row, T.RowRadius, T.Clear, "Tint"); UiKit.Ignore(r.tint);   // #190：材料の行の帯と同じ角丸 12
         var tr = r.tint.rectTransform; UiKit.Fill(tr);
         tr.offsetMin = new Vector2(-Look.TintPadX, -Look.TintPadY); tr.offsetMax = new Vector2(Look.TintPadX, Look.TintPadY);
 
-        // 左の円（アイコン。酸素はアイコンが無いので O₂ の文字。ガイドライン 4章）
-        r.chip = Ui.Rect("Chip", row); UiKit.Fixed(r.chip, Look.ChipD, Look.ChipD);
-        r.chipFace = UiKit.Pill(r.chip, T.Bg, Look.ChipD, "Face"); UiKit.Fill(r.chipFace.rectTransform);
-        if (d.icon != null)
+        // 左のアイコンの台（#190【01】。酸素はアイコンが無いので台に O₂ の文字。ガイドライン 4章）
+        r.disc = UiKit.Disc(row, d.icon, d.disc, Look.ChipD);
+        r.chip = r.disc.Root;
+        if (d.icon == null)
         {
-            r.chipIcon = UiKit.Icon(r.chip, d.icon, Look.ChipIcon, T.Ink);
-            UiKit.Center(r.chipIcon.rectTransform, Look.ChipIcon, Look.ChipIcon);
-        }
-        else
-        {
-            r.chipText = UiKit.Text(r.chip, d.chipText, TextStyle.Tag, T.Ink, TextAlignmentOptions.Center, false);
+            r.chipText = UiKit.Text(r.chip, d.chipText, TextStyle.Tag, T.Panel, TextAlignmentOptions.Center, false);
             UiKit.Fill(r.chipText.rectTransform);
         }
 
@@ -168,12 +168,12 @@ public class StatusPanel : HudPart
         var row = UiKit.Row(parent, T.S1, TextAnchor.MiddleLeft);
         row.name = "Info_" + label;
         Ui.Size(row, h: Look.InfoH).minHeight = Look.InfoH;
-        UiKit.Icon(row, icon, Look.InfoIcon, T.InkSub);
-        UiKit.Text(row, label, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+        UiKit.Icon(row, icon, Look.InfoIcon, T.HudSub);
+        UiKit.Text(row, label, TextStyle.Label, T.HudSub, TextAlignmentOptions.MidlineLeft);
         Ui.Size(UiKit.Space(row, 0f), flexW: 1f);
-        valueIcon = UiKit.Icon(row, null, Look.ValueIcon, T.Ink);
+        valueIcon = UiKit.Icon(row, null, Look.ValueIcon, T.HudText);
         valueIcon.gameObject.SetActive(false);
-        var v = UiKit.Text(row, "", TextStyle.Tag, T.Ink, TextAlignmentOptions.MidlineRight);
+        var v = UiKit.Text(row, "", TextStyle.Tag, T.HudText, TextAlignmentOptions.MidlineRight);
         return v;
     }
 
@@ -182,9 +182,9 @@ public class StatusPanel : HudPart
         var row = UiKit.Row(parent, T.S1, TextAnchor.MiddleLeft);
         row.name = "Legend";
         Ui.Size(row, h: Look.LegendH).minHeight = Look.LegendH;
-        var bar = UiKit.Round(row, Look.LineW * 0.5f, T.Ink, "Line");
+        var bar = UiKit.Round(row, Look.LineW * 0.5f, T.HudText, "Line");
         UiKit.Fixed(bar, Look.LineW, Look.LegendBarH);
-        UiKit.Text(row, Legend, TextStyle.Label, T.InkSub, TextAlignmentOptions.MidlineLeft);
+        UiKit.Text(row, Legend, TextStyle.Label, T.HudSub, TextAlignmentOptions.MidlineLeft);
     }
 
     // ================================================================== 状態を描く
@@ -259,7 +259,9 @@ public class StatusPanel : HudPart
         float m = Mathf.Max(max, 0.0001f);
         r.gauge.Set(Mathf.Clamp01(v / m), line >= 0f ? Mathf.Clamp01(line / m) : -1f, falling);
         r.value.text = text;
-        r.word.text = falling ? WordLeak : r.def.words[(int)lv];
+        string word = falling ? WordLeak : r.def.words[(int)lv];
+        if (word == "" && Learning) word = r.def.label;   // #189：練習・GET READY の間は、安全でも名前を出す
+        r.word.text = word;
         bool say = r.word.text != "";
         r.word.gameObject.SetActive(say);
         if (r.top.gameObject.activeSelf != say)
@@ -270,16 +272,16 @@ public class StatusPanel : HudPart
         }
     }
 
+    /// <summary>練習（practice）と GET READY（stir）の間。ゲージの名前を覚える時間（#189）</summary>
+    bool Learning => Ctx.Model.Phase == "practice" || Ctx.Model.Phase == "stir";
+
     void SetLevel(Row r, Level lv)
     {
         if (r.level == lv) return;
         r.level = lv;
         bool caution = lv == Level.Caution, danger = lv == Level.Danger;
-        Color face = danger ? T.Danger : caution ? T.Accent : T.Bg;
-        Color onFace = danger ? T.Panel : T.Ink;           // 危険の面には白、注意（オレンジ）と安全には ink
-        r.chipFace.color = face;
-        if (r.chipIcon != null) r.chipIcon.color = onFace;
-        if (r.chipText != null) r.chipText.color = onFace;
+        // #190：台の色で状態（注意＝accent、危険＝danger）。安全は行ごとの色。絵と O₂ はいつも白（色つきの台に白い絵【01】）
+        r.disc.Face.color = danger ? T.Danger : caution ? T.Accent : r.def.disc;
         r.tint.color = danger ? T.WithAlpha(T.Danger, Look.TintDanger) : caution ? T.WithAlpha(T.Accent, Look.TintCaution) : T.Clear;
         r.statusIcon.gameObject.SetActive(lv != Level.Safe);
         if (lv != Level.Safe) r.statusIcon.sprite = T.Icon(danger ? "danger" : "caution");
@@ -294,7 +296,7 @@ public class StatusPanel : HudPart
     void SetFacing(string attitude)
     {
         if (facingText == null) return;
-        if (!Facing.TryGetValue(attitude ?? "", out var f)) f = (attitude?.ToUpperInvariant() ?? "", null);
+        if (!Facing.TryGetValue(attitude ?? "", out var f)) f = (attitude ?? "", null);
         facingText.text = f.word;
         var sp = f.icon != null ? T.Icon(f.icon) : null;
         facingIcon.sprite = sp;
@@ -409,7 +411,7 @@ public class StatusPanel : HudPart
             line.sizeDelta = new Vector2(Look.LineW, Look.GaugeH + Look.LineOver * 2f);
             line.gameObject.SetActive(false);
 
-            var cs = T.Theme != null ? T.Theme.caretDown : null;
+            var cs = T.Art(T.CaretSoft) ?? (T.Theme != null ? T.Theme.caretDown : null);   // #190：角の丸い ▼（【12】）
             var ci = UiKit.Shape(track, cs, T.HudText, 0f, "Caret");
             caret = ci.rectTransform;
             caret.anchorMin = caret.anchorMax = new Vector2(0f, 0.5f); caret.pivot = new Vector2(0f, 0.5f);
