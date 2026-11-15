@@ -3,7 +3,7 @@
 書いた人：Taiga（作成：Fable 5.2）／ 最終更新：2026-11-15
 
   modeling/core/run.sh modeling/fx/render_seat_monitor.py
-出力（modeling/fx/renders/、1600×1000 と 320px 版）：
+出力（modeling/fx/renders/、960×600 と 320px 版）：
   seat_monitor_room_cutaway.png        横からの断面 15°（今の Slot_Cam_Cutaway）。4席とも入る
   seat_monitor_room_topdown.png        見下ろし 50°・席に寄せる（今のゲームのカメラ）
   seat_monitor_room_shoulder_<席>.png  肩ごしのカメラ（#167 の「近い三人称」の案）。Pilot（端の席）と LifeSupport（まん中の席）
@@ -22,6 +22,7 @@ import render_check as rc
 import render_assembled as asm
 
 OUT = os.path.join(_export.MODELING, "fx", "renders")
+asm.RES = (960, 600)      # 容量の上限（check.py の合計 30MB）に収めるため、組み立て図より小さく撮る
 # 肩ごしのカメラ（コンソールのローカル座標、m）：位置と、見る点。縦の画角は FOV_SHOULDER
 SHOULDER = {"pos": (0.55, -2.05, 1.55), "look": (0.0, 0.28, 1.20)}
 FOV_SHOULDER = math.radians(42)

@@ -4,7 +4,7 @@
 
   modeling/core/run.sh modeling/fx/build_seat_monitor.py
 出力：unity/Assets/Models/Fx/Fx_SeatMonitor_<席>.fbx、modeling/fx/export/、modeling/fx/renders/
-      （各席の3枚＋320px 版、一覧 seat_monitor_lineup.png）
+      （Pilot の3枚＋320px 版、4席の一覧 seat_monitor_lineup.png。船室に置いた図は render_seat_monitor.py）
 
 ねらい（#167）：酸素・電力などの数値を、画面の上の表示（HUD）ではなく、船内の計器で読む。
   今の壁の画面（0.54×0.30m）とコンソールの板の画面（0.30×0.18m）は、数字を読ませるには小さい。
@@ -20,8 +20,8 @@
   MonScreen    画面（teal、0.80×0.50m）。独立した部品。名前が MonScreen で始まるので Unity の ScreenGlow が光らせる
   Lamp_Green / Lamp_Yellow / Lamp_Red   下の帯の状態ランプ（安全・注意・危険）。Unity の LampGlow で光らせる
   Stand        床に立つ柱＋足＋画面を支える腕（gray・gray_dark）＋席の色の輪
-  Slot_Screen  画面のまん中（画面の表の面の上）。ローカル +Z＝画面の法線（見る人の側）、+X＝右、+Y＝上。
-               world-space の Canvas をここに置く（幅 0.80m・高さ 0.50m）
+  Slot_Screen  画面のまん中（画面の表の面の上）。Unity では、ローカル +X＝見る人から見て右、+Y＝画面の上、+Z＝画面の奥。
+               world-space の Canvas を、この子に位置0・回転0 で置く（幅 0.80m・高さ 0.50m）。表が見る人を向く
 """
 import sys, os, math
 sys.dont_write_bytecode = True
@@ -93,9 +93,10 @@ def build(name, color, shift):
              ck.box("Collar", (shift, POLE_Y, 1.02), (POLE_T + 0.03, POLE_T + 0.03, 0.06), color, bevel=0.012)]
     ck.join(stand, "Stand")
 
-    # 画面のまん中（表の面の上）。+Z＝法線（見る人の側）、+X＝右、+Y＝上
+    # 画面のまん中（表の面の上）。Unity に入れたとき、ローカル +X＝見る人から見て右、+Y＝画面の上、+Z＝画面の奥（見る人の視線の向き）
+    # になる向き（Blender では Z まわり 180° ＋画面の傾き）。Unity の world-space の Canvas を回転0 の子に置けば、表が見る人を向く
     sl = ck.slot("Slot_Screen", M @ Matrix.Translation((0, front - 0.019, SCREEN_UP)).translation)
-    sl.rotation_euler = (math.radians(90) - TILT, 0, 0)
+    sl.rotation_euler = (Matrix.Rotation(-TILT, 4, "X") @ Matrix.Rotation(math.pi, 4, "Z")).to_euler()
     ck.end_asset()
     return root
 
@@ -133,7 +134,8 @@ if __name__ == "__main__":
             o.hide_render = True
         root = build(name, color, shift)
         ck.export_all(root, KIND)
-        ck.render_check(root, KIND)
+        if not roots:                             # 単体の3枚は1席分だけ（4席は色とずらす量が違うだけ。容量の上限 30MB のため。4席は一覧で見る）
+            ck.render_check(root, KIND)
         print(f"[build] {name}: {ck.tri_count(root)} 三角")
         roots.append(root)
     for o in bpy.data.objects:
