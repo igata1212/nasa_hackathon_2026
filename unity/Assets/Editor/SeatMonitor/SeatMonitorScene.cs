@@ -18,8 +18,8 @@ public static class SeatMonitorScene
     const string ModelFormat = "Assets/Models/Fx/Fx_SeatMonitor_{0}.fbx";
     static readonly string[] SeatNames = { "Pilot", "LifeSupport", "CommsPower", "MissionPlanner" };
     static readonly string[] SeatIds = { Seats.Pilot, Seats.Life, Seats.Comms, Seats.Planner };
-    // 肩ごしのカメラを置く側（モニターのローカル X の符号）。端の席は部屋の奥が背景に入る側、まん中の席は画面をずらした側と反対
-    static readonly float[] CameraSide = { 1f, -1f, 1f, -1f };
+    // 肩ごしのカメラを置く側（モニターのローカル X の符号）。まん中の2席は画面をずらした側と同じ（頭をはさまない）
+    static readonly float[] CameraSide = { 1f, 1f, -1f, -1f };
 
     [MenuItem("Tools/SeatMonitor/計器モニターを置く")]
     public static void BuildMenu()

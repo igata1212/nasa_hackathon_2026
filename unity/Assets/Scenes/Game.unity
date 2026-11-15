@@ -23933,19 +23933,19 @@ MonoBehaviour:
   - seat: life_support
     monitor: {fileID: 113547829}
     screen: {fileID: 113547827}
-    side: -1
+    side: 1
   - seat: comms_power
     monitor: {fileID: 1258131718}
     screen: {fileID: 1258131716}
-    side: 1
+    side: -1
   - seat: mission_planner
     monitor: {fileID: 2114374761}
     screen: {fileID: 2114374759}
     side: -1
   seatViewOnStart: 1
-  cameraOffset: {x: 0.95, y: 1.95, z: 1.45}
-  lookDown: 0.12
-  fieldOfView: 40
+  cameraOffset: {x: 0.3, y: 1.85, z: 0.95}
+  lookDown: 0.23
+  fieldOfView: 50
   moveSpeed: 6
   closeCabin: 1
   enclosure:
