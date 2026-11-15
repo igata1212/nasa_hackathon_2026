@@ -1,10 +1,11 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#190 地の大きな柄）
 // タイトルのやわらかく動く背景（#153）。クリームの地の上に、奥から順に：
+//   0. 地の大きな柄（#190。【09】の端の大きな柄の置き方）：左上に三日月、右上に輪のある惑星、左右の端に大きな星。bgDeep の1色（Motifs。ほかの明るい画面でも使える）
 //   1. 細かい模様（点と小さな星を並べた1マス）が斜めにゆっくり流れる
 //   2. またたく星（オレンジと薄い濃紺。大きさが呼吸する）
 //   3. ときどき空を横切る小さなロケット（点の尾つき）
 //   4. 下の丸い地球（大気の輪・陸がゆっくり回る）と、その前を流れる雲
-// 形はすべて UiDisc（頂点で描く円と星）と、実行時に描く模様の画像（UiShapes）。値は TitleLook。押す所は無い（raycastTarget なし）
+// 形はすべて UiDisc（頂点で描く円と星）・UiRing（輪）と、実行時に描く模様の画像（UiShapes）。値は TitleLook。押す所は無い（raycastTarget なし）
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,6 +33,9 @@ public class TitleBackdrop : MonoBehaviour
         var b = area.gameObject.AddComponent<TitleBackdrop>();
         b.area = area;
         var rnd = new System.Random(L.StarSeed);
+
+        // 0. 地の大きな柄
+        Motifs(area);
 
         // 1. 模様
         b.pattern = Ui.Rect("Pattern", area).gameObject.AddComponent<RawImage>();
@@ -112,6 +116,49 @@ public class TitleBackdrop : MonoBehaviour
         }
         b.start = UiEase.Now;
         return b;
+    }
+
+    /// <summary>地の大きな柄（#190。【09】の画面の端の大きな柄の置き方）を parent いっぱいの層に置く。左上に三日月、右上に輪のある惑星、
+    /// 左右の端の中ほどに大きな星。色は bgDeep の1色（欠けとすき間は地の色 bg で切る。地が bg の画面で使う）。押せない。層を返す</summary>
+    public static RectTransform Motifs(RectTransform parent)
+    {
+        var layer = Ui.Rect("Motifs", parent); UiKit.Fill(layer);
+        Color c = L.MotifColor, cut = L.MotifCut;
+        int seg = L.MotifSegments;
+
+        // 三日月：丸から、右上へずらした地の色の丸で欠けさせる
+        var moon = Spot(layer, new Vector2(0f, 1f), L.MoonAt, L.MoonTilt, "Moon");
+        UiDisc.Add(moon, UiDisc.Shape.Disc, c, L.MoonD, "Disc", seg);
+        var bite = UiDisc.Add(moon, UiDisc.Shape.Disc, cut, L.MoonD * L.MoonCutScale, "Cut", seg);
+        bite.rectTransform.anchoredPosition = L.MoonCutOffset * L.MoonD;
+
+        // 輪のある惑星：奥の輪（上半分）→ 惑星 → 手前の輪のすき間（地の色）→ 手前の輪（下半分）
+        var planet = Spot(layer, new Vector2(1f, 1f), L.PlanetAt, L.PlanetTilt, "Planet");
+        float r = L.PlanetD * 0.5f;
+        Vector2 ro = L.RingOuter * r, ri = L.RingInner * r, g = Vector2.one * L.RingGap;
+        UiRing.Add(planet, c, ro, ri, 0f, 180f, "RingBack");
+        UiDisc.Add(planet, UiDisc.Shape.Disc, c, L.PlanetD, "Disc", seg);
+        UiRing.Add(planet, cut, ro + g, ri - g, 200f, 340f, "RingGap");
+        UiRing.Add(planet, c, ro, ri, 180f, 360f, "RingFront");
+
+        // 大きな星
+        for (int i = 0; i < L.BigStars.Length && i < L.BigStarsAt.Length; i++)
+        {
+            var st = L.BigStars[i];
+            var s = Spot(layer, new Vector2(st.x, st.y), L.BigStarsAt[i], st.w, "BigStar");
+            UiDisc.Add(s, UiDisc.Shape.Sparkle, c, st.z, "Star", 48);
+        }
+        return layer;
+    }
+
+    /// <summary>柄の置き場（大きさ 0、anchor からの px、傾き）</summary>
+    static RectTransform Spot(RectTransform p, Vector2 anchor, Vector2 at, float deg, string name)
+    {
+        var r = Ui.Rect(name, p);
+        r.anchorMin = r.anchorMax = anchor; r.pivot = new Vector2(0.5f, 0.5f);
+        r.sizeDelta = Vector2.zero; r.anchoredPosition = at;
+        r.localRotation = Quaternion.Euler(0f, 0f, deg);
+        return r;
     }
 
     /// <summary>雲：横長の丸の上に、大小の丸を2つ（同じ色で重ねて1つの形に見せる）</summary>
