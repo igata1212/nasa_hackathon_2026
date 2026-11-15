@@ -171,8 +171,7 @@ public class UiCursor : MonoBehaviour
     {
         if (target == Target && dir == Dir && (target == null) == !hand.gameObject.activeSelf) return;
         Target = target; Dir = dir;
-        hand.localRotation = Quaternion.Euler(0f, 0f, dir == CursorDir.UpLeft ? 135f : 0f);
-        hand.localScale = new Vector3(1f, dir == CursorDir.UpLeft ? -1f : 1f, 1f);
+        hand.localRotation = Quaternion.Euler(0f, 0f, dir == CursorDir.UpLeft ? 135f : 0f);   // 左上向きは Z = 135（art/ui/README.md）
         if (target == null) { hand.gameObject.SetActive(false); placed = false; return; }
         from = shown; moveT = placed ? 0f : 1f;
         rt.SetAsLastSibling();

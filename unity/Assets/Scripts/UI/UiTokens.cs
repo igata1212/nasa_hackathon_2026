@@ -73,6 +73,9 @@ public static class UiTokens
     public const float RibbonH = 80;                            // 見出しの帯
     public const float StripeAlpha = 0.35f;                     // 主ボタンの縞（GoLight の 35%）
     public const float BandH = 64;                              // パネルの中の横縞の周期
+    public const float PanelCorner = 72;                        // blob_panel の縁を何 px に描くか（sprite の border 72 ＝ Multiplier 1）
+    public const float ChoiceCorner = 116;                      // 選択肢の吹き出しは Multiplier 0.62（72 ÷ 0.62。art/ui/README.md）
+    public const float BubbleCornerX = 120;                     // blob_bubble の縁（border 左右 120・上下 96 ＝ Multiplier 1）
 
     // ------------------------------------------------------------------ 余白（8 の倍数）
     public const float S1 = 8, S2 = 16, S3 = 24, S4 = 32;
@@ -220,12 +223,29 @@ public static class UiTokens
             if (f != null && typeof(TA).IsAssignableFrom(f.FieldType)) found = f.GetValue(th) as TA;
         }
 #if UNITY_EDITOR
-        if (found == null && typeof(TA) == typeof(Sprite))
-            found = UnityEditor.AssetDatabase.LoadAssetAtPath<TA>("Assets/Art/UI/Sprites/" + name + ".png");
+        if (found == null && typeof(TA) == typeof(Sprite)) found = EditorSprite(name) as TA;
 #endif
         if (found != null || Application.isPlaying) art[name] = found;   // 編集中は見つかるまで探し直す
         return found;
     }
+
+#if UNITY_EDITOR
+    /// <summary>エディタだけ：UiTheme に未登録でも Art/UI/Sprites/&lt;名前&gt;.png を読む。Sprite として読み込まれていなければ、
+    /// テクスチャから art/ui/README.md の border で作る（ビルドには入らない。ビルドには UiAssets で UiTheme に登録する）</summary>
+    static Sprite EditorSprite(string name)
+    {
+        string path = "Assets/Art/UI/Sprites/" + name + ".png";
+        var sp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        if (sp != null) return sp;
+        var tex = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        if (tex == null) return null;
+        Vector4 border = name == BlobBubble ? new Vector4(120, 96, 120, 96) : name == BlobPanel ? new Vector4(72, 72, 72, 72)
+            : name == BlobPill ? new Vector4(48, 0, 48, 0) : Vector4.zero;   // 左・下・右・上
+        sp = UnityEngine.Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, border);
+        sp.name = name;
+        return sp;
+    }
+#endif
 
     static string Camel(string snake)
     {

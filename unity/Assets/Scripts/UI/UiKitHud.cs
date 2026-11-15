@@ -1,4 +1,4 @@
-// 書いた人：iizuka（作成：Claude Opus 5.5）／ 最終更新：2026-11-14
+// 書いた人：iizuka（作成：Claude Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#190 影をやめ、明るい面の文字を text に、吹き出しを blob_bubble に）
 // HUD の部品（#71 の残り。UI ガイドライン 3章）：ゲージ・トグル・長押しボタン・カウントダウン・警告の帯・吹き出し・席タブ・同時押しの合図。
 // UiKit.cs と同じ作り（コードで組む UGUI ＋ TextMeshPro。色と大きさは UiTokens だけ）。UiKit.cs は変えない。
 // 状態は色だけで伝えない：安全＝go／注意＝accent＋caution のアイコン／危険＝danger＋danger のアイコン＋斜めの縞（#109）。
@@ -93,11 +93,11 @@ public class UiToggle
         var sr = State.rectTransform;
         sr.sizeDelta = new Vector2(right - left, T.ToggleH);
         sr.anchoredPosition = new Vector2((On ? 1f : -1f) * (left + right) * 0.5f, 0f);
-        State.text = On ? "ON" : "OFF";
-        Face.color = !Enabled ? T.Line : On ? T.Go : T.InkSub;
-        State.color = Enabled ? T.Panel : T.InkSub;
+        State.text = On ? "On" : "Off";
+        Face.color = !Enabled ? T.Line : On ? T.Go : T.TextSoft;
+        State.color = Enabled ? T.Panel : T.TextSoft;
         KnobIcon.enabled = !Enabled;
-        Label.color = Enabled ? T.Ink : T.InkSub;
+        Label.color = Enabled ? T.Text : T.TextSoft;
         if (Icon != null) Icon.color = Label.color;
     }
 
@@ -137,8 +137,8 @@ public class UiHoldButton
         EndFlash();
         Face.color = on ? faceOn : T.Line;
         Icon.sprite = on ? iconOn : T.Icon("lock");
-        Icon.color = on ? T.Ink : T.InkSub;
-        if (Label != null) Label.color = on ? T.Ink : T.InkSub;
+        Icon.color = on ? T.Text : T.TextSoft;
+        if (Label != null) Label.color = on ? T.Text : T.TextSoft;
         bool need = !on && needIcon != null;
         Need.gameObject.SetActive(need);
         if (need) NeedIcon.sprite = T.Icon(needIcon);
@@ -248,7 +248,7 @@ public class UiBanner
         Root.gameObject.SetActive(top != null);
         if (top == null) { Current = null; return; }
         bool danger = top.level == HudLevel.Danger;
-        Color fg = danger ? T.Panel : T.Ink;
+        Color fg = danger ? T.Panel : T.Text;
         Face.color = danger ? T.Danger : T.Accent;
         Icon.sprite = T.Icon(danger ? "danger" : "caution"); Icon.color = fg;
         Text.text = top.text; Text.color = fg;
@@ -286,8 +286,10 @@ public class UiBubble
         TagIcon.gameObject.SetActive(critical);
         Text.text = text;
         var face = Text.font.faceInfo;
-        float lineH = Text.fontSize * face.lineHeight / face.pointSize;
+        float lineH = Text.fontSize * Mathf.Max(T.TalkLineHeight, face.lineHeight / face.pointSize);
         float h = Mathf.Min(Text.GetPreferredValues(text, width - T.BubblePadX * 2f, 0f).y, lineH * T.BubbleMaxLines);
+        // 短い1行は中央、2行以上は左寄せ（【02】【12】）
+        Text.alignment = Text.GetPreferredValues(text).x <= width - T.BubblePadX * 2f ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft;
         textSize.preferredHeight = h; textSize.minHeight = h;
     }
 
@@ -298,7 +300,7 @@ public class UiBubble
         if (!Caret.gameObject.activeSelf) return;
         bobT = (bobT + dt) % T.CaretPeriod;
         float k = 0.5f - 0.5f * Mathf.Cos(bobT / T.CaretPeriod * Mathf.PI * 2f);
-        Caret.rectTransform.anchoredPosition = new Vector2(0f, T.CaretY + T.CaretBob * (1f - k));
+        Caret.rectTransform.anchoredPosition = new Vector2(0f, -T.CaretH * 0.5f + T.CaretBob * (1f - k));   // #190 縁に半分かぶせる
     }
 }
 
@@ -354,9 +356,9 @@ public class UiSeatTabs
         {
             bool on = t.Seat == seat;
             t.Shadow.enabled = on;
-            t.Frame.color = on ? T.Ink : T.Line;
+            t.Frame.color = on ? T.Text : T.Line;
             t.Face.color = on ? T.Panel : T.Bg;
-            t.Label.color = on ? T.Ink : T.InkSub;
+            t.Label.color = on ? T.Text : T.TextSoft;
         }
         if (notify && changed && seat != null) OnSelect?.Invoke(seat);
     }
@@ -377,7 +379,7 @@ public class UiSeatTabs
 public class UiDualPress
 {
     public enum Phase { Idle, Waiting, Together, Failed }
-    public const string TitleIdle = "HOLD TOGETHER", TitleTogether = "TOGETHER!", TitleFailed = "MISSED. TRY AGAIN";
+    public const string TitleIdle = "Hold together", TitleTogether = "Together!", TitleFailed = "Missed. Try again";
 
     public RectTransform Root, Row;
     public Image CmdIcon, StateIcon;
@@ -425,7 +427,7 @@ public class UiDualPress
     {
         State = Phase.Idle;
         foreach (var s in slots) { s.pressing = false; Paint(s, 0f, T.Go, false); }
-        SetTitle(TitleIdle, null, T.Ink);
+        SetTitle(TitleIdle, null, T.Text);
     }
 
     /// <summary>pressed の席が押した。輪が windowSec で一周する（0 なら最初から一周）</summary>
@@ -566,19 +568,15 @@ public static class HudKit
     /// <summary>影つきのピルの面を root いっぱいに敷く（レイアウトの外）</summary>
     static Image PillFace(RectTransform root, float h, Color face, bool shadow)
     {
-        if (shadow)
-        {
-            var sh = UiKit.Pill(root, T.Shadow, h, "Shadow"); UiKit.Fill(sh.rectTransform); UiKit.Ignore(sh);
-            sh.rectTransform.offsetMin = new Vector2(0f, -T.ShadowY); sh.rectTransform.offsetMax = new Vector2(0f, -T.ShadowY);
-        }
-        var f = UiKit.Pill(root, face, h, "Face"); UiKit.Fill(f.rectTransform); UiKit.Ignore(f);
+        // #190 影はやめた（shadow は呼び出しの形のために残す）。面は blob_pill
+        var f = UiKit.Blob(root, T.BlobPill, face, h * 0.5f, "Face"); UiKit.Fill(f.rectTransform); UiKit.Ignore(f);
         return f;
     }
 
     /// <summary>右上の小さな印（ink の丸に panel のアイコン 24）</summary>
     static RectTransform Mark(RectTransform body, out Image icon)
     {
-        var disc = Disc(body, T.Ink, T.MarkD, "Mark");
+        var disc = Disc(body, T.Text, T.MarkD, "Mark");
         var r = disc.rectTransform;
         r.anchorMin = r.anchorMax = Vector2.one; r.anchoredPosition = new Vector2(-T.S1, -T.S1);
         icon = UiKit.Icon(r, null, T.IconS, T.Panel);
@@ -625,11 +623,11 @@ public static class HudKit
         Ui.Size(g.Root, w: T.GaugeW, flexW: 1f);
         if (icon == null)
         {
-            var chip = UiKit.Pill(g.Root, T.Ink, T.IconM, "Symbol"); UiKit.Fixed(chip, T.IconM, T.IconM);
+            var chip = UiKit.Pill(g.Root, T.Text, T.IconM, "Symbol"); UiKit.Fixed(chip, T.IconM, T.IconM);
             g.Symbol = UiKit.Text(chip.transform, symbol, TextStyle.Tag, T.Panel, TextAlignmentOptions.Center, false);
             UiKit.Fill(g.Symbol.rectTransform);
         }
-        else g.Icon = UiKit.Icon(g.Root, icon, T.IconM, T.Ink);
+        else g.Icon = UiKit.Icon(g.Root, icon, T.IconM, T.Text);
 
         var box = Ui.Rect("Track", g.Root);
         var le = Ui.Size(box, h: T.GaugeH + T.LifelineOver * 2f, flexW: 1f);
@@ -641,11 +639,11 @@ public static class HudKit
         g.Stripes = st.gameObject.AddComponent<Image>();
         g.Stripes.sprite = T.Theme.stripes; g.Stripes.type = Image.Type.Tiled; g.Stripes.color = T.Panel; g.Stripes.raycastTarget = false;
         UiKit.Fill(st);
-        g.Lifeline = UiKit.Pill(g.Groove.transform, T.Ink, T.LifelineW, "Lifeline");
+        g.Lifeline = UiKit.Pill(g.Groove.transform, T.Text, T.LifelineW, "Lifeline");
 
-        g.Number = UiKit.Text(g.Root, "", TextStyle.Number, T.Ink, TextAlignmentOptions.MidlineRight);
+        g.Number = UiKit.Text(g.Root, "", TextStyle.Number, T.Text, TextAlignmentOptions.MidlineRight);
         UiKit.Fixed(g.Number, T.GaugeNumberW, T.TextNumber * T.HeadingLineHeight);
-        g.Status = UiKit.Icon(g.Root, null, T.IconM, T.Ink);
+        g.Status = UiKit.Icon(g.Root, null, T.IconM, T.Text);
         g.Set(0f, HudLevel.Safe, "");
         g.SetLine(-1f);
         return g;
@@ -659,20 +657,18 @@ public static class HudKit
         t.Root.name = "Toggle_" + label;
         HitArea(t.Root);
         var le = Ui.Size(t.Root, h: T.Hit); le.minHeight = T.Hit;
-        if (icon != null) t.Icon = UiKit.Icon(t.Root, icon, T.IconM, T.Ink);
-        t.Label = UiKit.Text(t.Root, label, TextStyle.Sub, T.Ink, TextAlignmentOptions.MidlineLeft);
+        if (icon != null) t.Icon = UiKit.Icon(t.Root, icon, T.IconM, T.Text);
+        t.Label = UiKit.Text(t.Root, label, TextStyle.Sub, T.Text, TextAlignmentOptions.MidlineLeft);
         Ui.Size(t.Label, flexW: 1f);
 
         var sw = Ui.Rect("Switch", t.Root); UiKit.Fixed(sw, T.ToggleW, T.ToggleH);
-        var sh = UiKit.Pill(sw, T.Shadow, T.ToggleH, "Shadow"); UiKit.Fill(sh.rectTransform);
-        sh.rectTransform.offsetMin = new Vector2(0f, -T.ShadowY); sh.rectTransform.offsetMax = new Vector2(0f, -T.ShadowY);
         t.Body = Ui.Rect("Body", sw); UiKit.Fill(t.Body);
         t.Face = UiKit.Pill(t.Body, T.Go, T.ToggleH, "Face"); UiKit.Fill(t.Face.rectTransform);
         t.State = UiKit.Text(t.Body, "", TextStyle.Tag, T.Panel, TextAlignmentOptions.Center, false);
         UiKit.Center(t.State.rectTransform, T.ToggleW, T.ToggleH);
         t.Knob = Ui.Rect("Knob", t.Body); UiKit.Center(t.Knob, T.ToggleKnob, T.ToggleKnob);
         t.KnobFace = UiKit.Pill(t.Knob, T.Panel, T.ToggleKnob, "Face"); UiKit.Fill(t.KnobFace.rectTransform);
-        t.KnobIcon = UiKit.Icon(t.Knob, "lock", T.IconS, T.InkSub); UiKit.Center(t.KnobIcon.rectTransform, T.IconS, T.IconS);
+        t.KnobIcon = UiKit.Icon(t.Knob, "lock", T.IconS, T.TextSoft); UiKit.Center(t.KnobIcon.rectTransform, T.IconS, T.IconS);
 
         t.Button = AddButton(t.Root.gameObject, t.Face);
         t.Button.onClick.AddListener(t.Click);
@@ -693,18 +689,16 @@ public static class HudKit
         b.Root.sizeDelta = new Vector2(ring, ring + labelH);
         HitArea(b.Root);
 
-        var sh = Disc(b.Root, T.Shadow, ring, "Shadow"); Top(sh.rectTransform, ring, ring);
-        sh.rectTransform.anchoredPosition = new Vector2(0f, -T.ShadowY);
         b.Body = Ui.Rect("Body", b.Root); Top(b.Body, ring, ring);
         b.Track = Disc(b.Body, T.Line, ring, "Track");
         b.Ring = Disc(b.Body, T.Go, ring, "Ring", true);
         b.Face = Disc(b.Body, b.faceOn, T.HoldD, "Face");
-        b.Icon = UiKit.Icon(b.Body, icon, T.IconInButton, T.Ink); UiKit.Center(b.Icon.rectTransform, T.IconInButton, T.IconInButton);
+        b.Icon = UiKit.Icon(b.Body, icon, T.IconInButton, T.Text); UiKit.Center(b.Icon.rectTransform, T.IconInButton, T.IconInButton);
         b.iconOn = b.Icon.sprite;
         b.Need = Mark(b.Body, out b.NeedIcon).GetComponent<Image>();
         if (label != null)
         {
-            b.Label = UiKit.Text(b.Root, label, TextStyle.Label, T.Ink);
+            b.Label = UiKit.Text(b.Root, label, TextStyle.Label, T.Text);
             var lr = b.Label.rectTransform;
             lr.anchorMin = Vector2.zero; lr.anchorMax = new Vector2(1f, 0f); lr.pivot = new Vector2(0.5f, 0f);
             lr.sizeDelta = new Vector2(0f, labelH - T.S1); lr.anchoredPosition = Vector2.zero;
@@ -756,7 +750,7 @@ public static class HudKit
         b.More = UiKit.Row(b.Root, 0f, TextAnchor.MiddleCenter, T.S2);
         b.More.name = "More";
         b.MoreFace = UiKit.Pill(b.More, T.Panel, T.TagH, "Face"); UiKit.Fill(b.MoreFace.rectTransform); UiKit.Ignore(b.MoreFace);
-        b.MoreText = UiKit.Text(b.More, "", TextStyle.Tag, T.Ink);
+        b.MoreText = UiKit.Text(b.More, "", TextStyle.Tag, T.Text);
         var mle = Ui.Size(b.More, h: T.TagH); mle.minHeight = T.TagH;
 
         UiTick.On(b.Root.gameObject, b.Tick);
@@ -765,7 +759,7 @@ public static class HudKit
     }
 
     // ------------------------------------------------------------------ 吹き出し
-    /// <summary>幅 width（既定 880）。高さは文に合わせて 150〜200。置き場所は呼ぶ側で決める（pivot は下の中央）</summary>
+    /// <summary>会話の吹き出し（blob_bubble・影としっぽなし・文字 36 行間 1.5）。幅 width（既定 1040。船内は T.BubbleWCabin）。高さは文に合わせる。置き場所は呼ぶ側で決める（pivot は下の中央）</summary>
     public static UiBubble Bubble(Transform p, float width = T.BubbleW)
     {
         var u = new UiBubble { width = width };
@@ -780,9 +774,14 @@ public static class HudKit
         l.childForceExpandWidth = true; l.childForceExpandHeight = false;
         var le = Ui.Size(u.Root, w: width); le.minWidth = width; le.minHeight = T.BubbleMinH; le.flexibleWidth = 0f;
         u.Root.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        UiKit.Surface(u.Root, T.RadiusL, T.Panel);
+        var bf = UiKit.Blob(u.Root, T.BlobBubble, T.Panel, T.BubbleCornerX, "Face"); UiKit.Fill(bf.rectTransform); UiKit.Ignore(bf);
 
-        u.Text = UiKit.Text(u.Root, "", TextStyle.Body, T.Ink, TextAlignmentOptions.MidlineLeft, false);
+        u.Text = UiKit.Text(u.Root, "", TextStyle.Talk, T.Text, TextAlignmentOptions.MidlineLeft, false);
+        if (u.Text.font != null)
+        {
+            var fi = u.Text.font.faceInfo;   // 行間 1.5（TMP の lineSpacing は字の 1/100 単位で足す）
+            u.Text.lineSpacing = Mathf.Max(0f, (T.TalkLineHeight - fi.lineHeight / fi.pointSize) * 100f);
+        }
         u.Text.textWrappingMode = TextWrappingModes.Normal;
         u.Text.overflowMode = TextOverflowModes.Ellipsis;
         u.Text.maxVisibleLines = T.BubbleMaxLines;
@@ -794,23 +793,24 @@ public static class HudKit
         UiKit.Ignore(u.Tag);
         u.Tag.anchorMin = u.Tag.anchorMax = new Vector2(0f, 1f); u.Tag.pivot = new Vector2(0f, 0.5f);
         u.Tag.anchoredPosition = new Vector2(T.BubblePadX, 0f);
-        u.Tag.localEulerAngles = new Vector3(0f, 0f, T.BubbleTagTilt);
+        u.Tag.localEulerAngles = new Vector3(0f, 0f, T.NameTagTilt);
         var tfit = u.Tag.gameObject.AddComponent<ContentSizeFitter>();
         tfit.horizontalFit = tfit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        var tle = Ui.Size(u.Tag, h: T.TagH); tle.minHeight = T.TagH;
-        u.TagFace = UiKit.Pill(u.Tag, T.Go, T.TagH, "Face"); UiKit.Fill(u.TagFace.rectTransform); UiKit.Ignore(u.TagFace);
+        var tle = Ui.Size(u.Tag, h: T.NameTagH); tle.minHeight = T.NameTagH;
+        u.TagFace = UiKit.Blob(u.Tag, T.BlobPill, T.Go, T.NameTagH * 0.5f, "Face"); UiKit.Fill(u.TagFace.rectTransform); UiKit.Ignore(u.TagFace);
         u.TagIcon = UiKit.Icon(u.Tag, "danger", T.IconS, T.Panel);
         u.Name = UiKit.Text(u.Tag, "", TextStyle.Tag, T.Panel);
+        u.Name.fontSize = T.TextHint;
 
         // ▼：下の中央で上下に揺れる
-        u.Caret = UiKit.Shape(u.Root, T.Theme.caretDown, T.Accent, 0f, "Caret");
+        u.Caret = UiKit.Shape(u.Root, T.Art(T.CaretSoft) ?? T.Theme.caretDown, T.Accent, 0f, "Caret");
         UiKit.Ignore(u.Caret);
         var cr = u.Caret.rectTransform;
         cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0f); cr.pivot = new Vector2(0.5f, 0f);
-        cr.sizeDelta = new Vector2(T.CaretW, T.CaretH); cr.anchoredPosition = new Vector2(0f, T.CaretY);
+        cr.sizeDelta = new Vector2(T.CaretW, T.CaretH); cr.anchoredPosition = new Vector2(0f, -T.CaretH * 0.5f);
 
         UiTick.On(u.Root.gameObject, u.Tick);
-        u.Set("HOUSTON", "");
+        u.Set("Houston", "");
         return u;
     }
 
@@ -830,16 +830,15 @@ public static class HudKit
     {
         root = Ui.Rect("Tab_" + seat, owner.Root);
         HitArea(root);
-        shadow = UiKit.Pill(root, T.Shadow, T.TabH, "Shadow"); UiKit.MiddleBand(shadow.rectTransform, T.TabH);
-        shadow.rectTransform.anchoredPosition = new Vector2(0f, -T.ShadowY);
+        shadow = UiKit.Pill(root, T.Clear, T.TabH, "Shadow"); UiKit.MiddleBand(shadow.rectTransform, T.TabH);   // #190 影なし（欄は残す）
         body = Ui.Rect("Body", root); UiKit.MiddleBand(body, T.TabH);
-        frame = UiKit.Pill(body, T.Ink, T.TabH, "Frame"); UiKit.Fill(frame.rectTransform);
+        frame = UiKit.Pill(body, T.Text, T.TabH, "Frame"); UiKit.Fill(frame.rectTransform);
         face = UiKit.Pill(body, T.Panel, T.TabH - T.Border * 2f, "Face"); UiKit.Fill(face.rectTransform, T.Border);
 
         var row = UiKit.Row(body, T.S2, TextAnchor.MiddleLeft); UiKit.Fill(row);
         row.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(Mathf.RoundToInt(T.S1), Mathf.RoundToInt(T.S3), 0, 0);
         badge = UiKit.SeatBadge(row, seat, T.BadgeS);
-        label = UiKit.Text(row, Seats.Title(seat), TextStyle.Tag, T.Ink);
+        label = UiKit.Text(row, Seats.Title(seat), TextStyle.Tag, T.Text);
         mark = Mark(body, out markIcon);
 
         var btn = AddButton(root.gameObject, face);
@@ -860,8 +859,8 @@ public static class HudKit
         var fit = u.Root.gameObject.AddComponent<ContentSizeFitter>();
         fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         var head = UiKit.Row(u.Root, T.S2, TextAnchor.MiddleCenter);
-        u.CmdIcon = UiKit.Icon(head, cmdIcon, T.IconM, T.Ink);
-        u.Title = UiKit.Text(head, "", TextStyle.Sub, T.Ink);
+        u.CmdIcon = UiKit.Icon(head, cmdIcon, T.IconM, T.Text);
+        u.Title = UiKit.Text(head, "", TextStyle.Sub, T.Text);
         float tw = 0f;   // 見出しが変わってもパネルの幅が動かないように、一番長い見出しの幅にそろえる
         foreach (var s in new[] { UiDualPress.TitleIdle, UiDualPress.TitleTogether, UiDualPress.TitleFailed }) tw = Mathf.Max(tw, u.Title.GetPreferredValues(s).x);
         UiKit.Fixed(u.Title, tw, T.TextSub * T.HeadingLineHeight);
@@ -883,8 +882,8 @@ public static class HudKit
         badge = UiKit.SeatBadge(box, seat, T.BadgeL); UiKit.Center(badge.Root, T.BadgeL, T.BadgeL);
         check = UiKit.Icon(badge.Root, "check", T.IconL, T.OnSeat(seat)); UiKit.Center(check.rectTransform, T.IconL, T.IconL);
         check.enabled = false;
-        UiKit.Text(root, Seats.Title(seat), TextStyle.Label, T.InkSub);
-        you = UiKit.Tag(root, "YOU", T.Ink, T.Panel);
+        UiKit.Text(root, Seats.Title(seat), TextStyle.Label, T.TextSoft);
+        you = UiKit.Tag(root, "You", T.Text, T.Panel);
         you.gameObject.SetActive(false);
     }
 }
