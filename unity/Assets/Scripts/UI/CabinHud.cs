@@ -148,6 +148,8 @@ public class CabinHud
     }
 
     // ------------------------------------------------------------------ 席
+    /// <summary>席タブで選んでいる席（#167：SeatView がその席のモニターとカメラを選ぶ）。席がまだ無ければ null</summary>
+    public string ActiveSeat => activeSeat;
     internal void SelectSeat(string seat) { activeSeat = seat; Refresh(); }
 
     void RefreshSeat(GameState s)

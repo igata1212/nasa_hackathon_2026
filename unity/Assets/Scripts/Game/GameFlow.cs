@@ -50,6 +50,8 @@ public class GameFlow : MonoBehaviour
     [System.NonSerialized] public IGameClient Client;
 
     TitleScreen title; LobbyScreen lobby; DesignScreen design; CabinHud cabin; EndingScreen ending; ReportScreen report;
+    /// <summary>船内の HUD（#167：SeatView がゲージを席のモニターへ移すのに使う）。Start の前は null</summary>
+    public CabinHud Cabin => cabin;
     HoustonBox houston;
     GameToast toast;   // #132 短いお知らせ（UI/GameToast.cs）
     ConnectionUi conn; // #94 切れたら自動でつなぎ直す・RECONNECTING・ほかの人の切断の印（UI/ConnectionUi.cs）
