@@ -1,7 +1,8 @@
 // 書いた人：Taiga（作成：Opus 5.5）／ 最終更新：2026-11-15
 // 作る Issue：#167（NASA GMAT の軌道の値を、針のメーターで読む）
 //
-// 大きい地図（MapWidget）を開いている間だけ、その左に出すパネル。ふだんは出さない（#210。収納のつまみは無くした）。
+// 大きい地図（MapWidget）を開いている間だけ出すパネル。ふだんは出さない（#210。収納のつまみは無くした）。
+// #212：大きい地図は全画面になった。パネルは地図の中の左の列（MapWidget.GaugeColumn）に入る。「NASA GMAT」の字は地図の右上に1回だけ書くので、このパネルの見出しは無くした。
 // 元の説明：画面の左に出すポップアップ。NASA GMAT で計算した帰還ルート（data/gmat/route_a.csv・route_b.csv）の、今の船の位置から
 //   ① 地球までの距離（km）  ② 月までの距離（km）  ③ 速さ（km/s）
 // を針のメーター3つで見せる。
@@ -21,22 +22,22 @@ public class GmatGauges : HudPart
     // ================================================================== 直しやすい所
     static class Look
     {
-        public const float W = 260f;                  // パネルの幅（1600×900 基準）
+        public const float W = ColumnW;               // パネルの幅（1600×900 基準）
         public const float Pad = 14f, Gap = 8f;
-        public const float HeadH = 34f;
-        public const float RowH = 104f;
+        public const float RowH = 96f;
         public const float Dial = 92f;                // メーターの直径
         public const float NeedleW = 5f, NeedleL = 38f, Hub = 14f;
         public const float TickW = 3f, TickL = 9f;
-        public const float Margin = 14f;              // 大きい地図の左の端の外へ
         public const float CenterY = 0.5f;            // パネルのまん中の高さ（大きい地図の割合）
         public const float Sweep = 120f;              // 針の振れ幅（±度。0 が真上）
         public const float NeedleSpeed = 4f;
     }
 
+    /// <summary>#212：大きい地図の左の列の幅（MapWidget が列を作る）</summary>
+    public const float ColumnW = 260f;
+
     static class Words
     {
-        public const string Title = "NASA GMAT";
         public const string Earth = "To Earth", Moon = "To Moon", Speed = "Speed";
         public const string Km = "{0} km", Kms = "{0} km/s";
     }
@@ -58,22 +59,16 @@ public class GmatGauges : HudPart
         panel = Ui.Rect("GmatGauges", root);
         panel.anchorMin = panel.anchorMax = new Vector2(0f, Look.CenterY);
         panel.pivot = new Vector2(0f, 0.5f);
-        float h = Look.Pad * 2f + Look.HeadH + Look.Gap + Look.RowH * 3f;
+        float h = Look.Pad * 2f + Look.RowH * 3f;
         panel.sizeDelta = new Vector2(Look.W, h);
         UiKit.Surface(panel, T.RadiusM, T.HudFace);
         Detail = panel.gameObject.AddComponent<CanvasGroup>();   // 照明 OFF で暗くしてよい
-
-        // 見出し
-        var head = UiKit.Text(panel, Words.Title, TextStyle.Label, T.HudSub, TextAlignmentOptions.MidlineLeft, false);
-        var hr = head.rectTransform;
-        hr.anchorMin = new Vector2(0f, 1f); hr.anchorMax = new Vector2(1f, 1f); hr.pivot = new Vector2(0.5f, 1f);
-        hr.offsetMin = new Vector2(Look.Pad + 4f, -(Look.Pad + Look.HeadH)); hr.offsetMax = new Vector2(-Look.Pad, -Look.Pad);
 
         string[] labels = { Words.Earth, Words.Moon, Words.Speed };
         string[] icons = { "earth", "moon", "rocket" };
         for (int i = 0; i < 3; i++)
         {
-            float top = Look.Pad + Look.HeadH + Look.Gap + Look.RowH * i;
+            float top = Look.Pad + Look.RowH * i;
             gauges[i] = BuildGauge(panel, top, labels[i], icons[i]);
         }
         panel.gameObject.SetActive(false);   // #210：大きい地図が開くまで出さない（開くとき地図の中に移す）
@@ -160,16 +155,15 @@ public class GmatGauges : HudPart
     // ================================================================== 毎フレーム
     public override void Tick(float now)
     {
-        // #210：大きい地図が開いている間だけ、その左（地図の枠の外）に出す
+        // #210：大きい地図が開いている間だけ出す。#212：地図の中の左の列に入る（軌道・A/B に重ならない）
         if (map == null) foreach (var p in Ctx.Parts) if (p is MapWidget m) { map = m; break; }
-        bool show = map != null && map.BigOpen && map.BigRect != null;
-        if (show && panel.parent != map.BigRect)
+        bool show = map != null && map.BigOpen && map.GaugeColumn != null;
+        if (show && panel.parent != map.GaugeColumn)
         {
-            panel.SetParent(map.BigRect, false);
-            // #210 地図の枠の外の左に出す（中に置くと地球・A の札・軌道に重なる）
-            panel.anchorMin = panel.anchorMax = new Vector2(0f, Look.CenterY);
-            panel.pivot = new Vector2(1f, 0.5f);
-            panel.anchoredPosition = new Vector2(-Look.Margin, 0f);
+            panel.SetParent(map.GaugeColumn, false);
+            panel.anchorMin = panel.anchorMax = new Vector2(0f, 0.5f);
+            panel.pivot = new Vector2(0f, 0.5f);
+            panel.anchoredPosition = Vector2.zero;
         }
         if (show) panel.SetAsLastSibling();
         if (panel.gameObject.activeSelf != show) panel.gameObject.SetActive(show);
