@@ -91,6 +91,8 @@ public static class HoustonStyle
     //   32・3 行に戻すなら：new HoustonPlace("cabin", 0.225f, 0.775f, 0.25f, 0f, 0f, T.BubbleMaxHCabin, 100, TextCabin, 24f, 14f)
     //   上の端は名前タグを入れて約 0.48。CabinHud の真ん中（CenterMid：0.42〜。中身は上から下へ伸びる）・左（Left：0.39 から上）と重ならない
     public static readonly HoustonPlace Cabin = new HoustonPlace("cabin", 0.225f, 0.775f, 0.25f, 0f, 0f, T.BubbleMaxHCabin, 80);
+    // #210：一人称（SeatView.FirstPerson）の船内。盤（CO2・燃料・先生の画面）を隠さないよう低く：席パネルのすぐ上、台詞 32・2 行・高さ 132
+    public static readonly HoustonPlace CabinFirst = new HoustonPlace("cabin_fp", 0.225f, 0.775f, 0.25f, 0f, 0f, 132f, 80, 32f, 20f, 14f);
     // 設計：部品の一覧（右の列）と打ち上げのボタン（右下）を避けて左下。先生の小窓は出ない（x0 < 0.1）。2 行（1 行 約 44 字）× 36 で高さ 200
     public static readonly HoustonPlace Design = new HoustonPlace("design", 0.03f, 0.6f, 0.02f, 0f, 0f, 200f, 84);
     // エンディング：題・要件・SCORE・ボタンが真ん中の列にあるので、右の列に出す（ED-C の台詞が SCORE に重ならない）。幅が 544 しかないので 1 ページ 36 字（2 行）

@@ -99,6 +99,7 @@ public class HoustonBox
     void UpdatePlace()
     {
         var want = briefing != null ? S.Briefing : designDock ? S.Design : S.PlaceFor(Phase);
+        if (briefing == null && want.name == S.Cabin.name && SeatView.FirstPerson) want = S.CabinFirst;   // #210：一人称は低く・2 行
         if (want.name == place.name) return;
         place = want;
         view.Place(place);
@@ -266,8 +267,9 @@ public class HoustonBox
     {
         dirty = false;
         bool brief = briefing != null && cur != null;
-        bool lost = !brief && (noSignal || commsOff);
-        bool line = brief || (!lost && cur != null && pages.Count > 0);
+        bool hushed = !brief && noSignal && !commsOff && SeatView.FirstPerson;   // #210：一人称の電波なしは吹き出しを出さない（盤の先生の画面に印）
+        bool lost = !brief && (noSignal || commsOff) && !hushed;
+        bool line = brief || (!lost && !hushed && cur != null && pages.Count > 0);
         bool warnOn = view.WarningOn;
 
         if (scrim.activeSelf != (brief && S.BriefingScrim)) scrim.SetActive(brief && S.BriefingScrim);

@@ -59,6 +59,8 @@ public class SeatView : MonoBehaviour
     public float holdScale = 1.3f;
 
     public bool SeatViewOn { get; private set; }
+    /// <summary>#210：一人称の間 true（V キーの見下ろしや船内以外では false）。HoustonBox が吹き出しの置き場所を替えるのに読む</summary>
+    public static bool FirstPerson { get; private set; }
 
     // メーターの並び（モデルの Move_Needle_<名前>・Slot_Dial_<名前>）と、アイコン・単位の parameters.json のキー
     static readonly (string part, string icon, string chip, string unitParam)[] Meters =
@@ -198,9 +200,17 @@ public class SeatView : MonoBehaviour
     GameObject BuildFace(Transform screen)
     {
         var c = WorldCanvas("HoustonScreen", screen, new Vector2(ScreenPxW, ScreenPxH), ScreenMeters);
+        // #210：話していない間は暗い画面＋小さい待機の印（青緑のべた塗りをやめる）。電波が無いときは印を通信途絶のアイコンに
+        var dark = Ui.PanelImg(c, UiTokens.HudFace, "Dark"); dark.raycastTarget = false; Ui.Fill(dark.rectTransform);
+        var dot = UiKit.Round(c, 9f, UiTokens.HudSub, "Standby"); dot.raycastTarget = false;
+        var dr = dot.rectTransform; dr.anchorMin = dr.anchorMax = dr.pivot = new Vector2(0.5f, 0.5f); dr.sizeDelta = new Vector2(18f, 18f); dr.anchoredPosition = Vector2.zero;
+        var sig = UiKit.Icon(c, HoustonStyle.NoSignalIcon, 56f, UiTokens.Danger); sig.name = "NoSignal"; sig.raycastTarget = false;
+        sig.rectTransform.anchorMin = sig.rectTransform.anchorMax = sig.rectTransform.pivot = new Vector2(0.5f, 0.5f); sig.rectTransform.anchoredPosition = Vector2.zero;
+        sig.gameObject.SetActive(false);
         var view = Ui.Rect("View", c); Ui.Fill(view);
         var img = view.gameObject.AddComponent<RawImage>(); img.raycastTarget = false;
         if (houston != null && houston.Texture != null) img.texture = houston.Texture;
+        view.gameObject.SetActive(false);
         c.gameObject.SetActive(false);
         return c.gameObject;
     }
@@ -225,6 +235,7 @@ public class SeatView : MonoBehaviour
         var kb = Keyboard.current;
         if (kb != null && kb.vKey.wasPressedThisFrame && InCabin) SeatViewOn = !SeatViewOn;
         bool on = SeatViewOn && InCabin;
+        FirstPerson = on;
 
         // 船室を閉じる・警報の光を縮める・画面の上の左のゲージを隠す（一人称の間だけ）
         bool closed = closeCabin && on;
@@ -317,13 +328,20 @@ public class SeatView : MonoBehaviour
     {
         if (houston == null) return;
         houston.hideOverlay = on;
-        bool show = houston.Visible && houston.Texture != null;
+        // #210：一人称の間は画面を出しっぱなしにする。話している間（小窓が描いている間）だけ顔、そうでなければ暗い画面＋待機の印、電波が無いときは通信途絶の印
+        bool talk = houston.Visible && houston.Texture != null;
+        bool lost = HoustonBox.Current != null && HoustonBox.Current.Link == HoustonLink.NoSignal;
         foreach (var p in panels)
         {
             if (p.face == null) continue;
+            if (p.face.activeSelf != on) p.face.SetActive(on);
+            if (!on) continue;
             var img = p.face.GetComponentInChildren<RawImage>(true);
             if (img != null && img.texture == null) img.texture = houston.Texture;
-            if (p.face.activeSelf != show) p.face.SetActive(show);
+            bool face = talk && !lost;
+            if (img != null && img.gameObject.activeSelf != face) img.gameObject.SetActive(face);
+            var sb = p.face.transform.Find("Standby"); if (sb != null && sb.gameObject.activeSelf != (!face && !lost)) sb.gameObject.SetActive(!face && !lost);
+            var ns = p.face.transform.Find("NoSignal"); if (ns != null && ns.gameObject.activeSelf != lost) ns.gameObject.SetActive(lost);
         }
     }
 
