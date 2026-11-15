@@ -40,6 +40,10 @@ public class HoustonWindow : MonoBehaviour
     public void ReleaseTalk() { forced = false; }
     public bool Talking { get; private set; }
     public bool Visible { get; private set; }
+    /// <summary>管制室の映像（#167：SeatView が席のモニターに映す）。Start の前は null</summary>
+    public RenderTexture Texture => rt;
+    /// <summary>true の間、字幕の左の小窓は出さない（映像は描き続ける）。#167：モニターに映しているとき</summary>
+    [System.NonSerialized] public bool hideOverlay;
 
     void Start()
     {
@@ -91,7 +95,7 @@ public class HoustonWindow : MonoBehaviour
         if (panel == null) { Attach(); if (panel == null) return; }
         bool docked = panel.anchorMin.x < 0.1f;   // 設計の画面（左下に寄せた窓）
         bool show = panel.gameObject.activeInHierarchy && !docked && !(director != null && director.Playing);
-        frame.gameObject.SetActive(show);
+        frame.gameObject.SetActive(show && !hideOverlay);
         if (show != Visible)
         {
             Visible = show;

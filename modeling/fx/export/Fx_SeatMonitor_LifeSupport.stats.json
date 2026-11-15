@@ -1,20 +1,20 @@
 {
  "name": "Fx_SeatMonitor_LifeSupport",
- "tris": 1284,
+ "tris": 1180,
  "min": [
   -0.74,
-  0.13924,
+  0.09,
   0.0
  ],
  "max": [
   0.22,
   0.47,
-  1.89577
+  1.8745
  ],
  "size": [
   0.96,
-  0.33076,
-  1.89577
+  0.38,
+  1.8745
  ],
  "objects": {
   "Fx_SeatMonitor_LifeSupport": {
@@ -25,13 +25,21 @@
    ],
    "tris": 0
   },
+  "Fx_SeatMonitor_LifeSupport.Dials": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tris": 620
+  },
   "Fx_SeatMonitor_LifeSupport.Frame": {
    "origin": [
     0.0,
     0.0,
     0.0
    ],
-   "tris": 168
+   "tris": 156
   },
   "Fx_SeatMonitor_LifeSupport.Hood": {
    "origin": [
@@ -39,7 +47,7 @@
     0.0,
     0.0
    ],
-   "tris": 108
+   "tris": 12
   },
   "Fx_SeatMonitor_LifeSupport.Lamp_Green": {
    "origin": [
@@ -47,7 +55,7 @@
     0.0,
     0.0
    ],
-   "tris": 188
+   "tris": 44
   },
   "Fx_SeatMonitor_LifeSupport.Lamp_Red": {
    "origin": [
@@ -55,7 +63,7 @@
     0.0,
     0.0
    ],
-   "tris": 188
+   "tris": 44
   },
   "Fx_SeatMonitor_LifeSupport.Lamp_Yellow": {
    "origin": [
@@ -63,7 +71,7 @@
     0.0,
     0.0
    ],
-   "tris": 188
+   "tris": 44
   },
   "Fx_SeatMonitor_LifeSupport.MonScreen": {
    "origin": [
@@ -73,11 +81,99 @@
    ],
    "tris": 12
   },
-  "Fx_SeatMonitor_LifeSupport.Slot_Screen": {
+  "Fx_SeatMonitor_LifeSupport.Move_Needle_Co2": {
+   "origin": [
+    -0.53,
+    0.185,
+    1.415
+   ],
+   "tris": 40
+  },
+  "Fx_SeatMonitor_LifeSupport.Move_Needle_Fuel": {
    "origin": [
     -0.26,
-    0.22358,
-    1.55842
+    0.185,
+    1.415
+   ],
+   "tris": 40
+  },
+  "Fx_SeatMonitor_LifeSupport.Move_Needle_Oxygen": {
+   "origin": [
+    -0.26,
+    0.185,
+    1.665
+   ],
+   "tris": 40
+  },
+  "Fx_SeatMonitor_LifeSupport.Move_Needle_Power": {
+   "origin": [
+    -0.53,
+    0.185,
+    1.665
+   ],
+   "tris": 40
+  },
+  "Fx_SeatMonitor_LifeSupport.Move_Needle_Temp": {
+   "origin": [
+    0.01,
+    0.185,
+    1.665
+   ],
+   "tris": 40
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Dial_Co2": {
+   "origin": [
+    -0.53,
+    0.1965,
+    1.415
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Dial_Fuel": {
+   "origin": [
+    -0.26,
+    0.1965,
+    1.415
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Dial_Oxygen": {
+   "origin": [
+    -0.26,
+    0.1965,
+    1.665
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Dial_Power": {
+   "origin": [
+    -0.53,
+    0.1965,
+    1.665
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Dial_Temp": {
+   "origin": [
+    0.01,
+    0.1965,
+    1.665
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Panel": {
+   "origin": [
+    -0.26,
+    0.219,
+    1.55
+   ],
+   "tris": 0
+  },
+  "Fx_SeatMonitor_LifeSupport.Slot_Screen": {
+   "origin": [
+    0.01,
+    0.198,
+    1.415
    ],
    "tris": 0
   },
@@ -87,7 +183,7 @@
     0.4,
     0.67
    ],
-   "tris": 432
+   "tris": 48
   }
  }
 }
