@@ -100,10 +100,9 @@
 
 ## 8. 提出の前に直す所（出典・クレジット）
 
-tmp の出典の下調べ（tmp/space_assets/・tmp/audio_build/・tmp/ui_ref/ の SOURCES.md）と比べて、次が足りない。
-- `CREDITS.md` に無い：ヒューストンの声（Gemini 3.8 Flash TTS、Achird。AI で作った音声）、NASA GMAT、アポロ13号の NASA 文書（3 章の表）
-- `data/README.md` に無い：アポロ13号の交信の声、NASA 3D Resources（寸法取りだけ）、NTRS の文書の一覧
-- Universe Study の曲のページの URL が「要確認」のまま（ID 141461 は確か）
+tmp の出典の下調べ（tmp/space_assets/・tmp/audio_build/・tmp/ui_ref/ の SOURCES.md）と比べて足りなかった物は、#220 で直した。
+- 済み：`CREDITS.md` に「NASA のツールと文書」（GMAT・NTRS の文書）と「AI で作った物」（ヒューストンの声＝Gemini 3.8 Flash TTS・Achird、合成の効果音、Claude Code）を足した。`data/README.md` に「data/ の外にある NASA のデータ」（交信の声・地球と月の画像・NASA 3D Resources・文書）を足した
+- 残り：Universe Study の曲のページの URL（ID 141461 は確か）、GMAT のライセンスの表記（Apache 2.0 と書いたが要確認）、交信の声が NASA の物であることの NASA 本体での確認
 - `docs/reference/demo-video-ref/` の参考動画 mp4 2本は他社の著作物。リポジトリを公開する前に消す
 - `docs/reference/art-ref/acnh/` のあつ森の参考画像も任天堂の著作物。提出物に入れない
 

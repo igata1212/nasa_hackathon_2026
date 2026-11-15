@@ -1,6 +1,6 @@
 # data
 
-書いた人：Taiga ／ 最終更新：2026-11-14
+書いた人：Taiga ／ 最終更新：2026-11-14 ／ 更新：iizuka（2026-11-15、#220 data/ の外にある NASA のデータ）
 
 ゲームが読む外部データ。ファイルを足したら、下の表に1行ずつ書く（提出のときに、使った NASA のデータとツールを一覧で出すため）。
 
@@ -50,3 +50,16 @@ CSV の列（単位は km、1行目が見出し）：
 
 事故までの往路は A / B で同じ。倍速は区間ごとに違う（事故〜LOS は約 850 倍、噴射〜再突入は A 約 5700 倍・B 約 2500 倍）。
 出典（事故・LOS・AOS・噴射・再突入の本物の時刻）：NASA Apollo 13 Mission Report（MSC-02680）、Apollo Flight Journal。事故 GET 55:54:53、LOS 約 77:08、AOS 約 77:34、PC+2 噴射 79:27:39、再突入 142:40:46。
+
+## data/ の外にある NASA のデータ（提出の一覧用、#220）
+
+ゲームに入っている、または数値の裏付けに使った NASA のデータで、`data/` に置いていない物。作者・ライセンスの細かい所は `CREDITS.md`。
+
+| 物 | 出典 | 置き場所・使い方 |
+|---|---|---|
+| アポロ13号の交信「Houston, we've had a problem」 | NASA（Wikimedia Commons 経由：https://commons.wikimedia.org/wiki/File:Apollo13-wehaveaproblem.ogg ） | `unity/Assets/Audio/Sfx/voice_problem.wav`。事故の瞬間に流す |
+| 地球の画像 Blue Marble: Next Generation | NASA Earth Observatory（https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/ ） | 地球のモデルの画像 |
+| 月の画像 CGI Moon Kit | NASA's Scientific Visualization Studio（https://svs.gsfc.nasa.gov/4720 ） | 月のモデルの画像 |
+| NASA 3D Resources（Apollo Lunar Module・Apollo Soyuz・Astronaut） | https://github.com/nasa/NASA-3D-Resources | 寸法を測るためだけ。ゲームには入れていない（`modeling/PhysDraft-SpaceCrew3D/nasa_source/`） |
+| アポロ13号の文書（Mission Report・Review Board・TN D-6725・Press Kit など） | NTRS 19710003598・19700076776・19720013191 ほか | 時刻・数値の裏付け。一覧と数値は `docs/reference/apollo13-data.md`、URL は `CREDITS.md` |
+
