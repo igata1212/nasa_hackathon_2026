@@ -54,5 +54,353 @@
    "unity_sign": -1,
    "unit": "m"
   }
+ ],
+ "Fx_SeatMonitor_CommsPower": [
+  {
+   "name": "Fx_SeatMonitor_CommsPower.Move_Needle_Power",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.01,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_CommsPower.Move_Needle_Oxygen",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.26,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_CommsPower.Move_Needle_Temp",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.53,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_CommsPower.Move_Needle_Co2",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.01,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_CommsPower.Move_Needle_Fuel",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.26,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Fx_SeatMonitor_LifeSupport": [
+  {
+   "name": "Fx_SeatMonitor_LifeSupport.Move_Needle_Power",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.53,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_LifeSupport.Move_Needle_Oxygen",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.26,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_LifeSupport.Move_Needle_Temp",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.01,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_LifeSupport.Move_Needle_Co2",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.53,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_LifeSupport.Move_Needle_Fuel",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.26,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Fx_SeatMonitor_MissionPlanner": [
+  {
+   "name": "Fx_SeatMonitor_MissionPlanner.Move_Needle_Power",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.27,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_MissionPlanner.Move_Needle_Oxygen",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.0,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_MissionPlanner.Move_Needle_Temp",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.27,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_MissionPlanner.Move_Needle_Co2",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.27,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_MissionPlanner.Move_Needle_Fuel",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.0,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
+ ],
+ "Fx_SeatMonitor_Pilot": [
+  {
+   "name": "Fx_SeatMonitor_Pilot.Move_Needle_Power",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.27,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_Pilot.Move_Needle_Oxygen",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.0,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_Pilot.Move_Needle_Temp",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.27,
+    0.185,
+    1.665
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_Pilot.Move_Needle_Co2",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    -0.27,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  },
+  {
+   "name": "Fx_SeatMonitor_Pilot.Move_Needle_Fuel",
+   "type": "rotate",
+   "axis": "Y",
+   "min": -120.0,
+   "max": 120.0,
+   "default": 0,
+   "note": "0 が真上。値 0 で −120°（左下）、満タンで ＋120°（右下）。Unity では localEulerAngles.z",
+   "origin": [
+    0.0,
+    0.185,
+    1.415
+   ],
+   "unity_axis": "Z",
+   "unity_sign": 1,
+   "unit": "deg"
+  }
  ]
 }

@@ -23944,8 +23944,8 @@ MonoBehaviour:
     side: -1
   seatViewOnStart: 1
   cameraOffset: {x: 0, y: 1.55, z: 0.9}
-  lookDown: 0.27
-  fieldOfView: 58
+  lookDown: 0
+  fieldOfView: 54
   moveSpeed: 6
   closeCabin: 1
   enclosure:
