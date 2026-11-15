@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- 書いた人：Taiga（Claude） ／ 最終更新：2026-11-15（#222）。WebGL ビルドのページ。画面いっぱいに出す -->
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #0b1026; }
+      #unity-canvas { display: block; width: 100vw; height: 100vh; background: #0b1026; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+                 color: #fff; font: 700 22px/1.2 "Nunito", "Segoe UI", system-ui, sans-serif; letter-spacing: 0.04em; }
+      #bar { width: min(360px, 70vw); height: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); overflow: hidden; }
+      #bar-fill { width: 0%; height: 100%; border-radius: 999px; background: #ffd24a; transition: width 0.15s; }
+      #error { display: none; max-width: 80vw; text-align: center; color: #ff9a8a; font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <div>{{{ PRODUCT_NAME }}}</div>
+      <div id="bar"><div id="bar-fill"></div></div>
+      <div id="error"></div>
+    </div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+      var loading = document.querySelector("#loading");
+      var fill = document.querySelector("#bar-fill");
+      var error = document.querySelector("#error");
+      function showError(msg) { error.style.display = "block"; error.textContent = msg; }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+        workerUrl: buildUrl + "/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        showBanner: function (msg, type) { if (type === "error") showError(msg); }
+      };
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = function () {
+        createUnityInstance(canvas, config, function (progress) {
+          fill.style.width = Math.round(100 * progress) + "%";
+        }).then(function () {
+          loading.style.display = "none";
+          canvas.focus();
+        }).catch(function (message) { showError(String(message)); });
+      };
+      script.onerror = function () { showError("Could not load the game files."); };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

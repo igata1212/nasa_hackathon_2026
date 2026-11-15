@@ -13,6 +13,10 @@ from .room import Game, GameError
 log = logging.getLogger("mission_return")
 
 
+class SocketClosed(Exception):
+    """app.py（ASGI）が、相手が切れたときに出す。ConnectionClosed と同じ扱い"""
+
+
 class Server:
     def __init__(self, speed=1.0, difficulty=1):
         self.speed = speed
@@ -38,7 +42,7 @@ class Server:
             for ws in targets:
                 try:
                     await ws.send(data)
-                except ConnectionClosed:
+                except (ConnectionClosed, SocketClosed):
                     pass
 
     async def _clock(self, code):
@@ -80,7 +84,7 @@ class Server:
                                           "echo": msg})
                 if code:
                     await self.flush(code)
-        except ConnectionClosed:
+        except (ConnectionClosed, SocketClosed):
             pass
         finally:
             if code in self.games and pid:

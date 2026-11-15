@@ -1,4 +1,4 @@
-書いた人：iizuka ／ 最終更新：2026-11-14（#155 会話の決定）
+書いた人：iizuka ／ 最終更新：2026-11-15（#222 ブラウザ版の置き場所） ／ 更新：Taiga（2026-11-15、#222）
 
 # 通信とサーバーの作り
 
@@ -9,6 +9,8 @@ flowchart LR
   C["Unity クライアント（iOS・WebGL）×1〜4"] <-->|wss| T["Cloudflare Tunnel"]
   T <--> S["Python サーバー（reference_sim）"]
   S <--> J["JSON（parameters / parts / houston_lines）"]
+  C <-->|wss /api/ws| V["Vercel（同じ Python サーバー。#222 からこちらが本番、Tunnel は予備）"]
+  V <--> J
 ```
 
 ## 決めたこと
@@ -19,8 +21,10 @@ flowchart LR
 - Unity は状態を受け取って描き、ボタンを送るだけ。シミュレーションを C# に移植しない
 - SPEC 10章の確認（±0.5 以内）は、サーバーの Python が reference_sim と同じ結果を出すことで行う
 - 公開は自宅サーバー＋Cloudflare Tunnel（ポート開放なし。https・wss が付く。WebGL は wss が必須）
+- **サーバーは Vercel に置く**（Taiga 2026-11-15、#222。上の「自宅サーバー＋Cloudflare Tunnel」は予備に回す）。同じ Python サーバーを `server/app.py`（FastAPI の WebSocket、`wss://<host>/api/ws`）から動かす。ブラウザ版（WebGL のビルド）も同じ Vercel プロジェクトに置く。手順と Vercel の決まり（部屋はメモリの中・接続は最大時間で切れる）は `tools/vercel/README.md`
+- クライアントは iOS（Apple Developer Program で配る）とブラウザ。つなぐ先の決め方は `Net/WebLink.cs`
 - 予備は同じプログラムをクラウド（Fly.io・Render など。料金は未確認）に置く
-- Unity の WebSocket は、WebGL と iOS の両方で動くライブラリ（NativeWebSocket など。ライセンスは入れる前に確認）。WebGL は C# 標準の WebSocket が使えないため
+- Unity の WebSocket は、エディタ・iOS・デスクトップが C# 標準の `ClientWebSocket`、WebGL がブラウザの WebSocket（`Plugins/WebGL/MrWebSocket.jslib`。ライブラリは入れない）。どちらも `Net/WsClient.cs`（#222）
 - プレイヤー同士の声はつながない（ボイスチャットなし。同じ場所で話す前提、離れているなら通話アプリ）。コミュニケーションの機能は作らない（#155・#159）
 - 担当：iizuka がサーバーと Unity、Taiga が物語・台詞・パラメータ・UI など上の層。UI は、Taiga が絵とレイアウト（何をどこにどう見せるか）まで、Unity への組み込みは iizuka（#110 の決定。更新：Taiga 2026-11-14）
 
