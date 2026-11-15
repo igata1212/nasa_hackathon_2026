@@ -1,0 +1,136 @@
+deadline-delivery-trailer.mp4: 0:00.00-0:56.61 (56.6 s). Loudness -14.1 LUFS integrated, true peak -2.4 dBTP, LRA 6.8 LU; loudest 0:44.50-0:47.50 (-13.1 LUFS short-term). Quiet tail 0.4 s (drop). Beat grid: ~146 BPM (weak pulse, clarity 0.27, 138 beats). 5 section(s): 0:00.00-0:02.25 also: explosion (AST); 0:02.25-0:07.50 glitch hop music, vocal chop, aggressive | also: vehicle, dubstep (AST); 0:07.50-0:47.25 drum and bass music, orchestral percussion, aggressive; 0:47.25-0:52.30 trap beat?, vocal chop | also: breaking, shatter (AST); 0:52.30-0:56.61 also: vehicle, car (AST). 248 events (4.4/s); 96 tagged (59 note, 17 drum, 6 riser, 6 whoosh, 3 hit, 2 key, 2 voice, 1 foley; tags are hints). Strongest accents over a running bed: 0:07.69 +28 dB (orchestral stab), 0:53.54 +16 dB (swoosh passing by), 0:53.00 +14 dB (rising riser building tension). Sync to 51 cuts: 14% have an onset within 1 frame (chance 14%), 71% within 100 ms, median |offset| 56 ms; 0% land on a strong accent (>= 6 dB over the bed) within 1 frame (chance 0%); 28% on the beat grid (chance 24%); 1 met by a whoosh / riser peak; 10 only by a level peak (soft whoosh / swell?); 4 without a hit: 0:03.50, 0:03.97, 0:04.78, 0:30.45.
+
+SECTIONS
+  0:00.00-0:02.25  also: explosion (AST)  -15 LUFS  [AST music 0.12, speech 0.07]
+  0:02.25-0:07.50  glitch hop music, vocal chop, aggressive | also: vehicle, dubstep (AST)  -15 LUFS  [AST music 0.44, speech 0.09]
+  0:07.50-0:47.25  drum and bass music, orchestral percussion, aggressive  -14 LUFS  [AST music 0.52, speech 0.16]
+  0:47.25-0:52.30  trap beat?, vocal chop | also: breaking, shatter (AST)  -22 LUFS  [AST music 0.33, speech 0.04]
+  0:52.30-0:56.61  also: vehicle, car (AST)  -21 LUFS  [AST music 0.04, speech 0.06]
+
+TRANSCRIPT   time  kind   what (CLAP tag / runner-up)                     peak  over bed  length  centroid  | sync
+== 0:00.00-0:02.25  also: explosion (AST)  (+11 untagged onsets, 4.9/s)
+ 0:00.04  KEY    spacebar press / fast air whoosh                 -3.9 dBFS   silent   101 ms   920 Hz
+ 0:00.25  HIT?   heavy thud / rising riser building tension       -4.3 dBFS  +7.6 dB  2000 ms   108 Hz
+ 0:00.33  KEY    spacebar press / breath                          -4.3 dBFS   silent  1000 ms   150 Hz
+ 0:00.97  HIT?   heavy thud / fast air whoosh                     -7.5 dBFS  +3.2 dB    26 ms   212 Hz
+ 0:01.46  DRUM?  kick drum / heavy thud                           -8.2 dBFS  +3.7 dB    24 ms   120 Hz  [AST Electronic music 0.17]
+ 0:01.52  HIT?   heavy thud / kick drum                           -3.6 dBFS  +5.1 dB  1347 ms   367 Hz  [AST Explosion 0.26]  | cut -29 ms near
+ 0:01.74  -      high onset                                       -2.4 dBFS  +5.1 dB   379 ms   261 Hz  | cut +35 ms near
+ 0:01.87  CUT     no onset; level peak -27 ms, rising 16 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+== 0:02.25-0:07.50  glitch hop music, vocal chop, aggressive | also: vehicle, dubstep (AST)  (+9 untagged onsets, 1.7/s)
+ 0:02.48  RISER? uplifter sweep / short swish                     -7.6 dBFS  +2.5 dB   404 ms   143 Hz
+ 0:03.13  CUT     no onset; level peak +67 ms, rising 6 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:03.50  CUT     no onset or level peak within 250 ms  <- NO HIT
+ 0:03.78  WHOOSH? whip pan whoosh transition / kick drum           -6.1 dBFS  +3.9 dB   356 ms   148 Hz  [AST Vehicle 0.29]  | cut +76 ms near
+ 0:03.97  CUT     no onset within 100 ms (strong sound at +100 ms)  <- NO HIT
+ 0:04.07  NOTE?  orchestral stab / rising riser building tensio   -6.1 dBFS  +4.0 dB  2000 ms   171 Hz  [AST Speech 0.06]  | cut -100 ms near
+ 0:04.13  NOTE?  orchestral stab / rising riser building tensio   -6.3 dBFS  +1.2 dB  2000 ms   200 Hz
+ 0:04.45  CUT     no onset; level peak -120 ms, rising 4 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:04.78  CUT     no onset within 100 ms (strong sound at -194 ms)  <- NO HIT
+ 0:05.12  NOTE   glockenspiel note / short vocal sound            -5.5 dBFS +13.8 dB  1000 ms   625 Hz  [AST Vehicle 0.10]  | cut -47 ms near
+ 0:05.83  NOTE?  orchestral stab / short vocal sound              -4.0 dBFS  +3.4 dB   611 ms   170 Hz
+ 0:06.25  DRUM?  kick drum / sub bass drop                        -5.0 dBFS  +3.9 dB   245 ms   616 Hz
+ 0:07.08  DRUM?  kick drum                                        -5.9 dBFS  +5.2 dB   139 ms   814 Hz  [AST Electronic music 0.15]  | cut -8 ms OK
+ 0:07.48  -      high onset                                       -6.5 dBFS  +4.8 dB  2000 ms  1.6 kHz  | cut +45 ms near
+== 0:07.50-0:47.25  drum and bass music, orchestral percussion, aggressive  (+109 untagged onsets, 2.7/s)
+ 0:07.69  NOTE   orchestral stab / punchy impact hit              -6.8 dBFS +27.6 dB  1000 ms  1.0 kHz  [AST Speech 0.07]  | cut -93 ms near; strong accent (summary)
+ 0:08.73  NOTE?  orchestral stab / snare drum hit                 -7.0 dBFS  +3.0 dB   334 ms  1.3 kHz
+ 0:09.55  RISER? uplifter sweep / kick drum                       -6.8 dBFS  +3.8 dB   161 ms   522 Hz
+ 0:10.18  DRUM?  kick drum / orchestral stab                      -7.0 dBFS  +2.6 dB   144 ms   389 Hz  | cut +17 ms near
+ 0:11.21  DRUM?  snare drum hit                                   -6.8 dBFS  +3.0 dB   119 ms   688 Hz
+ 0:12.04  DRUM?  kick drum / orchestral stab                      -6.9 dBFS  +3.7 dB   172 ms   783 Hz
+ 0:12.60  NOTE?  orchestral stab / kick drum                      -7.3 dBFS  +1.8 dB    45 ms  1.0 kHz
+ 0:12.87  DRUM?  drum hit / orchestral stab                       -6.5 dBFS  +3.4 dB   463 ms  1.2 kHz
+ 0:13.12  NOTE?  orchestral stab / drum hit                       -6.6 dBFS  +0.4 dB   563 ms   497 Hz  | cut +91 ms near
+ 0:13.49  NOTE?  orchestral stab / punchy impact hit              -5.2 dBFS  +3.3 dB   351 ms   528 Hz
+ 0:14.06  WHOOSH? whip pan whoosh transition / reverse cymbal sw   -4.3 dBFS  +3.0 dB   142 ms  1.2 kHz
+ 0:14.16  NOTE?  orchestral stab / spoken word                    -4.8 dBFS  +2.4 dB   217 ms   700 Hz
+ 0:14.94  NOTE?  orchestral stab / reverse cymbal swell           -4.8 dBFS  +2.0 dB  1464 ms   510 Hz  | cut -26 ms near
+ 0:15.35  NOTE?  orchestral stab / rising riser building tensio   -6.9 dBFS  +2.5 dB   332 ms   599 Hz
+ 0:15.65  CUT     no onset; level peak -50 ms, rising 3 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:16.18  NOTE?  orchestral stab / kick drum                      -7.3 dBFS  +3.8 dB   145 ms   806 Hz
+ 0:17.01  DRUM?  snare drum hit                                   -6.7 dBFS  +3.1 dB   320 ms   780 Hz
+ 0:17.84  NOTE?  orchestral stab / snare drum hit                 -6.8 dBFS  +3.0 dB    94 ms   600 Hz
+ 0:18.66  NOTE?  orchestral stab / rising riser building tensio   -6.6 dBFS  +3.0 dB  2000 ms   599 Hz  [AST Speech 0.09]  | cut -9 ms OK
+ 0:19.49  NOTE?  orchestral stab / snare drum hit                 -6.3 dBFS  +4.1 dB   349 ms  1.1 kHz
+ 0:19.75  NOTE?  orchestral stab / snare drum hit                 -7.3 dBFS  +2.0 dB   124 ms   499 Hz
+ 0:20.11  NOTE?  orchestral stab / drum hit                       -6.9 dBFS  +1.7 dB   330 ms   867 Hz
+ 0:20.55  NOTE?  orchestral stab / short vocal sound              -6.6 dBFS  +2.3 dB   399 ms   313 Hz
+ 0:20.73  DRUM?  kick drum / orchestral stab                      -6.6 dBFS  +2.9 dB  1077 ms   791 Hz
+ 0:21.35  NOTE?  orchestral stab / rising riser building tensio   -6.8 dBFS  +2.1 dB   351 ms   357 Hz
+ 0:21.57  NOTE?  orchestral stab / sub bass drop                  -7.1 dBFS  +2.7 dB   236 ms   613 Hz  [AST Electronic music 0.10]  | cut +73 ms near
+ 0:22.08  CUT     no onset; level peak +107 ms, rising 5 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:22.79  NOTE?  orchestral stab / snare drum hit                 -7.0 dBFS  +3.1 dB   161 ms   825 Hz
+ 0:23.44  NOTE?  orchestral stab / rising riser building tensio   -7.0 dBFS  +2.2 dB    93 ms   442 Hz
+ 0:24.04  NOTE?  orchestral stab / snare drum hit                 -6.7 dBFS  +2.6 dB   764 ms   640 Hz
+ 0:24.67  NOTE?  orchestral stab / rising riser building tensio   -7.0 dBFS  +1.4 dB    31 ms  1.1 kHz  | cut +83 ms near
+ 0:24.87  -      high onset                                       -7.3 dBFS  +2.2 dB    30 ms  1.2 kHz  | cut +71 ms near
+ 0:25.08  -      high onset                                       -7.4 dBFS  +1.4 dB    36 ms   681 Hz  | cut +80 ms near
+ 0:25.28  NOTE?  orchestral stab / snare drum hit                 -6.5 dBFS  +3.1 dB   566 ms   877 Hz  [AST Speech 0.08]  | cut +65 ms near
+ 0:25.42  CUT     no onset; level peak +73 ms, rising 5 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:25.70  -      high onset                                       -7.0 dBFS  +1.7 dB    33 ms  1.1 kHz  | cut +67 ms near
+ 0:26.11  NOTE?  orchestral stab / snare drum hit                 -6.7 dBFS  +3.1 dB   388 ms  1.1 kHz  [AST Speech 0.07]  | cut +23 ms near
+ 0:26.36  NOTE?  orchestral stab / snare drum hit                 -7.5 dBFS  +0.7 dB    15 ms   618 Hz  | cut +65 ms near
+ 0:26.53  -      high onset                                       -7.0 dBFS  +2.7 dB    63 ms   810 Hz  | cut -5 ms OK
+ 0:26.76  NOTE?  orchestral stab / kick drum                      -7.2 dBFS  +3.0 dB    94 ms   887 Hz  [AST Speech 0.06]  | cut +12 ms OK
+ 0:26.94  -      high onset                                       -7.0 dBFS  +2.4 dB    95 ms   837 Hz  | cut -29 ms near
+ 0:27.18  NOTE?  orchestral stab / rising riser building tensio   -6.6 dBFS  +2.3 dB  1406 ms   523 Hz  | cut -15 ms OK
+ 0:27.35  NOTE?  orchestral stab / rising riser building tensio   -6.5 dBFS  +2.5 dB   341 ms   479 Hz  | cut -63 ms near
+ 0:28.18  NOTE?  orchestral stab / punchy impact hit              -6.8 dBFS  +3.7 dB   114 ms   517 Hz
+ 0:29.05  VOICE? short vocal sound / kick drum                    -7.1 dBFS  +0.9 dB   349 ms   803 Hz  | cut +34 ms near
+ 0:29.42  NOTE?  orchestral stab / drum hit                       -6.8 dBFS  +3.3 dB   145 ms  1.0 kHz
+ 0:30.03  NOTE?  orchestral stab / rising riser building tensio   -6.9 dBFS  +3.4 dB   344 ms   812 Hz
+ 0:30.45  CUT     no onset within 100 ms (strong sound at -200 ms)  <- NO HIT
+ 0:31.08  DRUM?  snare drum hit / orchestral stab                 -6.4 dBFS  +3.3 dB   114 ms   614 Hz
+ 0:31.91  NOTE?  orchestral stab / rising riser building tensio   -6.7 dBFS  +2.9 dB  1794 ms   678 Hz  [AST Electronic music 0.11]  | cut -73 ms near
+ 0:32.76  DRUM?  snare drum hit                                   -6.6 dBFS  +4.8 dB   259 ms  1.0 kHz
+ 0:33.37  DRUM?  kick drum                                        -6.5 dBFS  +2.3 dB     4 ms  1.4 kHz
+ 0:33.98  NOTE?  orchestral stab / short vocal sound              -6.4 dBFS  +4.0 dB  1094 ms   841 Hz  [AST Speech 0.07]  | cut -16 ms OK
+ 0:34.08  VOICE? short vocal sound / orchestral stab              -6.4 dBFS  +1.5 dB  1347 ms   665 Hz
+ 0:35.23  NOTE?  orchestral stab / snare drum hit                 -6.7 dBFS  +3.3 dB   484 ms   821 Hz
+ 0:35.43  CUT     no onset; level peak +7 ms, rising 4 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:36.05  NOTE?  orchestral stab / kick drum                      -6.3 dBFS  +2.7 dB   132 ms   734 Hz
+ 0:36.88  NOTE?  orchestral stab / snare drum hit                 -7.1 dBFS  +2.6 dB   133 ms   707 Hz
+ 0:37.70  NOTE?  orchestral stab / snare drum hit                 -6.6 dBFS  +2.7 dB   120 ms   495 Hz
+ 0:37.96  NOTE?  orchestral stab / rising riser building tensio   -6.9 dBFS  +2.0 dB   558 ms   464 Hz
+ 0:38.53  DRUM?  kick drum / orchestral stab                      -6.8 dBFS  +3.2 dB   451 ms   954 Hz
+ 0:39.00  NOTE?  orchestral stab / rising riser building tensio   -7.1 dBFS  +1.3 dB    46 ms   500 Hz  | cut +33 ms near
+ 0:39.36  NOTE?  orchestral stab / rising riser building tensio   -6.7 dBFS  +3.3 dB   388 ms   921 Hz
+ 0:39.99  NOTE?  orchestral stab / kick drum                      -7.0 dBFS  +3.3 dB   166 ms   765 Hz
+ 0:40.44  NOTE?  orchestral stab / short vocal sound              -6.7 dBFS  +0.5 dB  1399 ms   692 Hz  | cut +9 ms OK
+ 0:40.83  NOTE?  orchestral stab / punchy impact hit              -7.0 dBFS  +3.0 dB   120 ms  1.1 kHz
+ 0:41.27  NOTE?  orchestral stab / rising riser building tensio   -6.5 dBFS  +1.8 dB   548 ms   561 Hz
+ 0:41.43  NOTE?  orchestral stab / drum hit                       -6.5 dBFS  +3.1 dB   308 ms   517 Hz  [AST Speech 0.06]  | cut -34 ms near
+ 0:41.97  CUT     no onset; level peak +123 ms, rising 4 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:42.71  NOTE?  orchestral stab / snare drum hit                 -7.1 dBFS  +1.8 dB    64 ms  1.0 kHz  | cut -57 ms near
+ 0:43.29  NOTE?  orchestral stab / drum hit                       -6.8 dBFS  +2.9 dB   344 ms   626 Hz  [AST Speech 0.06]  | cut +26 ms near
+ 0:43.92  NOTE?  orchestral stab / rising riser building tensio   -7.0 dBFS  +1.8 dB    74 ms  1.1 kHz
+ 0:43.95  -      high onset                                       -7.0 dBFS  +1.6 dB    63 ms   629 Hz  | cut -47 ms near
+ 0:44.07  RISER? rising riser building tension / orchestral sta   -6.7 dBFS  +1.6 dB   458 ms  1.3 kHz
+ 0:44.54  RISER? rising riser building tension / orchestral sta   -6.0 dBFS  +2.2 dB   114 ms   897 Hz
+ 0:45.16  NOTE?  orchestral stab / rising riser building tensio   -6.1 dBFS  +2.5 dB  2000 ms  1.0 kHz
+ 0:45.78  DRUM?  kick drum / orchestral stab                      -6.4 dBFS  +2.6 dB    43 ms  1.8 kHz
+ 0:46.01  DRUM?  kick drum / plucked string note                  -6.4 dBFS  +2.2 dB   300 ms  1.6 kHz
+ 0:46.63  DRUM?  kick drum / orchestral stab                      -6.6 dBFS  +1.8 dB    21 ms  1.5 kHz
+== 0:47.25-0:52.30  trap beat?, vocal chop | also: breaking, shatter (AST)  (+9 untagged onsets, 1.8/s)
+ 0:47.27  NOTE?  orchestral stab / snare drum hit                 -6.0 dBFS  +0.6 dB    78 ms  1.1 kHz  | cut +54 ms near; cut -79 ms near
+ 0:48.58  NOTE?  orchestral stab / notification ding             -10.0 dBFS  +4.6 dB   379 ms  1.3 kHz
+ 0:48.67  NOTE?  orchestral stab / whip pan whoosh transition    -10.0 dBFS  +2.8 dB   321 ms   525 Hz
+ 0:49.51  NOTE?  orchestral stab / chat message pop              -15.0 dBFS  +2.4 dB   328 ms   884 Hz
+ 0:49.77  CUT     no onset; level peak +23 ms, rising 3 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:49.92  CUT     no onset; level peak -127 ms, rising 3 dB (a soft whoosh / swell, or just the bed?)  <- CHECK
+ 0:50.06  NOTE?  orchestral stab / chat message pop              -16.9 dBFS  +0.6 dB     2 ms   814 Hz
+ 0:51.29  RISER? reverse cymbal swell / orchestral stab          -18.0 dBFS  +2.6 dB  2000 ms   691 Hz
+== 0:52.30-0:56.61  also: vehicle, car (AST)  (+6 untagged onsets, 1.4/s)
+ 0:52.55  WHOOSH? swoosh passing by / breath                      -10.1 dBFS  +4.8 dB  1343 ms   530 Hz
+ 0:53.00  RISER  rising riser building tension / swoosh passing   -6.8 dBFS +14.1 dB   920 ms   364 Hz  | strong accent (summary)
+ 0:53.54  WHOOSH swoosh passing by / reverse cymbal swell         -6.7 dBFS +16.2 dB   350 ms   232 Hz  | cut -143 ms swell; strong accent (summary)
+ 0:54.02  FOLEY? leaves rustling / reverse cymbal swell          -12.3 dBFS  +3.9 dB   845 ms   476 Hz
+ 0:54.14  WHOOSH? swoosh passing by / water drop                  -12.3 dBFS  +5.5 dB   712 ms   172 Hz
+ 0:55.23  WHOOSH? short swish / kick drum                         -16.1 dBFS  +3.8 dB   117 ms   252 Hz
+ 0:55.95  NOTE?  orchestral stab / heavy thud                    -19.7 dBFS  +5.7 dB   242 ms   163 Hz
+ 0:55.99  NOTE?  orchestral stab / short swish                   -19.7 dBFS  +5.7 dB   200 ms   343 Hz
+ 0:56.10  DRUM?  snare drum hit                                  -19.7 dBFS  +6.2 dB     9 ms   506 Hz
+ 0:56.20  GAP    drop 0.41 s (-38 LUFS) = tail
+
+NOTES  times, levels, loudness and sync offsets are measurements. Event kinds / tags are CLAP guesses: '?' = the event is less than 12 dB over its bed, so its excerpt is mostly bed and the tag a weak hint (right kind about 1 in 4 on the tuning mixes, 1 in 2 for exposed events; often wrong on music and voice). Where AST ran, its speech overrides the kind with VOICE. Section genres marked ? are weak. 'over bed' = how far the event rises over the level just before it; 'silent' = that bed was below -60 (after a gap the rise means nothing). Full data: --json.

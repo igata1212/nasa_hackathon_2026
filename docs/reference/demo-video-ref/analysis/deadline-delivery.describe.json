@@ -1,0 +1,506 @@
+{
+ "path": "docs/reference/demo-video-ref/deadline-delivery-trailer.mp4",
+ "start": null,
+ "end": null,
+ "duration": 56.61,
+ "measurements": {
+  "duration": 56.61,
+  "peak_dbfs": -2.4,
+  "true_peak_dbtp": -2.4,
+  "rms_dbfs": -16.9,
+  "lufs": -14.1,
+  "lra_lu": 6.8,
+  "attack_ms": 207.0,
+  "decay_ms": 56065.0,
+  "brightness_hz": 2247,
+  "bandwidth_hz": 16254,
+  "noise_floor_dbfs": -25.1,
+  "flatness": 0.0,
+  "harmonic_ratio": 0.855,
+  "f0_hz": 71.2,
+  "onset_count": 75,
+  "onsets_per_s": 1.32,
+  "width": "side/mid -10 dB",
+  "digital_silence_frac": 0.0006
+ },
+ "shape": "75 separate events, loudness range 7 LU",
+ "top_tags": [
+  {
+   "term": "a big braam",
+   "category": "impacts",
+   "z": 1.95,
+   "cosine": 0.149,
+   "verdict": "no match"
+  },
+  {
+   "term": "digging in soil",
+   "category": "nature",
+   "z": 1.82,
+   "cosine": 0.056,
+   "verdict": "no match"
+  },
+  {
+   "term": "footsteps on gravel",
+   "category": "foley",
+   "z": 1.77,
+   "cosine": 0.028,
+   "verdict": "no match"
+  },
+  {
+   "term": "a match being struck",
+   "category": "everyday",
+   "z": 1.57,
+   "cosine": 0.063,
+   "verdict": "no match"
+  },
+  {
+   "term": "a kettle whistling",
+   "category": "everyday",
+   "z": 1.55,
+   "cosine": 0.023,
+   "verdict": "no match"
+  },
+  {
+   "term": "a police siren",
+   "category": "everyday",
+   "z": 1.41,
+   "cosine": 0.033,
+   "verdict": "no match"
+  },
+  {
+   "term": "a car horn honking",
+   "category": "everyday",
+   "z": 1.39,
+   "cosine": 0.015,
+   "verdict": "no match"
+  },
+  {
+   "term": "a power drill",
+   "category": "everyday",
+   "z": 1.3,
+   "cosine": 0.036,
+   "verdict": "no match"
+  }
+ ],
+ "music_hints": [
+  {
+   "term": "drum and bass music",
+   "category": "music_genre",
+   "z": 3.65,
+   "cosine": 0.282
+  },
+  {
+   "term": "aggressive music",
+   "category": "music_mood",
+   "z": 3.59,
+   "cosine": 0.309
+  },
+  {
+   "term": "rock music with electric guitars",
+   "category": "music_genre",
+   "z": 2.9,
+   "cosine": 0.226
+  },
+  {
+   "term": "energetic and driving music",
+   "category": "music_mood",
+   "z": 2.83,
+   "cosine": 0.243
+  },
+  {
+   "term": "synthwave music",
+   "category": "music_genre",
+   "z": 2.76,
+   "cosine": 0.257
+  },
+  {
+   "term": "techno music",
+   "category": "music_genre",
+   "z": 2.74,
+   "cosine": 0.226
+  },
+  {
+   "term": "indie pop music",
+   "category": "music_genre",
+   "z": 2.72,
+   "cosine": 0.274
+  },
+  {
+   "term": "future bass music",
+   "category": "music_genre",
+   "z": 2.71,
+   "cosine": 0.27
+  }
+ ],
+ "tags": {
+  "transitions": [
+   {
+    "term": "a rising riser building tension",
+    "z": 0.87,
+    "cosine": 0.064
+   },
+   {
+    "term": "a reverse cymbal swell",
+    "z": 0.57,
+    "cosine": 0.021
+   },
+   {
+    "term": "a tape stop slowing down",
+    "z": 0.51,
+    "cosine": 0.04
+   }
+  ],
+  "impacts": [
+   {
+    "term": "a big braam",
+    "z": 1.95,
+    "cosine": 0.149
+   },
+   {
+    "term": "an explosion",
+    "z": 1.11,
+    "cosine": 0.003
+   },
+   {
+    "term": "a cinematic hit with a long tail",
+    "z": 0.93,
+    "cosine": -0.002
+   }
+  ],
+  "ui": [
+   {
+    "term": "a phone vibration buzz",
+    "z": 0.89,
+    "cosine": 0.012
+   },
+   {
+    "term": "a camera shutter click",
+    "z": 0.5,
+    "cosine": 0.03
+   },
+   {
+    "term": "a notification ding",
+    "z": -0.69,
+    "cosine": -0.09
+   }
+  ],
+  "keyboard": [
+   {
+    "term": "a soft key release click",
+    "z": -1.0,
+    "cosine": -0.135
+   },
+   {
+    "term": "a keyboard typing fast",
+    "z": -1.66,
+    "cosine": -0.174
+   },
+   {
+    "term": "an enter key press",
+    "z": -1.66,
+    "cosine": -0.123
+   }
+  ],
+  "foley": [
+   {
+    "term": "footsteps on gravel",
+    "z": 1.77,
+    "cosine": 0.028
+   },
+   {
+    "term": "a metal scrape",
+    "z": 0.68,
+    "cosine": -0.025
+   },
+   {
+    "term": "scissors cutting",
+    "z": 0.68,
+    "cosine": 0.023
+   }
+  ],
+  "water": [
+   {
+    "term": "ice cubes in a glass",
+    "z": 0.94,
+    "cosine": 0.038
+   },
+   {
+    "term": "being underwater",
+    "z": -0.39,
+    "cosine": -0.079
+   },
+   {
+    "term": "a waterfall",
+    "z": -0.52,
+    "cosine": -0.064
+   }
+  ],
+  "nature": [
+   {
+    "term": "digging in soil",
+    "z": 1.82,
+    "cosine": 0.056
+   },
+   {
+    "term": "a branch snapping",
+    "z": 0.83,
+    "cosine": 0.042
+   },
+   {
+    "term": "footsteps on grass",
+    "z": 0.46,
+    "cosine": -0.051
+   }
+  ],
+  "chimes": [
+   {
+    "term": "a wine glass ring",
+    "z": 0.09,
+    "cosine": -0.067
+   },
+   {
+    "term": "a sustained glass harp tone",
+    "z": -0.26,
+    "cosine": -0.118
+   },
+   {
+    "term": "a music box melody",
+    "z": -0.37,
+    "cosine": -0.039
+   }
+  ],
+  "ambience": [
+   {
+    "term": "birds singing in the morning",
+    "z": 1.27,
+    "cosine": -0.0
+   },
+   {
+    "term": "a city street with traffic",
+    "z": 0.92,
+    "cosine": -0.047
+   },
+   {
+    "term": "a quiet countryside morning",
+    "z": 0.91,
+    "cosine": -0.016
+   }
+  ],
+  "everyday": [
+   {
+    "term": "a match being struck",
+    "z": 1.57,
+    "cosine": 0.063
+   },
+   {
+    "term": "a kettle whistling",
+    "z": 1.55,
+    "cosine": 0.023
+   },
+   {
+    "term": "a police siren",
+    "z": 1.41,
+    "cosine": 0.033
+   }
+  ],
+  "music_genre": [
+   {
+    "term": "drum and bass music",
+    "z": 3.65,
+    "cosine": 0.282
+   },
+   {
+    "term": "rock music with electric guitars",
+    "z": 2.9,
+    "cosine": 0.226
+   },
+   {
+    "term": "synthwave music",
+    "z": 2.76,
+    "cosine": 0.257
+   }
+  ],
+  "music_mood": [
+   {
+    "term": "aggressive music",
+    "z": 3.59,
+    "cosine": 0.309
+   },
+   {
+    "term": "energetic and driving music",
+    "z": 2.83,
+    "cosine": 0.243
+   },
+   {
+    "term": "confident and cool music",
+    "z": 2.29,
+    "cosine": 0.223
+   }
+  ],
+  "instruments": [
+   {
+    "term": "a vocal chop",
+    "z": 1.31,
+    "cosine": 0.142
+   },
+   {
+    "term": "strings ensemble",
+    "z": 0.95,
+    "cosine": 0.079
+   },
+   {
+    "term": "pizzicato strings",
+    "z": 0.9,
+    "cosine": 0.065
+   }
+  ],
+  "voice": [
+   {
+    "term": "a man shouting",
+    "z": 1.24,
+    "cosine": -0.065
+   },
+   {
+    "term": "singing vocals",
+    "z": 1.01,
+    "cosine": 0.024
+   },
+   {
+    "term": "people laughing",
+    "z": 1.0,
+    "cosine": -0.095
+   }
+  ],
+  "quality": [
+   {
+    "term": "a metallic sound",
+    "z": 0.9,
+    "cosine": -0.006
+   },
+   {
+    "term": "a loud sound",
+    "z": 0.79,
+    "cosine": -0.02
+   },
+   {
+    "term": "a distant sound",
+    "z": 0.75,
+    "cosine": -0.037
+   }
+  ],
+  "production": [
+   {
+    "term": "a professionally mixed and mastered music track",
+    "z": 1.05,
+    "cosine": 0.211
+   },
+   {
+    "term": "a low quality recording with hiss",
+    "z": 0.58,
+    "cosine": -0.021
+   },
+   {
+    "term": "a field recording outdoors",
+    "z": 0.32,
+    "cosine": -0.052
+   }
+  ]
+ },
+ "audioset": [
+  {
+   "label": "Music",
+   "p": 0.709
+  },
+  {
+   "label": "Vehicle",
+   "p": 0.295
+  },
+  {
+   "label": "Shatter",
+   "p": 0.223
+  },
+  {
+   "label": "Speech",
+   "p": 0.193
+  },
+  {
+   "label": "Boom",
+   "p": 0.128
+  }
+ ],
+ "character": [],
+ "distinct_windows": [
+  {
+   "start": 0.0,
+   "end": 10.0,
+   "top_tag": {
+    "term": "a police siren",
+    "category": "everyday",
+    "z": 2.8,
+    "cosine": 0.093,
+    "verdict": "plausible"
+   },
+   "audioset": [
+    {
+     "label": "Music",
+     "p": 0.525
+    },
+    {
+     "label": "Vehicle",
+     "p": 0.295
+    },
+    {
+     "label": "Boom",
+     "p": 0.128
+    }
+   ]
+  },
+  {
+   "start": 20.0,
+   "end": 30.0,
+   "top_tag": {
+    "term": "birds singing in the morning",
+    "category": "ambience",
+    "z": 1.77,
+    "cosine": 0.045,
+    "verdict": "no match"
+   },
+   "audioset": [
+    {
+     "label": "Music",
+     "p": 0.541
+    },
+    {
+     "label": "Speech",
+     "p": 0.13
+    }
+   ]
+  },
+  {
+   "start": 46.61,
+   "end": 56.61,
+   "top_tag": {
+    "term": "a big braam",
+    "category": "impacts",
+    "z": 2.69,
+    "cosine": 0.253,
+    "verdict": "plausible"
+   },
+   "audioset": [
+    {
+     "label": "Music",
+     "p": 0.709
+    },
+    {
+     "label": "Shatter",
+     "p": 0.223
+    },
+    {
+     "label": "Vehicle",
+     "p": 0.187
+    }
+   ]
+  }
+ ],
+ "summary": "56.61 s 75 separate events, loudness range 7 LU. Music (AudioSet Music 0.71). Unvalidated hints - genre: drum and bass music (z +3.6), rock music with electric guitars (z +2.9); mood (wrong for ~1 in 5 tracks in a test): aggressive music (z +3.5), energetic and driving music (z +2.8). No sound-effect description stands out (closest: a big braam z +1.9, digging in soil z +1.8; tentative). AudioSet: Music 0.71, Vehicle 0.29, Shatter 0.22. peak -2.4 dBFS, -14.1 LUFS, brightness 2.2 kHz, bandwidth 16.3 kHz, side/mid -10 dB. Windows that read differently: 0:00.00-0:10.00 a police siren (z +2.8; AudioSet Music 0.53); 0:20.00-0:30.00 birds singing in the morning (z +1.7; AudioSet Music 0.54); 0:46.61-0:56.61 a big braam (z +2.6; AudioSet Music 0.71)."
+}

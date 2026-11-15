@@ -1,0 +1,47 @@
+earshot critique: deadline-delivery-trailer.mp4 (56.6 s) vs 7 reference films (bundled launch films)
+VERDICT: close - 19 of 23 scored metrics in range (weighted 82%), 0 critical and 3 major issues.
+FIX FIRST (most important first):
+  1. [major] sparse: 1.3 onsets/s (refs 2.46 /s .. 8.22 /s): use music with more rhythmic drive, or add UI foley (clicks, typing, ticks) on the on-screen actions
+  2. [major] 34 of 51 visual events have no onset (new attack) within +-100 ms (refs 50% .. 100%); no sound at all at 0:03.50, 0:03.97, 0:04.78, 0:30.45: add a whoosh into the transition (peak on the cut), a hit or a UI click there; 30 have sound playing through them (a swell, music or a level peak) but no new attack: add an accent on the ones that matter
+  3. [major] no salient hits (0.00/s, refs 0.10 /s .. 1.66 /s): add impacts / accents (a hit, a sub drop, a snappy UI click) on the key moments - the biggest visual events without one: 0:07.43, 0:27.42, 0:35.43, 0:40.43, 0:41.47, 0:47.22
+  4. [minor] honky or harsh mids: cut 1-3 kHz on the loudest layer by 2 dB (-7.4 dB share, refs -19.1 dB .. -10.5 dB)
+  tip: no stop-downs: 4 of 7 references drop the sound out for 0.2-1 s right before a big hit; try one before the biggest visual change at 0:40.43
+SCORECARD                                      value   ok range                        ref median  status
+  loudness integrated loudness             -14.1 LUFS   -16.0 LUFS .. -9.0 LUFS (web)   -14.8 LUFS  ok
+  loudness true peak                        -2.4 dBTP   <= 0.0 dBTP (decoded lossy)       0.6 dBTP  ok
+  realness realness (p_real)                     0.96   >= 0.77 (realness model)                    ok
+  music    music presence                         83%   >= 62%                                100%  ok
+  sync     onset on visual events +-100ms         33%   >= 45%                                 81%  low (major)
+  loudness loudness range                      6.8 LU   0.7 LU .. 13.2 LU                   5.5 LU  ok
+  loudness loudest 3 s above integrated        1.0 LU   0.6 LU .. 4.0 LU                    2.3 LU  ok
+  arc      time to first sound                 0.04 s   <= 0.58 s                           0.13 s  ok
+  ending   dead air at the end                 0.03 s   <= 2.15 s                           0.04 s  ok
+  arc      longest silent gap inside           0.02 s   <= 1.91 s                           0.02 s  ok
+  ending   final moment vs integrated         -2.0 LU   -3.7 LU .. 7.1 LU                   0.2 LU  ok
+  density  onset density                      1.32 /s   2.16 /s .. 8.52 /s                 5.66 /s  low (major)
+  density  salient hit density                0.00 /s   0.05 /s .. 1.86 /s                 1.25 /s  low (major)
+  arc      opening level (first 10%)          -1.5 LU   -19.0 LU .. 3.7 LU                 -1.1 LU  ok
+  arc      closing level (last 10%)           -7.8 LU   -15.8 LU .. 1.2 LU                 -3.0 LU  ok
+  ending   final fade / ring-out length        2.58 s   <= 3.04 s                           0.27 s  ok
+  spectrum sub 20-60 Hz share                 -8.4 dB   -17.7 dB .. -2.6 dB                -6.6 dB  ok
+  spectrum low 60-250 Hz share                -2.8 dB   -8.2 dB .. -0.6 dB                 -4.2 dB  ok
+  spectrum low-mid 250-1k share               -9.2 dB   -18.3 dB .. -0.2 dB                -5.3 dB  ok
+  spectrum mid 1-4 kHz share                  -7.4 dB   -20.6 dB .. -9.0 dB               -12.4 dB  high (minor)
+  spectrum presence 4-8 kHz share            -15.3 dB   -31.8 dB .. -11.6 dB              -17.8 dB  ok
+  spectrum air 8-16 kHz share                -27.7 dB   -35.7 dB .. -9.7 dB               -23.6 dB  ok
+  stereo   stereo width (side vs mid)         -9.8 dB   -15.5 dB .. -4.0 dB                -8.5 dB  ok
+LOUDNESS ARC (LU vs integrated at 0%, 10% .. 100% of the film; not scored):
+  this film      -1.8   -0.4   +0.5   +0.5   +0.6   +0.6   +0.5   +0.6   +0.5   -6.8  -11.3
+  refs median    -1.3   -0.8   +0.3   -0.3   -0.2   +0.2   +0.0   -0.4   +0.9   -0.3   -7.4
+NOT SCORED (style choices, shown for context):
+  voice / speech presence                                            0%   refs p10-p90 0% .. 100%
+  tempo                                                         144 BPM   refs p10-p90 115 BPM .. 136 BPM
+  position of the loudest 3 s                                      0.81   refs p10-p90 0.10 .. 0.83
+  stop-downs                                                   0.0 /min   refs p10-p90 0.0 /min .. 9.1 /min
+  visual events (cuts, big changes)                             0.90 /s   refs p10-p90 0.31 /s .. 1.42 /s
+  visual events with a salient hit +-100 ms              0% (chance 0%)   refs p10-p90 8% .. 49%
+  visual events with an onset +-1 frame                 12% (chance 6%)   refs p10-p90 34% .. 59%
+  visual events on the beat grid +-70 ms               31% (chance 34%)   refs p10-p90 20% .. 45%
+  brightness (median spectral centroid)                         2247 Hz   refs p10-p90 1183 Hz .. 3030 Hz
+  L/R correlation                                                  0.81   refs p10-p90 0.58 .. 0.86
+realness: deadline-delivery-trailer.mp4: real or pro-produced (p_real 0.96, mean of 15 4 s windows; file thresholds lo 0.4 / hi 0.77, weak calibration): 0 of 15 windows lean synthesized (p_real < 0.5); mean CLAP head score +3.6. No window leans synthesized (lowest p_real 0.78); that does not rule out a code-made layer under a louder real mix (most are missed): judge the source files and stems.

@@ -1,0 +1,502 @@
+{
+ "path": "docs/reference/demo-video-ref/splatoon-intro.mp4",
+ "start": null,
+ "end": null,
+ "duration": 400.614,
+ "measurements": {
+  "duration": 400.614,
+  "peak_dbfs": -0.4,
+  "true_peak_dbtp": -0.4,
+  "rms_dbfs": -21.4,
+  "lufs": -17.4,
+  "lra_lu": 4.8,
+  "attack_ms": 6.0,
+  "decay_ms": 119.0,
+  "brightness_hz": 3000,
+  "bandwidth_hz": 16254,
+  "noise_floor_dbfs": -31.1,
+  "flatness": 0.0002,
+  "width": "side/mid -14 dB",
+  "digital_silence_frac": 0.0005
+ },
+ "shape": "long recording, loudness range 5 LU",
+ "top_tags": [
+  {
+   "term": "digging in soil",
+   "category": "nature",
+   "z": 2.89,
+   "cosine": 0.007,
+   "verdict": "plausible"
+  },
+  {
+   "term": "a snare hit",
+   "category": "impacts",
+   "z": 2.6,
+   "cosine": 0.004,
+   "verdict": "plausible"
+  },
+  {
+   "term": "an apple falling on grass",
+   "category": "nature",
+   "z": 2.12,
+   "cosine": 0.011,
+   "verdict": "weak"
+  },
+  {
+   "term": "fireworks exploding",
+   "category": "everyday",
+   "z": 2.08,
+   "cosine": -0.036,
+   "verdict": "weak"
+  },
+  {
+   "term": "walking through dry leaves",
+   "category": "nature",
+   "z": 1.85,
+   "cosine": -0.019,
+   "verdict": "no match"
+  },
+  {
+   "term": "a gunshot",
+   "category": "impacts",
+   "z": 1.77,
+   "cosine": -0.016,
+   "verdict": "no match"
+  },
+  {
+   "term": "a wooden block hit",
+   "category": "foley",
+   "z": 1.72,
+   "cosine": 0.002,
+   "verdict": "no match"
+  },
+  {
+   "term": "a punchy impact hit",
+   "category": "impacts",
+   "z": 1.69,
+   "cosine": -0.075,
+   "verdict": "no match"
+  }
+ ],
+ "music_hints": [
+  {
+   "term": "funk music",
+   "category": "music_genre",
+   "z": 2.83,
+   "cosine": 0.105
+  },
+  {
+   "term": "a snare roll",
+   "category": "instruments",
+   "z": 2.46,
+   "cosine": 0.01
+  },
+  {
+   "term": "aggressive music",
+   "category": "music_mood",
+   "z": 2.25,
+   "cosine": 0.055
+  },
+  {
+   "term": "celebratory and joyful music",
+   "category": "music_mood",
+   "z": 1.97,
+   "cosine": 0.032
+  },
+  {
+   "term": "drum and bass music",
+   "category": "music_genre",
+   "z": 1.95,
+   "cosine": 0.003
+  },
+  {
+   "term": "rock music with electric guitars",
+   "category": "music_genre",
+   "z": 1.93,
+   "cosine": 0.014
+  },
+  {
+   "term": "a man shouting",
+   "category": "voice",
+   "z": 1.91,
+   "cosine": -0.127
+  },
+  {
+   "term": "inspirational corporate background music",
+   "category": "music_genre",
+   "z": 1.8,
+   "cosine": 0.066
+  }
+ ],
+ "tags": {
+  "transitions": [
+   {
+    "term": "cloth whipping through the air",
+    "z": 1.68,
+    "cosine": -0.025
+   },
+   {
+    "term": "a tape stop slowing down",
+    "z": 1.4,
+    "cosine": 0.011
+   },
+   {
+    "term": "a stick swung fast through the air",
+    "z": 1.22,
+    "cosine": -0.045
+   }
+  ],
+  "impacts": [
+   {
+    "term": "a snare hit",
+    "z": 2.6,
+    "cosine": 0.004
+   },
+   {
+    "term": "a gunshot",
+    "z": 1.77,
+    "cosine": -0.016
+   },
+   {
+    "term": "a punchy impact hit",
+    "z": 1.69,
+    "cosine": -0.075
+   }
+  ],
+  "ui": [
+   {
+    "term": "a camera shutter click",
+    "z": 1.57,
+    "cosine": 0.014
+   },
+   {
+    "term": "a phone vibration buzz",
+    "z": 0.92,
+    "cosine": -0.083
+   },
+   {
+    "term": "a toggle switch click",
+    "z": 0.72,
+    "cosine": -0.02
+   }
+  ],
+  "keyboard": [
+   {
+    "term": "an old typewriter",
+    "z": 0.5,
+    "cosine": -0.089
+   },
+   {
+    "term": "a soft key release click",
+    "z": -0.09,
+    "cosine": -0.125
+   },
+   {
+    "term": "a single mechanical keyboard key press",
+    "z": -0.17,
+    "cosine": -0.089
+   }
+  ],
+  "foley": [
+   {
+    "term": "a wooden block hit",
+    "z": 1.72,
+    "cosine": 0.002
+   },
+   {
+    "term": "footsteps on wood",
+    "z": 1.62,
+    "cosine": -0.072
+   },
+   {
+    "term": "footsteps on gravel",
+    "z": 1.61,
+    "cosine": -0.101
+   }
+  ],
+  "water": [
+   {
+    "term": "bubbles underwater",
+    "z": 0.81,
+    "cosine": -0.08
+   },
+   {
+    "term": "ice cubes in a glass",
+    "z": 0.56,
+    "cosine": -0.086
+   },
+   {
+    "term": "being underwater",
+    "z": 0.19,
+    "cosine": -0.107
+   }
+  ],
+  "nature": [
+   {
+    "term": "digging in soil",
+    "z": 2.89,
+    "cosine": 0.007
+   },
+   {
+    "term": "an apple falling on grass",
+    "z": 2.12,
+    "cosine": 0.011
+   },
+   {
+    "term": "walking through dry leaves",
+    "z": 1.85,
+    "cosine": -0.019
+   }
+  ],
+  "chimes": [
+   {
+    "term": "a triangle hit",
+    "z": 0.35,
+    "cosine": -0.132
+   },
+   {
+    "term": "a celesta note",
+    "z": -0.38,
+    "cosine": -0.083
+   },
+   {
+    "term": "a magic sparkle chime",
+    "z": -0.48,
+    "cosine": -0.098
+   }
+  ],
+  "ambience": [
+   {
+    "term": "a crackling fire",
+    "z": 1.18,
+    "cosine": -0.018
+   },
+   {
+    "term": "people talking in the background",
+    "z": 0.66,
+    "cosine": -0.21
+   },
+   {
+    "term": "a dog barking",
+    "z": 0.43,
+    "cosine": -0.156
+   }
+  ],
+  "everyday": [
+   {
+    "term": "fireworks exploding",
+    "z": 2.08,
+    "cosine": -0.036
+   },
+   {
+    "term": "a match being struck",
+    "z": 1.66,
+    "cosine": -0.045
+   },
+   {
+    "term": "keys jingling",
+    "z": 1.27,
+    "cosine": -0.052
+   }
+  ],
+  "music_genre": [
+   {
+    "term": "funk music",
+    "z": 2.83,
+    "cosine": 0.105
+   },
+   {
+    "term": "drum and bass music",
+    "z": 1.95,
+    "cosine": 0.003
+   },
+   {
+    "term": "rock music with electric guitars",
+    "z": 1.93,
+    "cosine": 0.014
+   }
+  ],
+  "music_mood": [
+   {
+    "term": "aggressive music",
+    "z": 2.25,
+    "cosine": 0.055
+   },
+   {
+    "term": "celebratory and joyful music",
+    "z": 1.97,
+    "cosine": 0.032
+   },
+   {
+    "term": "confident and cool music",
+    "z": 1.34,
+    "cosine": 0.028
+   }
+  ],
+  "instruments": [
+   {
+    "term": "a snare roll",
+    "z": 2.46,
+    "cosine": 0.01
+   },
+   {
+    "term": "pizzicato strings",
+    "z": 1.21,
+    "cosine": -0.013
+   },
+   {
+    "term": "brass section",
+    "z": 1.1,
+    "cosine": -0.032
+   }
+  ],
+  "voice": [
+   {
+    "term": "a man shouting",
+    "z": 1.91,
+    "cosine": -0.127
+   },
+   {
+    "term": "a man speaking",
+    "z": 1.75,
+    "cosine": -0.134
+   },
+   {
+    "term": "a crowd talking",
+    "z": 1.16,
+    "cosine": -0.177
+   }
+  ],
+  "quality": [
+   {
+    "term": "a tight snappy sound",
+    "z": 1.37,
+    "cosine": -0.013
+   },
+   {
+    "term": "a punchy sound",
+    "z": 0.78,
+    "cosine": -0.064
+   },
+   {
+    "term": "a loud sound",
+    "z": 0.18,
+    "cosine": -0.155
+   }
+  ],
+  "production": [
+   {
+    "term": "a professionally mixed and mastered music track",
+    "z": 0.83,
+    "cosine": 0.095
+   },
+   {
+    "term": "a distorted clipped recording",
+    "z": 0.7,
+    "cosine": -0.089
+   },
+   {
+    "term": "a low quality recording with hiss",
+    "z": 0.17,
+    "cosine": -0.138
+   }
+  ]
+ },
+ "audioset": [
+  {
+   "label": "Music",
+   "p": 0.824
+  },
+  {
+   "label": "Speech",
+   "p": 0.686
+  },
+  {
+   "label": "Fowl",
+   "p": 0.47
+  },
+  {
+   "label": "Gunshot, gunfire",
+   "p": 0.218
+  },
+  {
+   "label": "Machine gun",
+   "p": 0.183
+  }
+ ],
+ "character": [],
+ "distinct_windows": [
+  {
+   "start": 0.0,
+   "end": 10.0,
+   "top_tag": {
+    "term": "digging in soil",
+    "category": "nature",
+    "z": 2.76,
+    "cosine": 0.097,
+    "verdict": "plausible"
+   },
+   "audioset": [
+    {
+     "label": "Music",
+     "p": 0.583
+    },
+    {
+     "label": "Snare drum",
+     "p": 0.167
+    },
+    {
+     "label": "Drum",
+     "p": 0.127
+    }
+   ]
+  },
+  {
+   "start": 315.0,
+   "end": 325.0,
+   "top_tag": {
+    "term": "fireworks exploding",
+    "category": "everyday",
+    "z": 3.63,
+    "cosine": 0.101,
+    "verdict": "strong"
+   },
+   "audioset": [
+    {
+     "label": "Music",
+     "p": 0.449
+    },
+    {
+     "label": "Speech",
+     "p": 0.339
+    },
+    {
+     "label": "Gunshot, gunfire",
+     "p": 0.218
+    }
+   ]
+  },
+  {
+   "start": 390.614,
+   "end": 400.614,
+   "top_tag": {
+    "term": "a snare hit",
+    "category": "impacts",
+    "z": 2.32,
+    "cosine": 0.031,
+    "verdict": "weak"
+   },
+   "audioset": [
+    {
+     "label": "Music",
+     "p": 0.824
+    },
+    {
+     "label": "Speech",
+     "p": 0.657
+    }
+   ]
+  }
+ ],
+ "summary": "400.61 s long recording, loudness range 5 LU. Music (AudioSet Music 0.82). Unvalidated hints - genre: funk music (z +2.8), drum and bass music (z +1.9); mood (wrong for ~1 in 5 tracks in a test): aggressive music (z +2.2), celebratory and joyful music (z +1.9). Sounds most like: digging in soil (z +2.8), a snare hit (z +2.6), an apple falling on grass (z +2.1) [plausible reading]. Other readings: fireworks exploding (everyday, z +2.0), a wooden block hit (foley, z +1.7). AudioSet: Music 0.82, Speech 0.69, Fowl 0.47. peak -0.4 dBFS, -17.4 LUFS, brightness 3.0 kHz, bandwidth 16.3 kHz, side/mid -14 dB. Windows that read differently: 0:00.00-0:10.00 digging in soil (z +2.7; AudioSet Music 0.58); 5:15.00-5:25.00 fireworks exploding (z +3.6; AudioSet Music 0.45); 6:30.61-6:40.61 a snare hit (z +2.3; AudioSet Music 0.82)."
+}
