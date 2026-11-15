@@ -62,7 +62,6 @@ public class LifeSupportPanel : SeatPanel
     // ------------------------------------------------------------------ 作る
     protected override void BuildControls(RectTransform row)
     {
-        RootAsDetail();
         if (Ctx.Model.Phase != "flight") closed.Clear();
         strip = SeatLook.Strip(row, SeatLook.CursorRoom);   // 左の案内の文を手で指すので、左に手の場所を空ける
 
@@ -99,7 +98,6 @@ public class LifeSupportPanel : SeatPanel
     /// <summary>M04：かき混ぜの主ボタンだけ。押したら消す（M04 がもう一度流れたら出し直す）</summary>
     protected override void BuildStir(RectTransform row)
     {
-        RootAsDetail();
         strip = SeatLook.Strip(row);
         stirCard = LpKit.Card(strip.Rect, "Stir");
         stirBtn = UiKit.PrimaryButton(stirCard.Root, Txt.Stir, "switch", Stir);
