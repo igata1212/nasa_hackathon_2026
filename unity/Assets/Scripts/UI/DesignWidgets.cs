@@ -1,8 +1,9 @@
-// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#168・#190 あつ森の作り：数のチップ・タブの帯・材料の行・選択肢の吹き出し・指さしの手・チェックの丸・見出しの帯）
+// 書いた人：iizuka（作成：Opus 5.5）／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-15、#168・#190 あつ森の作り：数のチップ・タブの帯・材料の行・選択肢の吹き出し・指さしの手・チェックの丸・見出しの帯）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 共通の部品 UiKit.Row・Choice・Counter・Ribbon と UiSelect の手・チェックに替えた）
 // 設計の画面（#73・#168）の小さな部品。見た目の決まりは docs/design/ui-guidelines.md（#190）の 1〜3章、【NN】は 0章の基準の画像。
-//   影は付けない（原則 2）／明るい面の文字は茶（DesignTokens.Text）／大文字だけの言葉にしない／選んだ印は手・マーカー・チェック・名前の札（紺で塗らない）
-// 色と大きさは UiTokens・DesignTokens、形（sprite）は DesignShapes から読む（ここに色コードや px を書かない）。数字は計算しない（サーバーの totals をそのまま出す）。
-// #190 の UiSelect.cs（手・品名の札・チェック・マーカー）ができたら、DesignHand・DesignUi.CheckBadge・DesignChoiceBubble のマーカーをそれに替える
+//   影は付けない（原則 2）／明るい面の文字は茶（T.Text）／大文字だけの言葉にしない／選んだ印は手・マーカー・チェック・名前の札（紺で塗らない）
+// 中身は共通の部品（UiKit.Row＝材料の行、UiKit.Choice＝選択肢の吹き出し、UiKit.Counter＝数のチップ、UiKit.Ribbon＝見出しの帯、UiSelect＝手・チェック）。
+//   ここは設計の画面に足りない所だけ（行の名前の下の値段のアイコン、− ＋ の棒、選択肢の右の値段、数のチップの数え上げ、タブの帯）。
+// 色と大きさは UiTokens・DesignTokens から読む（ここに色コードや px を書かない）。数字は計算しない（サーバーの totals をそのまま出す）。
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -10,15 +11,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using T = UiTokens;
 using D = DesignTokens;
-using S = DesignShapes;
 
 public static class DesignUi
 {
-    /// <summary>言葉（丸い書体 Nunito。#190：見出し・ボタン・名前も同じ太さ1種類。Nunito ExtraBold ができるまで Bold）。h を渡すと高さを固定</summary>
+    /// <summary>言葉（丸い書体 Nunito。strong なら ExtraBold＝見出し・札・名前、それ以外は Bold）。h を渡すと高さを固定</summary>
     public static TextMeshProUGUI Words(Transform p, string s, float size, Color c, TextAlignmentOptions a = TextAlignmentOptions.MidlineLeft,
-        float h = -1f, bool ellipsis = false, bool wrap = false)
+        float h = -1f, bool ellipsis = false, bool wrap = false, bool strong = false)
     {
-        var t = UiKit.Text(p, s, TextStyle.Body, c, a, false);
+        var t = UiKit.Text(p, s, strong ? TextStyle.RowName : TextStyle.Body, c, a, false);
         t.fontSize = size;
         if (ellipsis) t.overflowMode = TextOverflowModes.Ellipsis;
         if (wrap) t.textWrappingMode = TextWrappingModes.Normal;
@@ -28,7 +28,7 @@ public static class DesignUi
         return t;
     }
 
-    /// <summary>押せる面。UiKit のボタンと同じ押し心地（ColorTint と UiPress）</summary>
+    /// <summary>押せる面（ColorTint と UiPress の音）。押すと body が UiSelect.Pick で弾む</summary>
     public static Button Press(RectTransform root, RectTransform body, Graphic target, Action on)
     {
         var b = root.gameObject.AddComponent<Button>();
@@ -38,7 +38,7 @@ public static class DesignUi
         cb.normalColor = cb.selectedColor = cb.disabledColor = Color.white;
         cb.highlightedColor = T.TintHover; cb.pressedColor = T.TintPressed; cb.fadeDuration = T.TintFade;
         b.colors = cb;
-        if (on != null) b.onClick.AddListener(() => on());
+        b.onClick.AddListener(() => { if (body != null) UiSelect.Pick(body); on?.Invoke(); });
         root.gameObject.AddComponent<UiPress>().Init(body, b);
         return b;
     }
@@ -46,46 +46,36 @@ public static class DesignUi
     /// <summary>丸（blob_disc）。d の大きさで親の中央に置く（レイアウトの外）</summary>
     public static Image Disc(Transform p, Color c, float d, string name = "Disc")
     {
-        var img = UiKit.Shape(p, S.Disc, c, d * 0.5f, name);
+        var img = UiKit.Blob(p, T.BlobDisc, c, d * 0.5f, name);
         UiKit.Center(img.rectTransform, d, d);
         UiKit.Ignore(img);
         return img;
     }
 
-    /// <summary>アイコンの台（【01】）：色つきの丸に panel の絵（台の 60%）。"O2" は O₂ の文字。レイアウトの中では d×d</summary>
+    /// <summary>アイコンの台（【01】）：色つきの blob_disc に panel の絵（台の 60%）。"O2" は O₂ の文字。レイアウトの中では d×d</summary>
     public static RectTransform Platform(Transform p, string icon, float d, Color face, out Image disc, out Graphic glyph)
     {
         var r = Ui.Rect("Platform_" + icon, p);
         UiKit.Fixed(r, d, d);
         r.sizeDelta = new Vector2(d, d);
         disc = Disc(r, face, d);
+        glyph = Glyph(r, icon, d);
+        return r;
+    }
+
+    /// <summary>台の上の絵（台の 60%、panel）。"O2" は O₂ の文字（Ionicons に酸素が無い。ui-guidelines 4章）</summary>
+    public static Graphic Glyph(RectTransform r, string icon, float d)
+    {
         if (icon == "O2")
         {
             var tx = UiKit.Text(r, "O₂", TextStyle.Tag, T.Panel, TextAlignmentOptions.Center, false);
             tx.fontSize = d * 0.42f;
             UiKit.Fill(tx.rectTransform); UiKit.Ignore(tx);
-            glyph = tx;
+            return tx;
         }
-        else
-        {
-            var ic = UiKit.Icon(r, icon, d * 0.6f, T.Panel);
-            UiKit.Center(ic.rectTransform, d * 0.6f, d * 0.6f); UiKit.Ignore(ic);
-            glyph = ic;
-        }
-        return r;
-    }
-
-    /// <summary>チェックの丸（【09】）：go の丸に白い ✓。親の右上の角にかぶせる</summary>
-    public static RectTransform CheckBadge(RectTransform owner, float d)
-    {
-        var r = Ui.Rect("Check", owner);
-        r.anchorMin = r.anchorMax = Vector2.one; r.pivot = new Vector2(0.5f, 0.5f);
-        r.sizeDelta = new Vector2(d, d); r.anchoredPosition = new Vector2(-d * 0.3f, -d * 0.05f);   // 右の言葉に重ならないよう、台の内側に寄せる
-        Disc(r, T.Go, d);
-        var ic = UiKit.Icon(r, "check", d * 0.62f, T.Panel);
-        UiKit.Center(ic.rectTransform, d * 0.62f, d * 0.62f); UiKit.Ignore(ic);
-        Ui.Size(r).ignoreLayout = true;
-        return r;
+        var ic = UiKit.Icon(r, icon, d * 0.6f, T.Panel);
+        UiKit.Center(ic.rectTransform, d * 0.6f, d * 0.6f); UiKit.Ignore(ic);
+        return ic;
     }
 
     /// <summary>横の点線（【11】の材料の行・見出しの下）。太さ 3、長さ 8・間 8</summary>
@@ -98,28 +88,32 @@ public static class DesignUi
         return d;
     }
 
-    /// <summary>パネル（【05】）：明るい内ふち＋面（＋横縞）。影なし。返す root に上から足す（VerticalLayoutGroup。内側＝内ふち＋pad）。後ろへの押下は止める</summary>
+    /// <summary>パネル（【05】）：UiKit.PanelFace（blob_panel＋明るい内ふち 12＋横縞）。影なし。3D の上に置くので内ふちは不透明（D.Rim）。
+    /// 返す root に上から足す（VerticalLayoutGroup。内側＝内ふち＋pad）。後ろへの押下は止める</summary>
     public static RectTransform Panel(Transform p, Color face, bool bands, float spacing, float pad, string name)
     {
         var r = Ui.Rect(name, p);
-        var rim = UiKit.Shape(r, S.Panel, D.Rim, S.PanelRadius, "Rim"); UiKit.Fill(rim.rectTransform); UiKit.Ignore(rim);
-        rim.raycastTarget = true;
-        var f = UiKit.Shape(r, S.Panel, face, S.PanelRadius - D.RimPanel, "Face"); UiKit.Fill(f.rectTransform, D.RimPanel); UiKit.Ignore(f);
-        if (bands)
-        {
-            f.gameObject.AddComponent<Mask>().showMaskGraphic = true;   // 横縞を面の形で切る
-            var br = Ui.Rect("Bands", f.transform); UiKit.Fill(br);
-            var raw = br.gameObject.AddComponent<RawImage>();
-            raw.texture = S.Bands; raw.color = D.PanelBand; raw.raycastTarget = false;
-            UiTick.On(br.gameObject, _ => { float h = Mathf.Max(1f, br.rect.height); raw.uvRect = new Rect(0f, 0f, 1f, h / 128f); });
-        }
+        var rim = UiKit.PanelFace(r, face, bands);
+        rim.color = D.Rim; rim.raycastTarget = true;
         var l = r.gameObject.AddComponent<VerticalLayoutGroup>();
-        int inset = Mathf.RoundToInt(D.RimPanel + pad);
+        int inset = Mathf.RoundToInt(T.RimPanel + pad);
         l.padding = new RectOffset(inset, inset, inset, inset);
         l.spacing = spacing; l.childAlignment = TextAnchor.UpperLeft;
         l.childControlWidth = l.childControlHeight = true;
         l.childForceExpandWidth = true; l.childForceExpandHeight = false;
         return r;
+    }
+
+    /// <summary>右寄せの小さな値段の列（選択肢の行の右）。親いっぱいの高さ、右の端に付く（レイアウトの外）</summary>
+    public static RectTransform RightStats(RectTransform row, DesignStatCopy[] stats, Func<string, string> fill)
+    {
+        var st = UiKit.Row(row, T.S2, TextAnchor.MiddleRight);
+        st.name = "Stats";
+        st.anchorMin = new Vector2(1f, 0f); st.anchorMax = Vector2.one; st.pivot = new Vector2(1f, 0.5f);
+        st.anchoredPosition = Vector2.zero; st.sizeDelta = Vector2.zero;
+        st.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        foreach (var s in stats) DesignStat.Make(st, s.Icon, fill(s.Text), D.TextPrice, D.TextSub);
+        return st;
     }
 }
 
@@ -137,14 +131,14 @@ public class DesignStat
         s.Root.name = "Stat_" + icon;
         if (icon == "O2")
         {
-            s.Icon = UiKit.Pill(s.Root, c, size, "O2");
+            s.Icon = UiKit.Blob(s.Root, T.BlobDisc, c, size * 0.5f, "O2");
             UiKit.Fixed(s.Icon, size, size);
             s.IconText = UiKit.Text(s.Icon.transform, "O₂", TextStyle.Tag, T.Panel, TextAlignmentOptions.Center, false);
             s.IconText.fontSize = size * 0.5f;
             UiKit.Fill(s.IconText.rectTransform); UiKit.Ignore(s.IconText);
         }
         else s.Icon = UiKit.Icon(s.Root, icon, size, c);
-        s.Text = UiKit.Text(s.Root, text, TextStyle.Body, c, TextAlignmentOptions.MidlineLeft, false);
+        s.Text = UiKit.Text(s.Root, text, TextStyle.Price, c, TextAlignmentOptions.MidlineLeft, false);
         s.Text.fontSize = size;
         s.SetColor(c);
         return s;
@@ -158,7 +152,8 @@ public class DesignStat
     }
 }
 
-/// <summary>− ＋ のボタン：panel の丸 56 に bgDeep のふち 5、茶の棒（影なし）。レイアウトの幅は 64、押せる範囲は 96（両どなりへはみ出す）</summary>
+/// <summary>− ＋ のボタン：panel の blob_disc 56 に bgDeep のふち 5、茶の棒（影なし）。レイアウトの幅は 64、押せる範囲は 96（両どなりへはみ出す）。
+/// UiKit.Row の − ＋ は Baloo の「−」（U+2212）で描くが、Baloo の SDF にその字が無く別の書体に落ちるので、棒で描く</summary>
 public class DesignStepButton
 {
     public RectTransform Root, Body;
@@ -198,17 +193,16 @@ public class DesignStepButton
     }
 }
 
-/// <summary>材料の行（【11】）：角丸の淡い帯に、アイコンの台＋名前（下に値段）＋点線＋（色の箱の数 / 上限 と − ＋）か トグル。
-/// 1個以上積んだ行は、台の右上にチェックの丸（【09】）。枠や影で囲まない</summary>
+/// <summary>材料の行（【11】）＝ UiKit.Row：panelBand の角丸の帯に、アイコンの台＋名前（下に値段のアイコンと数字。【09】）＋点線＋色の箱の数 ＋「/ 上限」＋ − ＋。
+/// 1個までの部品は − ＋ の代わりにトグル。1個以上積んだ行は台の右上にチェック（UiSelect.Check。【09】）。枠や影で囲まない</summary>
 public class DesignRow
 {
     public string Id;
     public int Min, Max;
     public RectTransform Root;
-    public TextMeshProUGUI Name, Count;
-    public DesignStepButton Minus, Plus;
-    public UiToggle Toggle;
-    RectTransform check;
+    public UiRow Row;
+    DesignStepButton minus, plus;
+    UiToggle toggle;
 
     /// <param name="onDelta">± を押したとき（+1／−1）</param>
     /// <param name="onSet">トグルを押したとき（なりたい個数 0／1）</param>
@@ -216,124 +210,99 @@ public class DesignRow
         int min, int max, Action<int> onDelta, Action<int> onSet)
     {
         var c = new DesignRow { Id = copy.Id, Min = min, Max = max };
-        c.Root = Ui.Rect("Part_" + copy.Id, p);
-        var le = Ui.Size(c.Root, w: 0f, h: D.RowStepH, flexW: 1f); le.minHeight = D.RowStepMinH; le.minWidth = 0f; le.flexibleHeight = 0f;
-        var strip = UiKit.Round(c.Root, D.RowRadius, D.PanelBand, "Strip"); UiKit.Fill(strip.rectTransform);
+        bool o2 = copy.Icon == "O2";
+        var u = UiKit.Row(p, o2 ? null : copy.Icon, copy.Name, null, platform);
+        c.Row = u; c.Root = u.Root;
+        c.Root.name = "Part_" + copy.Id;
+        if (o2) DesignUi.Glyph(u.Disc.Root, "O2", T.RowDiscD);
+        // − ＋ の行の高さ 96（画面が低いと 80。押せる範囲は 96 のまま）。棚の幅 528 に収まるよう間を詰める
+        var le = Ui.Size(u.Root, w: 0f, h: D.RowStepH, flexW: 1f); le.minHeight = D.RowStepMinH; le.minWidth = 0f; le.flexibleHeight = 0f;
+        var l = u.Root.GetComponent<HorizontalLayoutGroup>();
+        l.spacing = T.S1; l.padding.left = l.padding.right = Mathf.RoundToInt(D.RowPadX);
+        UiKit.Fixed(u.Box, D.CountBoxW, D.CountBoxW);
+        // 積んだ印（UiSelect.Check）を台 48 に合わせて小さく、台の右上の角へ（絵と名前にかぶらない。【09】）。あとの SetChecked はこの丸を出し入れするだけ
+        var chk = UiSelect.Check(u.Disc.Root, false).rectTransform;
+        chk.sizeDelta = new Vector2(D.RowCheckD, D.RowCheckD);
+        chk.anchoredPosition = new Vector2(-D.RowCheckD * 0.3f, -D.RowCheckD * 0.05f);
+        if (chk.Find("Icon_check") is RectTransform tick) tick.sizeDelta = new Vector2(D.RowCheckD * 0.62f, D.RowCheckD * 0.62f);
 
-        var row = UiKit.Row(c.Root, T.S1, TextAnchor.MiddleLeft, D.RowPadX, 0f); UiKit.Fill(row);
-        var plat = DesignUi.Platform(row, copy.Icon, D.RowIconD, platform, out _, out _);
-        c.check = DesignUi.CheckBadge(plat, D.CheckD * 0.8f);
-
-        var col = UiKit.Col(row, 0f, TextAnchor.MiddleLeft, 0f, 0f, true);
-        c.Name = DesignUi.Words(col, copy.Name, D.TextRow, D.Text, TextAlignmentOptions.MidlineLeft, D.RowNameH);
-        var price = UiKit.Row(col, T.S2, TextAnchor.MiddleLeft);
+        // 名前の下の値段：重さ・費用（・科学）の小さなアイコン＋数字（【09】）。UiRow.Sub は文字だけなので使わない
+        u.SetSub(null);
+        var price = UiKit.Row(u.Name.transform.parent, T.S2, TextAnchor.MiddleLeft);
+        price.name = "Price";
         Ui.Size(price, h: D.RowPriceH);
         DesignStat.Make(price, "mass", mass, D.TextPrice, D.TextSub);
         DesignStat.Make(price, "cost", cost, D.TextPrice, D.TextSub);
         if (science != null) DesignStat.Make(price, "science", science, D.TextPrice, D.TextSub);
 
-        DesignUi.Dots(row, D.BgDeep, true);
-
         if (max == 1)
         {
-            c.Toggle = HudKit.Toggle(row, null, "", on => onSet(on ? 1 : 0));
-            c.Toggle.Label.gameObject.SetActive(false);
-            UiKit.Fixed(c.Toggle.Root, T.ToggleW, T.Hit);
+            c.toggle = HudKit.Toggle(u.Right, null, "", on => onSet(on ? 1 : 0));
+            c.toggle.Label.gameObject.SetActive(false);
+            UiKit.Fixed(c.toggle.Root, T.ToggleW, T.Hit);
         }
         else
         {
-            var step = UiKit.Row(row, T.S1 * 0.5f, TextAnchor.MiddleCenter);
-            c.Minus = DesignStepButton.Make(step, false, () => onDelta(-1));
-            var box = Ui.Rect("Count", step);
-            UiKit.Fixed(box, D.CountBoxW, D.CountBoxW);
-            var boxFace = UiKit.Round(box, D.NumBoxRadius, D.Mark, "Box"); UiKit.Fill(boxFace.rectTransform);
-            c.Count = UiKit.Text(box, "0", TextStyle.Number, D.Text, TextAlignmentOptions.Center, false);
-            c.Count.fontSize = D.TextRow;
-            UiKit.Fill(c.Count.rectTransform);
-            var of = DesignUi.Words(step, "/ " + max, D.TextRow, D.TextSub, TextAlignmentOptions.MidlineLeft);
-            UiKit.Fixed(of, D.MaxW, D.RowNameH);
-            c.Plus = DesignStepButton.Make(step, true, () => onDelta(+1));
+            c.minus = DesignStepButton.Make(u.Right, false, () => onDelta(-1));
+            c.plus = DesignStepButton.Make(u.Right, true, () => onDelta(+1));
         }
         return c;
     }
 
     public void Set(int n)
     {
-        check.gameObject.SetActive(n > 0);
-        if (Toggle != null) { Toggle.Set(n > 0); return; }
-        Count.text = n.ToString();
-        Minus.SetEnabled(n > Min);
-        Plus.SetEnabled(n < Max);
+        Row.SetChecked(n > 0);
+        if (toggle != null) { toggle.Set(n > 0); return; }
+        Row.SetCount(n, Max);
+        minus.SetEnabled(n > Min);
+        plus.SetEnabled(n < Max);
     }
 }
 
-/// <summary>選択肢の吹き出し（【10】）：黄みの面に、選択肢の言葉だけを縦に（行の右に小さな値段）。選んだ行は文字の後ろにマーカー。手は DesignHand が左の外に置く。押すとすぐ決まる</summary>
+/// <summary>選択肢の吹き出し（【10】）＝ UiKit.Choice：黄みの blob_panel に選択肢の言葉を縦に、選んだ行の文字の後ろにマーカー。押すとすぐ決まる。
+/// 設計の画面で足す所：言葉を左寄せにして行の右に小さな値段、画面が低いと行を 64 まで縮める。手は画面に1つなので DesignScreen が置く（cursor=false）</summary>
 public class DesignChoiceBubble
 {
-    class Option { public string Key; public RectTransform Row; public TextMeshProUGUI Text; public Image Marker; }
-    public RectTransform Root;
-    readonly List<Option> options = new List<Option>();
-    public string Selected { get; private set; } = "";
+    public UiChoice Choice;
+    public RectTransform Root => Choice.Root;
+    readonly string[] keys;
+    public string Selected => Choice.Selected >= 0 ? keys[Choice.Selected] : "";
+    /// <summary>手を置く先（選んだ行。まだ選んでいなければ null）</summary>
+    public RectTransform SelectedRow => Choice.Selected >= 0 ? Choice.Rows[Choice.Selected] : null;
+
+    DesignChoiceBubble(string[] keys) { this.keys = keys; }
 
     public static DesignChoiceBubble Make(Transform p, DesignChoiceCopy[] list, Func<string, string> fill, Action<string> onPick)
     {
-        var b = new DesignChoiceBubble();
-        b.Root = Ui.Rect("Choice", p);
-        var face = UiKit.Shape(b.Root, S.Panel, D.Choice, S.PanelRadius, "Face"); UiKit.Fill(face.rectTransform); UiKit.Ignore(face);
-        face.raycastTarget = true;
-        var l = b.Root.gameObject.AddComponent<VerticalLayoutGroup>();
-        int padX = Mathf.RoundToInt(D.ChoicePad), padY = Mathf.RoundToInt(D.ChoicePad * 0.5f);
-        l.padding = new RectOffset(padX, padX, padY, padY);
-        l.childControlWidth = l.childControlHeight = true; l.childForceExpandWidth = true; l.childForceExpandHeight = false;
-
-        foreach (var c in list)
+        var keys = new string[list.Length];
+        var names = new string[list.Length];
+        for (int i = 0; i < list.Length; i++) { keys[i] = list[i].Key; names[i] = list[i].Name; }
+        var b = new DesignChoiceBubble(keys);
+        b.Choice = UiKit.Choice(p, names, i => onPick(keys[i]), -1, false);
+        for (int i = 0; i < list.Length; i++)
         {
-            var o = new Option { Key = c.Key };
-            o.Row = Ui.Rect("Option_" + c.Key, b.Root);
-            var le = Ui.Size(o.Row, h: D.ChoiceRowH); le.minHeight = D.ChoiceRowMinH;
-            var hit = o.Row.gameObject.AddComponent<Image>(); hit.color = T.Clear;
-            o.Marker = UiKit.Round(o.Row, T.RadiusS, D.Mark, "Marker");
-            var mr = o.Marker.rectTransform;
-            mr.anchorMin = mr.anchorMax = new Vector2(0f, 0.5f); mr.pivot = new Vector2(0f, 0.5f);
-            var line = UiKit.Row(o.Row, T.S2, TextAnchor.MiddleLeft); UiKit.Fill(line);
-            o.Text = DesignUi.Words(line, c.Name, D.TextChoice, D.Text);
-            Ui.Size(UiKit.Space(line, 0f), flexW: 1f);
-            foreach (var s in c.Stats) DesignStat.Make(line, s.Icon, fill(s.Text), D.TextPrice, D.TextSub);
-            string key = c.Key;
-            DesignUi.Press(o.Row, line, hit, () => onPick(key));
-            b.options.Add(o);
+            var row = b.Choice.Rows[i];
+            Ui.Size(row).minHeight = D.ChoiceRowMinH;
+            b.Choice.Labels[i].alignment = TextAlignmentOptions.MidlineLeft;
+            DesignUi.RightStats(row, list[i].Stats, fill);
         }
-        b.Select("");
         return b;
     }
 
-    /// <summary>選んだ行にマーカー（文字の幅＋左右 16、高さは文字の 0.8、少し下）。手を置く先（選んだ行のマーカー）を返す</summary>
-    public RectTransform Select(string key)
-    {
-        Selected = key;
-        RectTransform at = null;
-        foreach (var o in options)
-        {
-            bool on = o.Key == key;
-            o.Marker.enabled = on;
-            if (!on) continue;
-            float w = o.Text.GetPreferredValues(o.Text.text).x + T.S2 * 2f;
-            o.Marker.rectTransform.sizeDelta = new Vector2(w, D.TextChoice * 0.8f);
-            o.Marker.rectTransform.anchoredPosition = new Vector2(-T.S2, -D.TextChoice * 0.12f);
-            at = o.Marker.rectTransform;   // 手はマーカーの左の端を指す
-        }
-        return at;
-    }
+    /// <summary>サーバーの状態を映す（onPick は呼ばない）。知らない key なら何も選ばない</summary>
+    public void Select(string key) => Choice.Select(Array.IndexOf(keys, key));
 }
 
-/// <summary>タブの帯（【09】【11】）：丸を少しずつ重ねた1本のもこもこの帯（bgDeep）にアイコン。選んだタブはアイコンを accent の台に載せ、上に名前の札</summary>
+/// <summary>タブの帯（【09】【04】【11】）：bgDeep の blob_disc を少しずつ重ね、間を帯で埋めた1本のもこもこの帯にアイコン（textSoft）。
+/// 選んだタブはアイコンを accent の台に白で載せて弾ませ、上に名前の札（accent の blob_pill）。タブ1つずつのカードにしない</summary>
 public class DesignTabBand
 {
-    class Tab { public string Key, Name; public RectTransform Slot; public Image On, Icon; }
+    class Tab { public string Key, Name; public RectTransform Slot, Body; public Image On, Icon; }
     public RectTransform Root;
     readonly List<Tab> tabs = new List<Tab>();
     RectTransform band, tag;
     TextMeshProUGUI tagText;
+    string current;
 
     public static DesignTabBand Make(Transform p, DesignTabCopy[] list, Action<string> onPick)
     {
@@ -346,9 +315,12 @@ public class DesignTabBand
         b.band = Ui.Rect("Band", b.Root);
         b.band.anchorMin = b.band.anchorMax = b.band.pivot = new Vector2(0.5f, 0f);
         b.band.sizeDelta = new Vector2(w, D.TabBumpD); b.band.anchoredPosition = Vector2.zero;
+        // こぶの間の谷を浅くする帯（1本に見せる）
+        var neck = UiKit.Blob(b.band, T.BlobPill, D.BgDeep, D.TabNeckH * 0.5f, "Neck");
+        UiKit.Center(neck.rectTransform, w - D.TabBumpD + D.TabNeckH, D.TabNeckH);
         for (int i = 0; i < n; i++)
         {
-            var d = UiKit.Shape(b.band, S.Disc, D.BgDeep, D.TabBumpD * 0.5f, "Bump");
+            var d = UiKit.Blob(b.band, T.BlobDisc, D.BgDeep, D.TabBumpD * 0.5f, "Bump");
             Place(d.rectTransform, i, step);
         }
         for (int i = 0; i < n; i++)
@@ -357,13 +329,13 @@ public class DesignTabBand
             var t = new Tab { Key = c.Key, Name = c.Name };
             t.Slot = Ui.Rect("Tab_" + c.Key, b.band);
             Place(t.Slot, i, step);
-            var hit = t.Slot.gameObject.AddComponent<Image>(); hit.sprite = S.Disc; hit.color = T.Clear;
-            var body = Ui.Rect("Body", t.Slot); UiKit.Fill(body);
-            t.On = DesignUi.Disc(body, T.Accent, D.TabOnD, "On");
-            t.Icon = UiKit.Icon(body, c.Icon, D.TabIcon, D.TextSub);
+            var hit = t.Slot.gameObject.AddComponent<Image>(); hit.color = T.Clear;
+            t.Body = Ui.Rect("Body", t.Slot); UiKit.Fill(t.Body);
+            t.On = DesignUi.Disc(t.Body, T.Accent, D.TabOnD, "On");
+            t.Icon = UiKit.Icon(t.Body, c.Icon, D.TabIcon, D.TextSub);
             UiKit.Center(t.Icon.rectTransform, D.TabIcon, D.TabIcon);
             string key = c.Key;
-            DesignUi.Press(t.Slot, body, hit, () => onPick(key));
+            DesignUi.Press(t.Slot, null, hit, () => onPick(key));
             b.tabs.Add(t);
         }
         b.tag = UiKit.Chip(b.Root, T.Accent, D.TabLabelH, "Name");
@@ -371,7 +343,7 @@ public class DesignTabBand
         b.tag.anchorMin = b.tag.anchorMax = new Vector2(0.5f, 0f); b.tag.pivot = new Vector2(0.5f, 0.5f);
         b.tag.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
         b.tag.sizeDelta = new Vector2(0f, D.TabLabelH);
-        b.tagText = DesignUi.Words(b.tag, "", D.TextTag, T.Panel, TextAlignmentOptions.Center);
+        b.tagText = DesignUi.Words(b.tag, "", D.TextTag, T.Panel, TextAlignmentOptions.Center, strong: true);
         return b;
     }
 
@@ -382,10 +354,12 @@ public class DesignTabBand
         r.anchoredPosition = new Vector2(D.TabBumpD * 0.5f + step * i, 0f);
     }
 
-    /// <summary>選んだタブ：アイコンを accent の台に白で、上に名前の札。そのタブの RectTransform を返す</summary>
+    /// <summary>選んだタブ：アイコンを accent の台に白で（弾む）、上に名前の札（ぽんと出る）。そのタブの RectTransform を返す</summary>
     public RectTransform Select(string key)
     {
         RectTransform at = null;
+        bool changed = key != current;
+        current = key;
         float step = D.TabBumpD - D.TabOverlap, w = step * (tabs.Count - 1) + D.TabBumpD;
         for (int i = 0; i < tabs.Count; i++)
         {
@@ -397,20 +371,21 @@ public class DesignTabBand
             at = t.Slot;
             tagText.text = t.Name;
             tag.anchoredPosition = new Vector2(-w * 0.5f + D.TabBumpD * 0.5f + step * i, D.TabBumpD);
+            if (changed) { UiSelect.Pick(t.Body); UiSelect.Pop(tag); }
         }
         return at;
     }
 }
 
-/// <summary>数のチップ（【09】【10】右上の残高）：茶のピルに明るい数字（Baloo 40、幅固定で右寄せ）、上にアイコンの台を半分かぶせ、右下に単位の札（left／over）。
-/// 足りないときは danger の面、左右に揺れる。数字が変わると数え上げ／下げ、弾み、右上に −10／+10 のチップが浮いて消える。値はサーバーの totals のまま（引き算しない）</summary>
+/// <summary>数のチップ（【09】【10】右上の残高）＝ UiKit.Counter：茶の blob_pill に明るい数字（Baloo 40、幅 72 の箱に右寄せ）、上にアイコンの台、右下に単位の札（left／over）。
+/// 設計の画面で足す所：足りないときは danger の面で左右に揺れる。数字が変わると数え上げ／下げ、弾み、右上に −10／+10 のチップが浮いて消える。
+/// 値はサーバーの totals のまま（引き算しない）</summary>
 public class DesignCounter
 {
-    public RectTransform Root, Body;
-    Image face, platDisc;
-    Graphic platGlyph;
-    TextMeshProUGUI number, unit;
-    RectTransform unitTag, chip;
+    public RectTransform Root;   // レイアウトの中の入れ物（揺れ・弾みは中の UiCounter に掛ける）
+    UiCounter c;
+    TextMeshProUGUI unit;
+    RectTransform chip;
     TextMeshProUGUI chipText; CanvasGroup chipCg;
     readonly Color platFace;
     LayoutElement numberLe;
@@ -425,41 +400,27 @@ public class DesignCounter
         w.Root = Ui.Rect("Counter_" + icon, p);
         var hit = w.Root.gameObject.AddComponent<Image>(); hit.color = T.Clear;
         var le = Ui.Size(w.Root, w: 0f, h: D.CounterH, flexW: 1f); le.minHeight = D.CounterH; le.minWidth = 0f;
-        w.Body = Ui.Rect("Body", w.Root); UiKit.Fill(w.Body);
-        w.face = UiKit.Shape(w.Body, S.Pill, D.Text, D.CounterH * 0.5f, "Face"); UiKit.Fill(w.face.rectTransform);
 
-        var row = UiKit.Row(w.Body, T.S1, TextAnchor.MiddleCenter, T.S3); UiKit.Fill(row);
-        w.number = UiKit.Text(row, "", TextStyle.Number, T.Panel, TextAlignmentOptions.MidlineRight);
-        w.numberLe = UiKit.Fixed(w.number, D.CounterNumberW, T.TextNumber * T.HeadingLineHeight);
+        w.c = UiKit.Counter(w.Root, icon, DesignCopy.Left);
+        UiKit.Fill(w.c.Root);
+        w.c.Number.alignment = TextAlignmentOptions.MidlineRight;
+        w.numberLe = UiKit.Fixed(w.c.Number, D.CounterNumberW, T.TextNumber * T.HeadingLineHeight);
+        w.unit = w.c.Unit.GetComponentInChildren<TextMeshProUGUI>();
 
-        // 上にアイコンの台を半分かぶせる（左寄り）
-        var plat = DesignUi.Platform(w.Body, icon, D.CounterIconD, platFace, out w.platDisc, out w.platGlyph);
-        plat.anchorMin = plat.anchorMax = new Vector2(0.22f, 1f); plat.pivot = new Vector2(0.5f, 0.5f); plat.anchoredPosition = Vector2.zero;
-        UiKit.Ignore(plat);
-
-        // 右下に単位の札（panel の小さなピル、−4°）
-        w.unitTag = UiKit.Chip(w.Body, T.Panel, D.CounterUnitH, "Unit");
-        w.unitTag.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(Mathf.RoundToInt(T.S2), Mathf.RoundToInt(T.S2), 0, 0);
-        w.unitTag.anchorMin = w.unitTag.anchorMax = new Vector2(1f, 0f); w.unitTag.pivot = new Vector2(1f, 0.5f);
-        w.unitTag.anchoredPosition = new Vector2(-T.S2, T.S1 * 0.5f);
-        w.unitTag.localRotation = Quaternion.Euler(0f, 0f, D.CounterUnitTilt);
-        w.unitTag.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-        w.unitTag.sizeDelta = new Vector2(0f, D.CounterUnitH);
-        w.unit = DesignUi.Words(w.unitTag, DesignCopy.Left, D.TextTag, D.Text, TextAlignmentOptions.Center);
-
-        // 右上から浮く −10／+10（レイアウトの外）
+        // 右上から浮く −10／+10（レイアウトの外。チップといっしょに弾まない）
         w.chip = UiKit.Chip(w.Root, T.Accent, D.DeltaChipH, "Delta");
         w.chip.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(Mathf.RoundToInt(T.S2), Mathf.RoundToInt(T.S2), 0, 0);
         w.chip.anchorMin = w.chip.anchorMax = new Vector2(0.78f, 1f); w.chip.pivot = new Vector2(0.5f, 0.5f);
         w.chip.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
         w.chip.sizeDelta = new Vector2(0f, D.DeltaChipH);
-        w.chipText = DesignUi.Words(w.chip, "", D.TextPrice, T.Panel, TextAlignmentOptions.Center);
+        w.chipText = DesignUi.Words(w.chip, "", D.TextPrice, T.Panel, TextAlignmentOptions.Center, strong: true);
         w.chipCg = w.chip.gameObject.AddComponent<CanvasGroup>();
         w.chipCg.blocksRaycasts = false; w.chipCg.interactable = false;
         w.chip.gameObject.SetActive(false);
 
-        if (onTap != null) DesignUi.Press(w.Root, w.Body, w.face, onTap);
+        if (onTap != null) DesignUi.Press(w.Root, null, w.c.Face, onTap);
         UiTick.On(w.Root.gameObject, w.Tick);
+        w.Paint();
         return w;
     }
 
@@ -472,9 +433,9 @@ public class DesignCounter
         bool wasOver = over;
         over = overNow;
         has = left.HasValue;
-        unitTag.gameObject.SetActive(has);
+        c.Unit.gameObject.SetActive(has);
         numberLe.preferredWidth = numberLe.minWidth = has ? D.CounterNumberW : -1f;
-        if (!has) { number.text = fallback; known = false; Paint(); return; }
+        if (!has) { c.Number.text = fallback; known = false; Paint(); return; }
 
         float v = left.Value;
         if (!known || !animate) { shown = from = target = v; countT = 99f; }
@@ -493,15 +454,18 @@ public class DesignCounter
 
     void Draw()
     {
-        number.text = DesignValues.Fmt(Mathf.Round(Mathf.Abs(shown)));
-        unit.text = shown < 0f || over ? DesignCopy.Over : DesignCopy.Left;
+        c.Number.text = DesignValues.Fmt(Mathf.Round(Mathf.Abs(shown)));
+        string u = shown < 0f || over ? DesignCopy.Over : DesignCopy.Left;
+        if (unit.text == u) return;
+        unit.text = u;
+        c.Unit.sizeDelta = new Vector2(Mathf.Max(T.TagH, unit.GetPreferredValues(u).x + T.S4), T.TagH);
     }
 
     void Paint()
     {
-        face.color = over ? T.Danger : D.Text;
-        platDisc.color = over ? T.Panel : platFace;
-        platGlyph.color = over ? T.Danger : T.Panel;
+        c.Face.color = over ? T.Danger : D.Text;
+        c.Disc.Face.color = over ? T.Panel : platFace;
+        c.Disc.Icon.color = over ? T.Danger : T.Panel;
         unit.color = over ? T.Danger : D.Text;
     }
 
@@ -516,10 +480,10 @@ public class DesignCounter
         }
         bounceT += dt;
         float s = HudKit.Bounce(bounceT);
-        Body.localScale = new Vector3(s, s, 1f);
+        c.Root.localScale = new Vector3(s, s, 1f);
         float x = 0f;
         if (shakeT < D.PillShakeSec) { shakeT += dt; float p = shakeT / D.PillShakeSec; x = D.PillShakePx * Mathf.Sin(p * D.PillShakeSec * D.PillShakeHz * Mathf.PI * 2f) * (1f - p); }
-        Body.anchoredPosition = new Vector2(x, Body.anchoredPosition.y);
+        c.Root.anchoredPosition = new Vector2(x, 0f);
         if (chipT < D.DeltaSec)
         {
             chipT += dt;
@@ -580,122 +544,33 @@ public class DesignCheckRow
     }
 }
 
-/// <summary>画面の見出しの帯（【11】左上）：色の面に白い言葉 36、右の端と下の辺がもこもこ。画面の左の端につける</summary>
+/// <summary>画面の見出しの帯（【11】左上）＝ UiKit.Ribbon：色の面に白い言葉 36。左の丸みは画面の端へ逃がし、下の辺に波の縁（wave_edge を上下に返して半分重ねる）。
+/// 波の sprite が無ければ帯だけ</summary>
 public static class DesignRibbon
 {
-    public static RectTransform Make(Transform p, string text, Color color)
+    public static UiRibbon Make(Transform p, string text, Color color)
     {
-        var r = Ui.Rect("Ribbon", p);
+        var u = UiKit.Ribbon(p, text, color);
+        var r = u.Root;
         r.anchorMin = r.anchorMax = r.pivot = new Vector2(0f, 1f);
-        var body = UiKit.Round(r, T.RadiusS, color, "Body");
-        var t = DesignUi.Words(r, text, D.TextRibbon, T.Panel, TextAlignmentOptions.MidlineLeft);
-        float tw = t.GetPreferredValues(text).x;
-        float w = T.ScreenEdge + tw + T.S4, h = D.RibbonH, bump = h * 0.42f;
-        r.sizeDelta = new Vector2(w, h);
-        var br = body.rectTransform;   // 左の角は画面の外に出す
-        br.anchorMin = Vector2.zero; br.anchorMax = Vector2.one; br.offsetMin = new Vector2(-T.RadiusS * 2f, 0f); br.offsetMax = Vector2.zero;
-        // 右の端：丸を縦に3つ（もこもこ）
-        for (int i = 0; i < 3; i++)
+        var l = r.GetComponent<HorizontalLayoutGroup>();
+        l.padding.left = Mathf.RoundToInt(T.RibbonH * 0.5f + T.ScreenEdge);   // 言葉は画面の端から 32
+        var fit = r.gameObject.AddComponent<ContentSizeFitter>();
+        fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        r.anchoredPosition = new Vector2(-T.RibbonH * 0.5f, -T.ScreenEdge);
+        var wave = T.Art(T.WaveEdge);
+        if (wave != null)
         {
-            var d = UiKit.Shape(r, S.Disc, color, bump * 0.5f, "BumpR");
-            var dr = d.rectTransform;
-            dr.anchorMin = dr.anchorMax = new Vector2(1f, 0f); dr.pivot = new Vector2(0.5f, 0.5f);
-            dr.sizeDelta = new Vector2(bump, bump); dr.anchoredPosition = new Vector2(0f, h * (0.2f + 0.3f * i));
+            var img = UiKit.Shape(r, wave, color, 0f, "Wave");
+            img.type = Image.Type.Tiled;
+            UiKit.Ignore(img);
+            var w = img.rectTransform;
+            w.anchorMin = new Vector2(0f, 0f); w.anchorMax = new Vector2(1f, 0f); w.pivot = new Vector2(0.5f, 0.5f);
+            w.sizeDelta = new Vector2(-T.RibbonH, D.WaveH);   // 両端の丸みの内側だけ
+            w.anchoredPosition = Vector2.zero;
+            w.localScale = new Vector3(1f, -1f, 1f);   // こぶを下に（art/ui/README.md）
+            w.SetSiblingIndex(u.Face.transform.GetSiblingIndex() + 1);
         }
-        // 下の辺：小さな丸を並べる（→ wave_edge）
-        float small = bump * 0.7f;
-        for (float x = small * 0.5f; x < w; x += small * 1.25f)
-        {
-            var d = UiKit.Shape(r, S.Disc, color, small * 0.5f, "BumpB");
-            var dr = d.rectTransform;
-            dr.anchorMin = dr.anchorMax = Vector2.zero; dr.pivot = new Vector2(0.5f, 0.5f);
-            dr.sizeDelta = new Vector2(small, small); dr.anchoredPosition = new Vector2(x, small * 0.15f);
-        }
-        t.transform.SetAsLastSibling();
-        var tr = t.rectTransform;
-        tr.anchorMin = Vector2.zero; tr.anchorMax = Vector2.one; tr.offsetMin = new Vector2(T.ScreenEdge, 0f); tr.offsetMax = Vector2.zero;
-        UiKit.Ignore(t);
-        return r;
-    }
-}
-
-/// <summary>指さしの手（1画面に1つ。【09】【10】【11】）。Point した物の左の外から右を指す。ゆっくり上下し、乗り換えるときは素早く動く。
-/// glove_point（#190 の sprite）が無い間は、宇宙服のグローブを丸とカプセルで組む（白い面＋茶の輪郭＋手首にオレンジの輪）</summary>
-public class DesignHand
-{
-    public RectTransform Root;
-    readonly RectTransform layer;
-    RectTransform target;
-    Vector2 from, cur;
-    float moveT = 99f;
-    bool placed;
-
-    DesignHand(RectTransform layer) { this.layer = layer; }
-
-    public static DesignHand Make(RectTransform layer)
-    {
-        var h = new DesignHand(layer);
-        h.Root = Ui.Rect("Hand", layer);
-        h.Root.anchorMin = h.Root.anchorMax = new Vector2(0.5f, 0.5f);
-        h.Root.pivot = new Vector2(1f, 0.5f);   // 指の先
-        h.Root.sizeDelta = new Vector2(D.CursorSize, D.CursorSize);
-        if (S.Glove != null)
-        {
-            var img = h.Root.gameObject.AddComponent<Image>();
-            img.sprite = S.Glove; img.preserveAspect = true; img.raycastTarget = false;
-        }
-        else BuildGlove(h.Root);
-        UiTick.On(layer.gameObject, h.Tick);
-        h.Root.gameObject.SetActive(false);
-        return h;
-    }
-
-    /// <summary>右向きのグローブ（72×72 の箱の中。中心からの位置）。輪郭を先に、面を後に描く</summary>
-    static void BuildGlove(RectTransform r)
-    {
-        float k = D.CursorSize / 72f, o = 3f * k;
-        void Part(Vector2 at, Vector2 size, Color c, string n)
-        {
-            var img = UiKit.Shape(r, T.Theme.pill, c, Mathf.Min(size.x, size.y) * 0.5f, n);
-            var ir = img.rectTransform;
-            ir.anchorMin = ir.anchorMax = ir.pivot = new Vector2(0.5f, 0.5f);
-            ir.sizeDelta = size; ir.anchoredPosition = at;
-        }
-        var shapes = new (Vector2 at, Vector2 size)[]
-        {
-            (new Vector2(14f, 7f) * k, new Vector2(42f, 20f) * k),    // 人さし指
-            (new Vector2(-6f, -2f) * k, new Vector2(38f, 38f) * k),   // 手のひら
-            (new Vector2(-2f, 15f) * k, new Vector2(18f, 16f) * k),   // 親指のこぶ
-            (new Vector2(8f, -10f) * k, new Vector2(20f, 16f) * k),   // にぎった指
-            (new Vector2(0f, -17f) * k, new Vector2(18f, 14f) * k),
-        };
-        foreach (var s in shapes) Part(s.at, s.size + new Vector2(o * 2f, o * 2f), D.Text, "Outline");
-        Part(new Vector2(-26f, -2f) * k, new Vector2(16f, 36f) * k + new Vector2(o * 2f, o * 2f), D.Text, "WristOutline");
-        Part(new Vector2(-26f, -2f) * k, new Vector2(16f, 36f) * k, T.Accent, "Wrist");
-        foreach (var s in shapes) Part(s.at, s.size, T.Panel, "Glove");
-    }
-
-    /// <summary>手を t の左の外へ（null なら隠す）</summary>
-    public void Point(RectTransform t)
-    {
-        if (t == target) return;
-        target = t;
-        from = cur;
-        moveT = placed ? 0f : 99f;
-    }
-
-    void Tick(float dt)
-    {
-        bool show = target != null && target.gameObject.activeInHierarchy;
-        if (Root.gameObject.activeSelf != show) Root.gameObject.SetActive(show);
-        if (!show) return;
-        var r = target.rect;
-        Vector2 want = layer.InverseTransformPoint(target.TransformPoint(new Vector3(r.xMin, r.center.y, 0f)));
-        want.x += T.S1 * 0.5f;   // 指の先を少し重ねる
-        if (!placed) { cur = want; placed = true; }
-        moveT += Mathf.Min(dt, TitleLook.MaxStep);
-        cur = moveT < D.HandMoveSec ? Vector2.LerpUnclamped(from, want, UiEase.OutBack(moveT / D.HandMoveSec)) : want;
-        float bob = Mathf.Sin(UiEase.Now / D.HandBobSec * Mathf.PI * 2f) * D.HandBobPx;
-        Root.anchoredPosition = cur + new Vector2(0f, bob);
+        return u;
     }
 }

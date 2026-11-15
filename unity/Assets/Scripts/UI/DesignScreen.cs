@@ -1,9 +1,9 @@
-// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#73 UI ガイドラインの見た目にし、足りない理由が分かるようにした）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 parameters.json は GameParams から）／ 更新：iizuka（Opus 5.5、2026-11-15、#168 3D の舞台・右の棚・お財布・打ち上げチェック・説明は吹き出し。#190 あつ森の作り）
+// 書いた人：Claude ／ 最終更新：2026-11-15 ／ 更新：iizuka（Opus 5.5、2026-11-14、#73 UI ガイドラインの見た目にし、足りない理由が分かるようにした）／ 更新：iizuka（Opus 5.5、2026-11-14、#146 parameters.json は GameParams から）／ 更新：iizuka（Opus 5.5、2026-11-15、#168 3D の舞台・右の棚・お財布・打ち上げチェック・説明は吹き出し。#190 あつ森の作り）／ 更新：iizuka（Opus 5.5、2026-11-15、#190 共通の部品 UiKit・UiSelect に替えた）
 // Design（M01・M02）：部品の ON/OFF・±、ロケット・軌道、打ち上げ判定。#93 の決定：手描きの「素材の画面」はこの画面、「使う／使わない」は部品の ON/OFF・±。
 // 割り付け（1600×900。#168、tmp/handoff/168-plan.md）：
 //   全面＝3D の舞台（DesignStage。昼の発射場で回る台に載った宇宙船。部品は船に「ぽん」と付く。FLIGHT ではカメラが引いてロケットの全身）
 //   右の列＝数のチップ（お財布・重さ）→ タブの帯 → 棚（材料の行 最大4本。Flight は選択肢の吹き出し2つ）→ Ready for launch!。その左上＝打ち上げチェック。
-//   左上＝見出しの帯。左下＝ヒューストンの吹き出し。指さしの手は1つ（最後に触った行・選んだ選択肢）。#190（ui-guidelines 1〜3章）の作り
+//   左上＝見出しの帯（UiKit.Ribbon）。左下＝ヒューストンの吹き出し。指さしの手は1つ（UiSelect.Cursor：最後に触った行・選んだ選択肢、No go のときは Fix the ship!）。#190（ui-guidelines 1〜3章）の作り
 //   説明の文は画面に常に出さず、ヒューストンの吹き出しで言う（タブを開いたとき・部品が付いたとき。超えた瞬間はサーバーの H01・H02）
 // UI は計算・判定をしない：合計・残り・上限・判定はサーバーの design メッセージの totals（budget_left・mass_left・over_*・science_possible）、
 //   打ち上げの結果は launch イベント（GameFlow が Model に入れる）。部品が船に付く動きも、サーバーの design が届いてから（4人とも同じ動き）。
@@ -85,7 +85,6 @@ public class DesignScreen
     DesignChoiceBubble rocketPick, pathPick;
     DesignCounter wallet, weight;
     DesignCheckRow checkMass, checkCost, checkCrew, checkScience;
-    DesignHand hand;
     string tab = "", lastTouched = "", lastChoice = "rocket";
     // 前の design（変わった所だけ吹き出しで言う）
     readonly Dictionary<string, int> prevParts = new Dictionary<string, int>();
@@ -93,6 +92,7 @@ public class DesignScreen
     bool prevOverMass, prevOverCost, hadDesign, sciencePossible = true;
     GameObject noGo;
     TextMeshProUGUI noGoReason, noGoDetail, noGoHint;
+    UiButton noGoButton;
     bool noGoClosed;
 
     public DesignScreen(Transform parent, GameFlow f)
@@ -109,8 +109,6 @@ public class DesignScreen
         BuildTitle(safe);
         BuildTray(safe);
         BuildCheck(safe);
-        var handLayer = Ui.Rect("HandLayer", safe); Ui.Fill(handLayer);   // 手はいちばん上（1画面に1つ）
-        hand = DesignHand.Make(handLayer);
         BuildNoGo(view.transform);
 
         stage = Root.AddComponent<DesignStage>();
@@ -123,8 +121,7 @@ public class DesignScreen
     // ================================================================== 左上：見出しの帯（【11】）
     void BuildTitle(RectTransform safe)
     {
-        var r = DesignRibbon.Make(safe, DesignCopy.Title, D.Plum);
-        r.anchoredPosition = new Vector2(0f, -T.ScreenEdge);
+        DesignRibbon.Make(safe, DesignCopy.Title, D.Plum);
     }
 
     // ================================================================== 右の列：数のチップ → タブの帯 → 棚 → 打ち上げ
@@ -175,11 +172,11 @@ public class DesignScreen
 
     void BuildFlight(Transform page)
     {
-        rocketPick = DesignChoiceBubble.Make(page, DesignCopy.Rockets, values.Fill, k => { lastChoice = "rocket"; Send(Cmd.DesignRocket(k)); UpdateHand(); });
-        pathPick = DesignChoiceBubble.Make(page, DesignCopy.Paths, values.Fill, k => { lastChoice = "path"; Send(Cmd.DesignTrajectory(k)); UpdateHand(); });
+        rocketPick = DesignChoiceBubble.Make(page, DesignCopy.Rockets, values.Fill, k => { lastChoice = "rocket"; Send(Cmd.DesignRocket(k)); UpdateHand(true); });
+        pathPick = DesignChoiceBubble.Make(page, DesignCopy.Paths, values.Fill, k => { lastChoice = "path"; Send(Cmd.DesignTrajectory(k)); UpdateHand(true); });
     }
 
-    void Touch(string id) { lastTouched = id; UpdateHand(); }
+    void Touch(string id) { lastTouched = id; UpdateHand(true); }
 
     void SelectTab(string key, bool say)
     {
@@ -192,25 +189,33 @@ public class DesignScreen
         UpdateHand();
     }
 
-    /// <summary>手は1つ：Flight では最後に触った選択肢の選んだ行、ほかのタブでは最後に触った行（まだなら1本目）</summary>
-    void UpdateHand()
+    /// <summary>手は1つ（UiSelect.Cursor）：No go のときは Fix the ship!、Flight では最後に触った選択肢の選んだ行、ほかのタブでは最後に触った行（まだなら1本目）。
+    /// poke なら押した所へ突く</summary>
+    void UpdateHand(bool poke = false)
     {
-        if (hand == null) return;
+        if (noGo != null && noGo.activeSelf) { UiSelect.Cursor(noGoButton.Root, CursorDir.UpLeft); return; }
+        RectTransform at = null;
         if (tab == DesignCopy.FlightTab)
         {
             var b = lastChoice == "path" ? pathPick : rocketPick;
-            hand.Point(b != null ? b.Select(b.Selected) : null);
-            return;
+            at = b != null ? b.SelectedRow : null;
+            if (at == null) { var o = b == pathPick ? rocketPick : pathPick; at = o != null ? o.SelectedRow : null; }
         }
-        DesignRow first = null, touched = null;
-        foreach (var r in rows)
+        else
         {
-            if (!r.Root.IsChildOf(pages[tab])) continue;
-            if (first == null) first = r;
-            if (r.Id == lastTouched) touched = r;
+            DesignRow first = null, touched = null;
+            foreach (var r in rows)
+            {
+                if (!r.Root.IsChildOf(pages[tab])) continue;
+                if (first == null) first = r;
+                if (r.Id == lastTouched) touched = r;
+            }
+            var row = touched ?? first;
+            at = row != null ? row.Root : null;
         }
-        var at = touched ?? first;
-        hand.Point(at != null ? at.Root : null);
+        if (at == null) { UiSelect.HideCursor(Root.transform); return; }
+        var c = UiSelect.Cursor(at, CursorDir.Right);
+        if (poke) c.Poke();
     }
 
     void SayTab(string key)
@@ -230,7 +235,7 @@ public class DesignScreen
         var head = UiKit.Row(card, T.S1, TextAnchor.MiddleLeft);
         Ui.Size(head, h: D.CheckRowH);
         DesignUi.Platform(head, "rocket", D.CheckTitleIcon, T.Go, out _, out _);
-        DesignUi.Words(head, DesignCopy.CheckTitle, D.TextRow, D.Text);
+        DesignUi.Words(head, DesignCopy.CheckTitle, D.TextRow, D.Text, strong: true);
         DesignUi.Dots(card, D.BgDeep, false);
         checkMass = DesignCheckRow.Make(card, DesignCopy.CheckMass.Text);
         checkCost = DesignCheckRow.Make(card, DesignCopy.CheckCost.Text);
@@ -262,17 +267,18 @@ public class DesignScreen
 
         var top = UiKit.Row(card, 0f);
         DesignUi.Platform(top, "danger", D.OverlayIconD, T.Danger, out _, out _);
-        DesignUi.Words(card, DesignCopy.NoGo, D.TextRibbon, T.Danger, TextAlignmentOptions.Center);
+        var head = UiKit.Row(card, 0f);
+        UiKit.Ribbon(head, DesignCopy.NoGo, T.Danger);   // 見出しの帯（【11】）。危険は帯の色＋アイコン＋言葉で（文字色だけにしない）
         noGoReason = DesignUi.Words(card, "", D.TextRow, D.Text, TextAlignmentOptions.Center);
         noGoDetail = DesignUi.Words(card, "", T.TextBody, D.Text, TextAlignmentOptions.Center, wrap: true);
         noGoHint = DesignUi.Words(card, "", T.TextBody, D.TextSub, TextAlignmentOptions.Center, wrap: true);
         UiKit.Space(card, T.S1);
         var bottom = UiKit.Row(card, 0f);
-        UiKit.PrimaryButton(bottom, DesignCopy.NoGoBack, "settings", CloseNoGo);
+        noGoButton = UiKit.PrimaryButton(bottom, DesignCopy.NoGoBack, "settings", CloseNoGo);
         noGo.SetActive(false);
     }
 
-    void CloseNoGo() { noGoClosed = true; noGo.SetActive(false); }
+    void CloseNoGo() { noGoClosed = true; noGo.SetActive(false); UpdateHand(); }
 
     // ================================================================== 表示の更新（design メッセージ・launch イベント・段階が design になったとき）
     public void Refresh()
@@ -357,7 +363,7 @@ public class DesignScreen
     void SetNoGo(string launchStatus, string rocket)
     {
         bool bad = launchStatus == "over_mass" || launchStatus == "over_budget";
-        if (!bad) { noGoClosed = false; noGo.SetActive(false); return; }
+        if (!bad) { noGoClosed = false; if (noGo.activeSelf) { noGo.SetActive(false); UpdateHand(); } return; }
         if (noGoClosed) return;
         bool mass = launchStatus == "over_mass";
         noGoReason.text = values.Fill(mass ? DesignCopy.NoGoMass : DesignCopy.NoGoBudget);
@@ -366,5 +372,6 @@ public class DesignScreen
         if (!noGo.activeSelf) stage.Shake();
         noGo.SetActive(true);
         noGo.transform.SetAsLastSibling();
+        UpdateHand();   // 手は Fix the ship! へ（scrim の上）
     }
 }
