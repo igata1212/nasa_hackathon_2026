@@ -56,3 +56,4 @@
 - 15:42 #218 tmp にあったピッチで使える情報を docs/reference/pitch-materials.md にまとめた（遊びの流れ・NASA のデータと出典・見た目の判断・音・数字・提出前に直す出典）
 - 15:49 #220 出典の抜けを直した（CREDITS.md に NASA のツールと文書・AI で作った物、data/README.md に data/ の外の NASA のデータ）
 - 16:55 #223 iPhone 用のビルドのスクリプトを足した（iOS のモジュールが無いのでビルドは midori に頼む）
+- 21:00 #228 お題の Objectives・審査基準5つ・賞10個・提出の条件を docs/reference/challenge-and-judging.md にまとめた（公式ページを読んで）
