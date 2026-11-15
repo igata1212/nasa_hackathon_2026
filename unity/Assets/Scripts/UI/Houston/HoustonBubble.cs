@@ -69,6 +69,7 @@ public class HoustonBubble
         linkHint = UiKit.Text(linkView, "", TextStyle.Hint, T.TextSoft, TextAlignmentOptions.TopLeft, false);
         linkHint.textWrappingMode = TextWrappingModes.Normal;
         linkHint.overflowMode = TextOverflowModes.Ellipsis;
+        linkHint.enableAutoSizing = true; linkHint.fontSizeMin = T.TextLabel; linkHint.fontSizeMax = T.TextHint;
 
         // 下の真ん中：▼（caret_soft、accent。縁に半分かぶせる【12】）
         var cs = T.Art(T.CaretSoft);
@@ -219,7 +220,7 @@ public class HoustonBubble
         linkView.gameObject.SetActive(false);
         foreach (var kv in seatBadges) kv.Value.Root.gameObject.SetActive(seats != null && seats.Contains(kv.Key));
         caret.gameObject.SetActive(more);
-        SetFooter(footerText);
+        SetFooter(place.name == "cabin" ? "" : footerText);   // 船内はページ数の札を出さない（続きは ▼ が示す。Fable 採点 b-10）
         probe.text = plain;
     }
 

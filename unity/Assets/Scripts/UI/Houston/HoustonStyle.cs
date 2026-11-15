@@ -42,7 +42,7 @@ public static class HoustonStyle
     // NoSignal・CommsOff は先生の小窓（Story/HoustonWindow）が見えない Probe の文字で見分ける合図なので変えない。画面に出す言葉は *Title（#190：大文字をやめた）
     public const string NoSignal = "NO SIGNAL";
     public const string NoSignalTitle = "No signal";
-    public const string NoSignalFarSide = "The Moon is blocking the radio. Houston can't hear you.";
+    public const string NoSignalFarSide = "The Moon blocks the radio. Houston can't hear you.";
     public const string NoSignalOther = "The radio is cut off for now. Houston can't hear you.";   // 再突入の熱など
     public const string NoSignalIcon = "comms_lost";
     public const string CommsOff = "COMMS OFF";
@@ -153,8 +153,7 @@ public static class HoustonStyle
     public static int Rank(string priority) =>
         priority == "milestone" ? 3 : priority == "critical" ? 2 : priority == "high" ? 1 : 0;
 
-    /// <summary>名前タグの面の色（critical のときだけ danger）。#190：ふだんはオレンジ（【12】のタグ。iizuka の指示）。
-    /// ※ ui-guidelines 3章「名前タグ」は Houston＝go。食い違いは報告済み。戻すならここだけ</summary>
+    /// <summary>名前タグの面の色（critical のときだけ danger）。#190：ふだんは go（ui-guidelines 3章「名前タグ」。白い文字とのコントラストも accent より高い）。戻すならここだけ</summary>
     public static Color TagColor(string priority) => priority == "critical" ? T.Danger : T.Go;   // ui-guidelines 3章：Houston＝go（白い文字とのコントラストも accent より高い）
 
     /// <summary>台詞に出てくる席（だれの仕事か）。Seats.Title を大文字小文字を無視して探す</summary>

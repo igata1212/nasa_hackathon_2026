@@ -276,9 +276,9 @@ public class HoustonBox
         {
             string p = pages[Mathf.Clamp(page, 0, pages.Count - 1)];
             bool more = page + 1 < pages.Count || brief;
-            string foot = brief ? S.TapNext + "   " + (bIndex + 1) + " / " + briefing.Count
+            string foot = brief ? (bIndex + 1) + " / " + briefing.Count
                                 : pages.Count > 1 ? (page + 1) + " / " + pages.Count : "";
-            view.ShowLine(S.SpeakerName(cur.speaker), S.IsHouston(cur.speaker), S.TagColor(cur.priority), introUntil > 0f || brief,
+            view.ShowLine(S.SpeakerName(cur.speaker), S.IsHouston(cur.speaker), S.TagColor(cur.priority), introUntil > 0f && !brief,
                           HoustonScript.Mark(p, S.Highlight, S.NumberColor), p, S.SeatsIn(cur.text), more, foot);
         }
         else if (lost) view.ShowLink(noSignal, noSignal ? (FarSide ? S.NoSignalFarSide : S.NoSignalOther) : S.CommsOffHint);
