@@ -38,7 +38,8 @@ public class TimelineBar : HudPart
         public const string NextFarSide = "Far side in {0}";
         public const string InFarSide = "No radio · {0} left";
         public const string NextBurn = "Burn window in {0}";
-        public const string InBurn = "Burn now!";   // #189：残り秒は点火の準備のカード（BurnCheck）だけ（2か所に出さない）。残り 10 秒で赤く弾むのはそのまま
+        public const string InBurn = "Burn {0}";   // #189：残り秒は点火の準備のカード（BurnCheck）だけ（2か所に出さない）。残り 10 秒で赤く弾むのはそのまま
+        public const string InReentry = "Re-entry {0}";
         public const string NextReentry = "Re-entry in {0}";
         public const string NextSplash = "Splashdown in {0}";
         public const string Home = "Home!";
@@ -197,6 +198,9 @@ public class TimelineBar : HudPart
         RefreshNext(s, mine);
     }
 
+    static float ReadyS(GameState s) =>
+        J.Has(s.thresholds, "reentry_ready_s") ? J.Num(s.thresholds, "reentry_ready_s") : GameParams.Get("reentry_ready_s");
+
     /// <summary>右のチップ：次の出来事までの秒、窓の中なら残りの秒（BurnCheck の残り秒と同じ式：窓の終わり − t）。噴射窓の中は文字に秒を出さない（#189。残り 10 秒の赤と弾みには使う）</summary>
     void RefreshNext(GameState s, List<string> mine)
     {
@@ -205,6 +209,7 @@ public class TimelineBar : HudPart
         else if (t < s.tAos) next.Set("comms_lost", Words.InFarSide, s.tAos - t, false, SeatsObserve, mine);
         else if (!s.burnDone && t < s.tBurnOpen) next.Set("ignition", Words.NextBurn, s.tBurnOpen - t, false, SeatsBurn, mine);
         else if (!s.burnDone && t < s.tBurnClose) next.Set("ignition", Words.InBurn, s.tBurnClose - t, true, SeatsBurn, mine);
+        else if (s.burnDone && t >= s.tReentry && t < s.tReentry + ReadyS(s)) next.Set("heat_shield", Words.InReentry, s.tReentry + ReadyS(s) - t, true, SeatsReentry, mine);   // #210：準備の残り秒もここだけ
         else if (t < s.tReentry) next.Set("heat_shield", Words.NextReentry, s.tReentry - t, false, SeatsReentry, mine);
         else if (t < s.tSplashdown) next.Set("earth", Words.NextSplash, s.tSplashdown - t, false, NoSeats, mine);
         else next.Set("earth", Words.Home, -1f, false, NoSeats, mine);
