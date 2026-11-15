@@ -5,7 +5,7 @@
 //   ① ゲージ（StatusPanel。CabinHud の Left の slot）を、画面の上の表示から、今の席のモニターの上（world-space の Canvas）へ移す。
 //      席タブで席を替えたら、Canvas ごとその席のモニターへ移る（CabinHud.MoveSlot は最初の1回だけ）
 //   ② ヒューストン（先生）の顔を、同じモニターの右上に映す（HoustonWindow が描く RenderTexture）。その間、字幕の左の小窓は出さない
-//   ③ カメラを、今の席のクルーの肩ごしに寄せる（V キーで今までの見下ろしと切り替え）。席を替えるとなめらかに移る
+//   ③ カメラを一人称にする：今の席のクルーの目の位置に置き、そのクルーは腕だけ描く（V キーで今までの見下ろしと切り替え）。席を替えるとなめらかに移る
 //   ⑤ 肩ごしの間、手前の壁と屋根を出して船室を閉じる（見下ろしでは今までどおり外す）。船室のモデルは変えない
 //   ④ 揺れを強くする（UrgencyFx の値に倍率を掛ける。事故の一発を大きく、続く揺れは少しだけ：数字が読めなくならないように）
 // 置き場所・画角・倍率は下の SerializeField（見た目だけの値）。シーンへの組み込みは Editor/SeatMonitor/SeatMonitorScene.cs（手で置かない）。
@@ -31,11 +31,12 @@ public class SeatView : MonoBehaviour
     [Tooltip("空なら Camera.main")] public Camera mainCamera;
     public SeatRef[] seats = new SeatRef[0];
 
-    [Header("カメラ（肩ごし）")]
+    [Header("カメラ（一人称：自分のクルーの目の位置）")]
     public bool seatViewOnStart = true;
-    [Tooltip("モニターのルートから見たカメラの位置（m）。x は side を掛ける")] public Vector3 cameraOffset = new Vector3(0.30f, 1.85f, 0.95f);   // クルーの頭（高さ 1.48、コンソールから 0.55 手前）のすぐ上・後ろ。頭は画面の下（吹き出しと盆の後ろ）に落ちる
-    [Tooltip("画面のまん中から、見る点を下げる量（m）。コンソールの操作部品も入るように")] public float lookDown = 0.23f;   // モニターを画面の上半分に入れる（下半分は吹き出しと操作の盆）
-    public float fieldOfView = 50f;
+    [Tooltip("一人称の間、自分のクルーは腕だけ描く（ヘルメットと胴が画面をふさぐので）")] public bool hideOwnCrew = true;
+    [Tooltip("モニターのルートから見たカメラの位置（m）。x は side を掛ける")] public Vector3 cameraOffset = new Vector3(0f, 1.55f, 0.90f);   // 目の高さ。画面から約 1.1m
+    [Tooltip("画面のまん中から、見る点を下げる量（m）。コンソールの操作部品も入るように")] public float lookDown = 0.27f;   // モニターを画面の上半分に入れる（下半分は吹き出しと操作の盆）
+    public float fieldOfView = 58f;
     [Tooltip("席を替えたとき・切り替えたときに移る速さ（大きいほど速い）")] public float moveSpeed = 6f;
 
     [Header("船室を閉じる（狭く感じさせる）")]
@@ -114,6 +115,38 @@ public class SeatView : MonoBehaviour
         if (seat == null) return;
         UpdateCanvas(seat);
         UpdateCamera(seat);
+        UpdateOwnCrew(seat);
+    }
+
+    // ------------------------------------------------------------------ 一人称：自分のクルーは腕だけ見せる
+    // カメラは自分のクルーの目の位置にいるので、ヘルメットや胴が画面をふさぐ。腕（Arm_L・Arm_R）以外を描かない。
+    // Renderer.forceRenderingOff を使う（目の切り替えなど、ほかの部品の SetActive・enabled とぶつからない）
+    static readonly System.Collections.Generic.Dictionary<string, string> CrewSlot = new System.Collections.Generic.Dictionary<string, string>
+    {
+        { Seats.Pilot, "Slot_Crew_Pilot" }, { Seats.Life, "Slot_Crew_LifeSupport" },
+        { Seats.Comms, "Slot_Crew_CommsPower" }, { Seats.Planner, "Slot_Crew_MissionPlanner" },
+    };
+    readonly System.Collections.Generic.List<Renderer> hidden = new System.Collections.Generic.List<Renderer>();
+    string hiddenSeat;
+
+    void UpdateOwnCrew(SeatRef seat)
+    {
+        string want = hideOwnCrew && SeatViewOn && InCabin ? seat.seat : null;
+        if (want == hiddenSeat) return;
+        hiddenSeat = want;
+        foreach (var r in hidden) if (r != null) r.forceRenderingOff = false;
+        hidden.Clear();
+        if (want == null || !CrewSlot.TryGetValue(want, out var slotName)) return;
+        foreach (var t in FindObjectsByType<Transform>(FindObjectsInactive.Include))
+        {
+            bool dual = (want == Seats.Comms || want == Seats.Planner) && t.name.EndsWith("Slot_Crew_Dual_CommsPlanner");   // 3人のとき：2台を兼ねるクルー
+            if (!dual && t.name != slotName && !t.name.EndsWith("." + slotName)) continue;
+            foreach (var r in t.GetComponentsInChildren<Renderer>(true))
+            {
+                if (r.name.Contains(".Arm_")) continue;
+                r.forceRenderingOff = true; hidden.Add(r);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ モニターの上の表示
