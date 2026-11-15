@@ -5,9 +5,9 @@
 - モデル：`google/gemini-3.8-flash-tts`（OpenRouter `POST /api/v1/audio/speech`、pcm 24kHz を mp3 112kbps・モノに変換）
 - 声：Achird（Taiga が見本 04 から選んだ）
 - 話し方（instructions）：Speak as a friendly, patient teacher. Warm, approachable and encouraging, easy conversational pace.
-- 台詞の出どころ：`docs/design/houston_lines.json` の `milestone_lines`（M01〜M12, ED-A〜C, R01）と `reactive_lines`（H01〜H28）、ブリーフィング B01〜B08
-- 作った日：2026-11-14
-- 料金：合計 約 $0.08（52本）
+- 台詞の出どころ：`docs/design/houston_lines.json` の `milestone_lines`（M01〜M12, ED-A〜C, R01）と `reactive_lines`（H01〜H28）、ブリーフィング B01〜B09
+- 作った日：2026-11-14（B01〜B09 は 2026-11-15 に新しい文で作り直し、#189）
+- 料金：合計 約 $0.08（53本）
 - 合計：376秒、5.3MB
 - ト書き「(pause)」は「...」にして間を空けた（ED-C）。差し込み記号を含む台詞はなかった
 
@@ -57,11 +57,12 @@
 | H26 | 4.3 | -2.5 |
 | H27 | 3.4 | -3.0 |
 | H28 | 3.4 | -6.5 |
-| B01 | 5.4 | -0.4 |
-| B02 | 3.4 | -3.7 |
-| B03 | 5.8 | -2.8 |
-| B04 | 6.2 | -2.2 |
-| B05 | 6.0 | -0.4 |
-| B06 | 6.0 | -0.4 |
-| B07 | 4.7 | -2.1 |
-| B08 | 5.4 | -4.3 |
+| B01 | 6.8 | -2.8 |
+| B02 | 5.3 | -1.9 |
+| B03 | 6.9 | -3.8 |
+| B04 | 6.6 | -2.2 |
+| B05 | 5.6 | -2.6 |
+| B06 | 6.9 | -1.8 |
+| B07 | 6.8 | -2.3 |
+| B08 | 5.7 | -2.8 |
+| B09 | 6.2 | -3.9 |
